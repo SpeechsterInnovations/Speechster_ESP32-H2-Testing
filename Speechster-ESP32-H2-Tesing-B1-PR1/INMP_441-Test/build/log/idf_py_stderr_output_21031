@@ -1,0 +1,22 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python -DESP_PLATFORM=1 -DIDF_TARGET=esp32h2 -DCCACHE_ENABLE=0 /home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test
+fatal: detected dubious ownership in repository at '/opt/esp-idf'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/esp-idf
+fatal: detected dubious ownership in repository at '/opt/esp-idf'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/esp-idf
+fatal: detected dubious ownership in repository at '/opt/esp-idf/components/openthread/openthread'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /opt/esp-idf/components/openthread/openthread
+CMake Deprecation Warning at main/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+

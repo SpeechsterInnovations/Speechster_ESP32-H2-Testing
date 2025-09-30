@@ -1,0 +1,19 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPath": "/opt/esp-idf",
+  "idf.pythonInstallPath": "/usr/bin/python3",
+  "idf.openOcdConfigs": [
+    "board/esp32h2-builtin.cfg"
+  ],
+  "idf.port": "detect",
+  "idf.toolsPath": "/opt/esp-idf/tools",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32h2"
+  },
+  "clangd.path": "/opt/esp-idf/tools/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=/home/reyaansh/Documents/Coding/Speechstee-B1-PR1-Tesing/build"
+  ]
+}

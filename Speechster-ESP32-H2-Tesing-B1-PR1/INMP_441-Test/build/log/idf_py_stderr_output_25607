@@ -1,0 +1,5 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/INMP_441-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py'
+[0;33m--- esp-idf-monitor 1.8.0 on /dev/ttyACM0 115200[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+[0m--- 0x40017bcc: [0;33m__riscv_restore_3[0m[0m in [0;32mROM[0m
+[0m

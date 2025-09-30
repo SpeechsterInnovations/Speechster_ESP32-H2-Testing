@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/CMakeFiles/bootloader
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/CMakeFiles/bootloader.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/CMakeFiles/bootloader-complete.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
