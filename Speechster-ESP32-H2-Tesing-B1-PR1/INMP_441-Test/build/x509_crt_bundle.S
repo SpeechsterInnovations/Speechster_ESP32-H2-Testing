@@ -1,4 +1,4 @@
-/* * Data converted from /home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)

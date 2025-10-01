@@ -10,18 +10,18 @@ if(NOT EXISTS "/opt/esp-idf/components/bootloader/subproject")
   file(MAKE_DIRECTORY "/opt/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader"
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix"
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/tmp"
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp"
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src"
-  "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/tmp"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src"
+  "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

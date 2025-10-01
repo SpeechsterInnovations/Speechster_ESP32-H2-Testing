@@ -37,8 +37,12 @@ $<TARGET_FILE:__idf_app_update>
 $<TARGET_FILE:__idf_esp_app_format>
 $<TARGET_FILE:__idf_esp_bootloader_format>
 $<TARGET_FILE:idf::esp_mm>
+$<TARGET_FILE:idf::esp_pm>
 $<TARGET_FILE:idf::efuse>
+$<TARGET_FILE:__idf_espcoredump>
+$<TARGET_FILE:idf::esp_app_format>
 $<TARGET_FILE:__idf_esp_gdbstub>
+$<TARGET_FILE:__idf_esp_coex>
 $<TARGET_FILE:__idf_driver>
 $<TARGET_FILE:__idf_esp_driver_pcnt>
 $<TARGET_FILE:__idf_esp_driver_gptimer>
@@ -71,8 +75,6 @@ $<TARGET_FILE:__idf_esp_https_ota>
 $<TARGET_FILE:__idf_esp_security>
 $<TARGET_FILE:__idf_pthread>
 $<TARGET_FILE:idf::esp_driver_gpio>
-$<TARGET_FILE:idf::esp_pm>
-$<TARGET_FILE:idf::esp_app_format>
 $<TARGET_FILE:idf::esp_bootloader_format>
 $<TARGET_FILE:idf::app_update>
 $<TARGET_FILE:idf::esp_partition>
@@ -102,9 +104,11 @@ $<TARGET_FILE:idf::esp_driver_usb_serial_jtag>
 $<TARGET_FILE:idf::esp_vfs_console>
 $<TARGET_FILE:idf::lwip>
 $<TARGET_FILE:idf::esp_netif>
+$<TARGET_FILE:idf::esp_coex>
 $<TARGET_FILE:idf::esp_wifi>
 $<TARGET_FILE:idf::esp_driver_spi>
 $<TARGET_FILE:idf::esp_gdbstub>
+$<TARGET_FILE:idf::bt>
 $<TARGET_FILE:idf::unity>
 $<TARGET_FILE:idf::cmock>
 $<TARGET_FILE:__idf_unity>
@@ -129,6 +133,7 @@ $<TARGET_FILE:idf::esp_adc>
 $<TARGET_FILE:idf::esp_driver_cam>
 $<TARGET_FILE:idf::esp_eth>
 $<TARGET_FILE:idf::esp_hid>
+$<TARGET_FILE:__idf_bt>
 $<TARGET_FILE:idf::tcp_transport>
 $<TARGET_FILE:idf::esp_http_client>
 $<TARGET_FILE:idf::esp_http_server>

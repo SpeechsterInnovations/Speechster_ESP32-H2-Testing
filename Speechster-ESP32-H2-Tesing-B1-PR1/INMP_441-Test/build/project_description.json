@@ -1,13 +1,13 @@
 {
     "version":            "1.2",
     "project_name":       "INMP_441-Test",
-    "project_version":    "3d9832c-dirty",
-    "project_path":       "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test",
+    "project_version":    "f4ae61a-dirty",
+    "project_path":       "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test",
     "idf_path":           "/opt/esp-idf",
-    "build_dir":          "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build",
-    "config_file":        "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/sdkconfig",
+    "build_dir":          "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build",
+    "config_file":        "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/sdkconfig",
     "config_defaults":    "",
-    "bootloader_elf":     "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader/bootloader.elf",
+    "bootloader_elf":     "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader/bootloader.elf",
     "app_elf":            "INMP_441-Test.elf",
     "app_bin":            "INMP_441-Test.bin",
     "build_type":         "flash_app",
@@ -22,11 +22,11 @@
     "c_compiler":         "/home/reyaansh/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
     "config_environment" : {
         "COMPONENT_KCONFIGS" : "/opt/esp-idf/components/app_trace/Kconfig;/opt/esp-idf/components/bt/Kconfig;/opt/esp-idf/components/console/Kconfig;/opt/esp-idf/components/driver/Kconfig;/opt/esp-idf/components/efuse/Kconfig;/opt/esp-idf/components/esp-tls/Kconfig;/opt/esp-idf/components/esp_adc/Kconfig;/opt/esp-idf/components/esp_coex/Kconfig;/opt/esp-idf/components/esp_common/Kconfig;/opt/esp-idf/components/esp_driver_ana_cmpr/Kconfig;/opt/esp-idf/components/esp_driver_bitscrambler/Kconfig;/opt/esp-idf/components/esp_driver_cam/Kconfig;/opt/esp-idf/components/esp_driver_dac/Kconfig;/opt/esp-idf/components/esp_driver_gpio/Kconfig;/opt/esp-idf/components/esp_driver_gptimer/Kconfig;/opt/esp-idf/components/esp_driver_i2c/Kconfig;/opt/esp-idf/components/esp_driver_i2s/Kconfig;/opt/esp-idf/components/esp_driver_isp/Kconfig;/opt/esp-idf/components/esp_driver_jpeg/Kconfig;/opt/esp-idf/components/esp_driver_ledc/Kconfig;/opt/esp-idf/components/esp_driver_mcpwm/Kconfig;/opt/esp-idf/components/esp_driver_parlio/Kconfig;/opt/esp-idf/components/esp_driver_pcnt/Kconfig;/opt/esp-idf/components/esp_driver_rmt/Kconfig;/opt/esp-idf/components/esp_driver_sdm/Kconfig;/opt/esp-idf/components/esp_driver_spi/Kconfig;/opt/esp-idf/components/esp_driver_touch_sens/Kconfig;/opt/esp-idf/components/esp_driver_tsens/Kconfig;/opt/esp-idf/components/esp_driver_twai/Kconfig;/opt/esp-idf/components/esp_driver_uart/Kconfig;/opt/esp-idf/components/esp_driver_usb_serial_jtag/Kconfig;/opt/esp-idf/components/esp_eth/Kconfig;/opt/esp-idf/components/esp_event/Kconfig;/opt/esp-idf/components/esp_gdbstub/Kconfig;/opt/esp-idf/components/esp_hid/Kconfig;/opt/esp-idf/components/esp_http_client/Kconfig;/opt/esp-idf/components/esp_http_server/Kconfig;/opt/esp-idf/components/esp_https_ota/Kconfig;/opt/esp-idf/components/esp_https_server/Kconfig;/opt/esp-idf/components/esp_hw_support/Kconfig;/opt/esp-idf/components/esp_lcd/Kconfig;/opt/esp-idf/components/esp_mm/Kconfig;/opt/esp-idf/components/esp_netif/Kconfig;/opt/esp-idf/components/esp_partition/Kconfig;/opt/esp-idf/components/esp_phy/Kconfig;/opt/esp-idf/components/esp_pm/Kconfig;/opt/esp-idf/components/esp_psram/Kconfig;/opt/esp-idf/components/esp_ringbuf/Kconfig;/opt/esp-idf/components/esp_rom/Kconfig;/opt/esp-idf/components/esp_security/Kconfig;/opt/esp-idf/components/esp_system/Kconfig;/opt/esp-idf/components/esp_timer/Kconfig;/opt/esp-idf/components/esp_wifi/Kconfig;/opt/esp-idf/components/espcoredump/Kconfig;/opt/esp-idf/components/fatfs/Kconfig;/opt/esp-idf/components/freertos/Kconfig;/opt/esp-idf/components/hal/Kconfig;/opt/esp-idf/components/heap/Kconfig;/opt/esp-idf/components/ieee802154/Kconfig;/opt/esp-idf/components/log/Kconfig;/opt/esp-idf/components/lwip/Kconfig;/opt/esp-idf/components/mbedtls/Kconfig;/opt/esp-idf/components/mqtt/esp-mqtt/Kconfig;/opt/esp-idf/components/newlib/Kconfig;/opt/esp-idf/components/nvs_flash/Kconfig;/opt/esp-idf/components/nvs_sec_provider/Kconfig;/opt/esp-idf/components/openthread/Kconfig;/opt/esp-idf/components/protocomm/Kconfig;/opt/esp-idf/components/pthread/Kconfig;/opt/esp-idf/components/soc/Kconfig;/opt/esp-idf/components/spi_flash/Kconfig;/opt/esp-idf/components/spiffs/Kconfig;/opt/esp-idf/components/tcp_transport/Kconfig;/opt/esp-idf/components/ulp/Kconfig;/opt/esp-idf/components/unity/Kconfig;/opt/esp-idf/components/usb/Kconfig;/opt/esp-idf/components/vfs/Kconfig;/opt/esp-idf/components/wear_levelling/Kconfig;/opt/esp-idf/components/wifi_provisioning/Kconfig",
-        "COMPONENT_KCONFIGS_PROJBUILD" : "/opt/esp-idf/components/bootloader/Kconfig.projbuild;/opt/esp-idf/components/esp_app_format/Kconfig.projbuild;/opt/esp-idf/components/esp_rom/Kconfig.projbuild;/opt/esp-idf/components/esp_tee/Kconfig.projbuild;/opt/esp-idf/components/esptool_py/Kconfig.projbuild;/opt/esp-idf/components/partition_table/Kconfig.projbuild"
+        "COMPONENT_KCONFIGS_PROJBUILD" : "/opt/esp-idf/components/bootloader/Kconfig.projbuild;/opt/esp-idf/components/esp_app_format/Kconfig.projbuild;/opt/esp-idf/components/esp_rom/Kconfig.projbuild;/opt/esp-idf/components/esp_tee/Kconfig.projbuild;/opt/esp-idf/components/esptool_py/Kconfig.projbuild;/opt/esp-idf/components/partition_table/Kconfig.projbuild;/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main/Kconfig.projbuild"
     },
     "common_component_reqs": [ "cxx", "newlib", "freertos", "esp_hw_support", "heap", "log", "soc", "hal", "esp_rom", "esp_common", "esp_system", "riscv" ],
     "build_components" : [ "app_trace", "app_update", "bootloader", "bootloader_support", "bt", "cmock", "console", "cxx", "driver", "efuse", "esp-tls", "esp_adc", "esp_app_format", "esp_bootloader_format", "esp_coex", "esp_common", "esp_driver_ana_cmpr", "esp_driver_bitscrambler", "esp_driver_cam", "esp_driver_dac", "esp_driver_gpio", "esp_driver_gptimer", "esp_driver_i2c", "esp_driver_i2s", "esp_driver_isp", "esp_driver_jpeg", "esp_driver_ledc", "esp_driver_mcpwm", "esp_driver_parlio", "esp_driver_pcnt", "esp_driver_ppa", "esp_driver_rmt", "esp_driver_sdio", "esp_driver_sdm", "esp_driver_sdmmc", "esp_driver_sdspi", "esp_driver_spi", "esp_driver_touch_sens", "esp_driver_tsens", "esp_driver_twai", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_eth", "esp_event", "esp_gdbstub", "esp_hid", "esp_http_client", "esp_http_server", "esp_https_ota", "esp_https_server", "esp_hw_support", "esp_lcd", "esp_local_ctrl", "esp_mm", "esp_netif", "esp_netif_stack", "esp_partition", "esp_phy", "esp_pm", "esp_psram", "esp_ringbuf", "esp_rom", "esp_security", "esp_system", "esp_tee", "esp_timer", "esp_vfs_console", "esp_wifi", "espcoredump", "esptool_py", "fatfs", "freertos", "hal", "heap", "http_parser", "idf_test", "ieee802154", "json", "log", "lwip", "main", "mbedtls", "mqtt", "newlib", "nvs_flash", "nvs_sec_provider", "openthread", "partition_table", "protobuf-c", "protocomm", "pthread", "riscv", "rt", "sdmmc", "soc", "spi_flash", "spiffs", "tcp_transport", "ulp", "unity", "usb", "vfs", "wear_levelling", "wifi_provisioning", "wpa_supplicant", "" ],
-    "build_component_paths" : [ "/opt/esp-idf/components/app_trace", "/opt/esp-idf/components/app_update", "/opt/esp-idf/components/bootloader", "/opt/esp-idf/components/bootloader_support", "/opt/esp-idf/components/bt", "/opt/esp-idf/components/cmock", "/opt/esp-idf/components/console", "/opt/esp-idf/components/cxx", "/opt/esp-idf/components/driver", "/opt/esp-idf/components/efuse", "/opt/esp-idf/components/esp-tls", "/opt/esp-idf/components/esp_adc", "/opt/esp-idf/components/esp_app_format", "/opt/esp-idf/components/esp_bootloader_format", "/opt/esp-idf/components/esp_coex", "/opt/esp-idf/components/esp_common", "/opt/esp-idf/components/esp_driver_ana_cmpr", "/opt/esp-idf/components/esp_driver_bitscrambler", "/opt/esp-idf/components/esp_driver_cam", "/opt/esp-idf/components/esp_driver_dac", "/opt/esp-idf/components/esp_driver_gpio", "/opt/esp-idf/components/esp_driver_gptimer", "/opt/esp-idf/components/esp_driver_i2c", "/opt/esp-idf/components/esp_driver_i2s", "/opt/esp-idf/components/esp_driver_isp", "/opt/esp-idf/components/esp_driver_jpeg", "/opt/esp-idf/components/esp_driver_ledc", "/opt/esp-idf/components/esp_driver_mcpwm", "/opt/esp-idf/components/esp_driver_parlio", "/opt/esp-idf/components/esp_driver_pcnt", "/opt/esp-idf/components/esp_driver_ppa", "/opt/esp-idf/components/esp_driver_rmt", "/opt/esp-idf/components/esp_driver_sdio", "/opt/esp-idf/components/esp_driver_sdm", "/opt/esp-idf/components/esp_driver_sdmmc", "/opt/esp-idf/components/esp_driver_sdspi", "/opt/esp-idf/components/esp_driver_spi", "/opt/esp-idf/components/esp_driver_touch_sens", "/opt/esp-idf/components/esp_driver_tsens", "/opt/esp-idf/components/esp_driver_twai", "/opt/esp-idf/components/esp_driver_uart", "/opt/esp-idf/components/esp_driver_usb_serial_jtag", "/opt/esp-idf/components/esp_eth", "/opt/esp-idf/components/esp_event", "/opt/esp-idf/components/esp_gdbstub", "/opt/esp-idf/components/esp_hid", "/opt/esp-idf/components/esp_http_client", "/opt/esp-idf/components/esp_http_server", "/opt/esp-idf/components/esp_https_ota", "/opt/esp-idf/components/esp_https_server", "/opt/esp-idf/components/esp_hw_support", "/opt/esp-idf/components/esp_lcd", "/opt/esp-idf/components/esp_local_ctrl", "/opt/esp-idf/components/esp_mm", "/opt/esp-idf/components/esp_netif", "/opt/esp-idf/components/esp_netif_stack", "/opt/esp-idf/components/esp_partition", "/opt/esp-idf/components/esp_phy", "/opt/esp-idf/components/esp_pm", "/opt/esp-idf/components/esp_psram", "/opt/esp-idf/components/esp_ringbuf", "/opt/esp-idf/components/esp_rom", "/opt/esp-idf/components/esp_security", "/opt/esp-idf/components/esp_system", "/opt/esp-idf/components/esp_tee", "/opt/esp-idf/components/esp_timer", "/opt/esp-idf/components/esp_vfs_console", "/opt/esp-idf/components/esp_wifi", "/opt/esp-idf/components/espcoredump", "/opt/esp-idf/components/esptool_py", "/opt/esp-idf/components/fatfs", "/opt/esp-idf/components/freertos", "/opt/esp-idf/components/hal", "/opt/esp-idf/components/heap", "/opt/esp-idf/components/http_parser", "/opt/esp-idf/components/idf_test", "/opt/esp-idf/components/ieee802154", "/opt/esp-idf/components/json", "/opt/esp-idf/components/log", "/opt/esp-idf/components/lwip", "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main", "/opt/esp-idf/components/mbedtls", "/opt/esp-idf/components/mqtt", "/opt/esp-idf/components/newlib", "/opt/esp-idf/components/nvs_flash", "/opt/esp-idf/components/nvs_sec_provider", "/opt/esp-idf/components/openthread", "/opt/esp-idf/components/partition_table", "/opt/esp-idf/components/protobuf-c", "/opt/esp-idf/components/protocomm", "/opt/esp-idf/components/pthread", "/opt/esp-idf/components/riscv", "/opt/esp-idf/components/rt", "/opt/esp-idf/components/sdmmc", "/opt/esp-idf/components/soc", "/opt/esp-idf/components/spi_flash", "/opt/esp-idf/components/spiffs", "/opt/esp-idf/components/tcp_transport", "/opt/esp-idf/components/ulp", "/opt/esp-idf/components/unity", "/opt/esp-idf/components/usb", "/opt/esp-idf/components/vfs", "/opt/esp-idf/components/wear_levelling", "/opt/esp-idf/components/wifi_provisioning", "/opt/esp-idf/components/wpa_supplicant", "" ],
+    "build_component_paths" : [ "/opt/esp-idf/components/app_trace", "/opt/esp-idf/components/app_update", "/opt/esp-idf/components/bootloader", "/opt/esp-idf/components/bootloader_support", "/opt/esp-idf/components/bt", "/opt/esp-idf/components/cmock", "/opt/esp-idf/components/console", "/opt/esp-idf/components/cxx", "/opt/esp-idf/components/driver", "/opt/esp-idf/components/efuse", "/opt/esp-idf/components/esp-tls", "/opt/esp-idf/components/esp_adc", "/opt/esp-idf/components/esp_app_format", "/opt/esp-idf/components/esp_bootloader_format", "/opt/esp-idf/components/esp_coex", "/opt/esp-idf/components/esp_common", "/opt/esp-idf/components/esp_driver_ana_cmpr", "/opt/esp-idf/components/esp_driver_bitscrambler", "/opt/esp-idf/components/esp_driver_cam", "/opt/esp-idf/components/esp_driver_dac", "/opt/esp-idf/components/esp_driver_gpio", "/opt/esp-idf/components/esp_driver_gptimer", "/opt/esp-idf/components/esp_driver_i2c", "/opt/esp-idf/components/esp_driver_i2s", "/opt/esp-idf/components/esp_driver_isp", "/opt/esp-idf/components/esp_driver_jpeg", "/opt/esp-idf/components/esp_driver_ledc", "/opt/esp-idf/components/esp_driver_mcpwm", "/opt/esp-idf/components/esp_driver_parlio", "/opt/esp-idf/components/esp_driver_pcnt", "/opt/esp-idf/components/esp_driver_ppa", "/opt/esp-idf/components/esp_driver_rmt", "/opt/esp-idf/components/esp_driver_sdio", "/opt/esp-idf/components/esp_driver_sdm", "/opt/esp-idf/components/esp_driver_sdmmc", "/opt/esp-idf/components/esp_driver_sdspi", "/opt/esp-idf/components/esp_driver_spi", "/opt/esp-idf/components/esp_driver_touch_sens", "/opt/esp-idf/components/esp_driver_tsens", "/opt/esp-idf/components/esp_driver_twai", "/opt/esp-idf/components/esp_driver_uart", "/opt/esp-idf/components/esp_driver_usb_serial_jtag", "/opt/esp-idf/components/esp_eth", "/opt/esp-idf/components/esp_event", "/opt/esp-idf/components/esp_gdbstub", "/opt/esp-idf/components/esp_hid", "/opt/esp-idf/components/esp_http_client", "/opt/esp-idf/components/esp_http_server", "/opt/esp-idf/components/esp_https_ota", "/opt/esp-idf/components/esp_https_server", "/opt/esp-idf/components/esp_hw_support", "/opt/esp-idf/components/esp_lcd", "/opt/esp-idf/components/esp_local_ctrl", "/opt/esp-idf/components/esp_mm", "/opt/esp-idf/components/esp_netif", "/opt/esp-idf/components/esp_netif_stack", "/opt/esp-idf/components/esp_partition", "/opt/esp-idf/components/esp_phy", "/opt/esp-idf/components/esp_pm", "/opt/esp-idf/components/esp_psram", "/opt/esp-idf/components/esp_ringbuf", "/opt/esp-idf/components/esp_rom", "/opt/esp-idf/components/esp_security", "/opt/esp-idf/components/esp_system", "/opt/esp-idf/components/esp_tee", "/opt/esp-idf/components/esp_timer", "/opt/esp-idf/components/esp_vfs_console", "/opt/esp-idf/components/esp_wifi", "/opt/esp-idf/components/espcoredump", "/opt/esp-idf/components/esptool_py", "/opt/esp-idf/components/fatfs", "/opt/esp-idf/components/freertos", "/opt/esp-idf/components/hal", "/opt/esp-idf/components/heap", "/opt/esp-idf/components/http_parser", "/opt/esp-idf/components/idf_test", "/opt/esp-idf/components/ieee802154", "/opt/esp-idf/components/json", "/opt/esp-idf/components/log", "/opt/esp-idf/components/lwip", "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main", "/opt/esp-idf/components/mbedtls", "/opt/esp-idf/components/mqtt", "/opt/esp-idf/components/newlib", "/opt/esp-idf/components/nvs_flash", "/opt/esp-idf/components/nvs_sec_provider", "/opt/esp-idf/components/openthread", "/opt/esp-idf/components/partition_table", "/opt/esp-idf/components/protobuf-c", "/opt/esp-idf/components/protocomm", "/opt/esp-idf/components/pthread", "/opt/esp-idf/components/riscv", "/opt/esp-idf/components/rt", "/opt/esp-idf/components/sdmmc", "/opt/esp-idf/components/soc", "/opt/esp-idf/components/spi_flash", "/opt/esp-idf/components/spiffs", "/opt/esp-idf/components/tcp_transport", "/opt/esp-idf/components/ulp", "/opt/esp-idf/components/unity", "/opt/esp-idf/components/usb", "/opt/esp-idf/components/vfs", "/opt/esp-idf/components/wear_levelling", "/opt/esp-idf/components/wifi_provisioning", "/opt/esp-idf/components/wpa_supplicant", "" ],
     "build_component_info" : {
         "app_trace": {
             "alias": "idf::app_trace",
@@ -39,7 +39,7 @@
             "priv_reqs": [ "esp_driver_gptimer", "esp_driver_gpio", "esp_driver_uart" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/app_trace/libapp_trace.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/app_trace/libapp_trace.a",
             "sources": [ "/opt/esp-idf/components/app_trace/app_trace.c", "/opt/esp-idf/components/app_trace/app_trace_util.c", "/opt/esp-idf/components/app_trace/host_file_io.c", "/opt/esp-idf/components/app_trace/port/port_uart.c" ],
             "include_dirs": [ "include" ]
         },
@@ -54,7 +54,7 @@
             "priv_reqs": [ "esptool_py", "efuse", "spi_flash" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/app_update/libapp_update.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/app_update/libapp_update.a",
             "sources": [ "/opt/esp-idf/components/app_update/esp_ota_ops.c", "/opt/esp-idf/components/app_update/esp_ota_app_desc.c" ],
             "include_dirs": [ "include" ]
         },
@@ -84,7 +84,7 @@
             "priv_reqs": [ "spi_flash", "mbedtls", "efuse", "heap", "esp_bootloader_format", "esp_app_format" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/bootloader_support/libbootloader_support.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/bootloader_support/libbootloader_support.a",
             "sources": [ "/opt/esp-idf/components/bootloader_support/src/bootloader_common.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_common_loader.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_clock_init.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_mem.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_random.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_efuse.c", "/opt/esp-idf/components/bootloader_support/src/flash_encrypt.c", "/opt/esp-idf/components/bootloader_support/src/secure_boot.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_random_esp32h2.c", "/opt/esp-idf/components/bootloader_support/bootloader_flash/src/bootloader_flash.c", "/opt/esp-idf/components/bootloader_support/bootloader_flash/src/flash_qio_mode.c", "/opt/esp-idf/components/bootloader_support/bootloader_flash/src/bootloader_flash_config_esp32h2.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_utility.c", "/opt/esp-idf/components/bootloader_support/src/flash_partitions.c", "/opt/esp-idf/components/bootloader_support/src/esp_image_format.c", "/opt/esp-idf/components/bootloader_support/src/bootloader_sha.c", "/opt/esp-idf/components/bootloader_support/src/esp32h2/secure_boot_secure_features.c" ],
             "include_dirs": [ "include", "bootloader_flash/include" ]
         },
@@ -93,15 +93,15 @@
             "target": "___idf_bt",
             "prefix": "idf",
             "dir": "/opt/esp-idf/components/bt",
-            "type": "CONFIG_ONLY",
+            "type": "LIBRARY",
             "lib": "__idf_bt",
             "reqs": [ "esp_timer", "esp_wifi" ],
             "priv_reqs": [ "nvs_flash", "soc", "esp_pm", "esp_phy", "esp_coex", "mbedtls", "esp_driver_uart", "vfs", "esp_ringbuf", "esp_driver_spi", "esp_driver_gpio", "esp_gdbstub" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "",
-            "sources": [],
-            "include_dirs": []
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/bt/libbt.a",
+            "sources": [ "/opt/esp-idf/components/bt/controller/esp32h2/bt.c", "/opt/esp-idf/components/bt/controller/esp32h2/ble.c", "/opt/esp-idf/components/bt/common/btc/core/btc_alarm.c", "/opt/esp-idf/components/bt/common/api/esp_blufi_api.c", "/opt/esp-idf/components/bt/common/hci_log/bt_hci_log.c", "/opt/esp-idf/components/bt/common/btc/core/btc_manage.c", "/opt/esp-idf/components/bt/common/btc/core/btc_task.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/blufi_prf.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/blufi_protocol.c", "/opt/esp-idf/components/bt/common/osi/alarm.c", "/opt/esp-idf/components/bt/common/osi/allocator.c", "/opt/esp-idf/components/bt/common/osi/buffer.c", "/opt/esp-idf/components/bt/common/osi/config.c", "/opt/esp-idf/components/bt/common/osi/fixed_queue.c", "/opt/esp-idf/components/bt/common/osi/pkt_queue.c", "/opt/esp-idf/components/bt/common/osi/fixed_pkt_queue.c", "/opt/esp-idf/components/bt/common/osi/future.c", "/opt/esp-idf/components/bt/common/osi/hash_functions.c", "/opt/esp-idf/components/bt/common/osi/hash_map.c", "/opt/esp-idf/components/bt/common/osi/list.c", "/opt/esp-idf/components/bt/common/osi/mutex.c", "/opt/esp-idf/components/bt/common/osi/thread.c", "/opt/esp-idf/components/bt/common/osi/osi.c", "/opt/esp-idf/components/bt/common/osi/semaphore.c", "/opt/esp-idf/components/bt/porting/mem/bt_osi_mem.c", "/opt/esp-idf/components/bt/common/ble_log/ble_log_spi_out.c", "/opt/esp-idf/components/bt/common/ble_log/ble_log_uhci_out.c", "/opt/esp-idf/components/bt/porting/npl/freertos/src/npl_os_freertos.c", "/opt/esp-idf/components/bt/porting/mem/os_msys_init.c", "/opt/esp-idf/components/bt/porting/transport/src/hci_transport.c", "/opt/esp-idf/components/bt/porting/transport/driver/vhci/hci_driver_nimble.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/transport/esp_ipc/src/hci_esp_ipc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/transport/src/transport.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/util/src/addr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/gatt/src/ble_svc_gatt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/tps/src/ble_svc_tps.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ias/src/ble_svc_ias.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ipss/src/ble_svc_ipss.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ans/src/ble_svc_ans.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/hr/src/ble_svc_hr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/htp/src/ble_svc_htp.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/gap/src/ble_svc_gap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/bas/src/ble_svc_bas.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/dis/src/ble_svc_dis.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/lls/src/ble_svc_lls.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/prox/src/ble_svc_prox.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/cts/src/ble_svc_cts.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/hid/src/ble_svc_hid.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/sps/src/ble_svc_sps.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/cte/src/ble_svc_cte.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_conn.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_store_util.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_shutdown.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_sig_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_id.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_svr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gatts_lcl.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_ibeacon.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_atomic.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_alg.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_stop.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_evt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_mqueue.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_periodic_sync.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_ead.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_aes_ccm.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_store.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_lgcy.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_cfg.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_clt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_coc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_mbuf.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_log.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_eddystone.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_startup.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_sig.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_uuid.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_pvcy.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_flow.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_sc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_misc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gatts.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_adv.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_util.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_resolv.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/ram/src/ble_store_ram.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/config/src/ble_store_config.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/config/src/ble_store_nvs.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc_cache.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc_cache_conn.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_eatt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/porting/nimble/src/nimble_port.c", "/opt/esp-idf/components/bt/host/nimble/nimble/porting/npl/freertos/src/nimble_port_freertos.c", "/opt/esp-idf/components/bt/host/nimble/port/src/nvs_port.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/nimble_host/esp_blufi.c" ],
+            "include_dirs": [ "include/esp32h2/include", "common/osi/include", "common/api/include/api", "common/btc/profile/esp/blufi/include", "common/btc/profile/esp/include", "common/hci_log/include", "common/ble_log/include", "porting/include", "porting/npl/freertos/include", "porting/transport/include", "host/nimble/nimble/nimble/host/include", "host/nimble/nimble/nimble/include", "host/nimble/nimble/nimble/host/services/ans/include", "host/nimble/nimble/nimble/host/services/bas/include", "host/nimble/nimble/nimble/host/services/dis/include", "host/nimble/nimble/nimble/host/services/gap/include", "host/nimble/nimble/nimble/host/services/gatt/include", "host/nimble/nimble/nimble/host/services/hr/include", "host/nimble/nimble/nimble/host/services/htp/include", "host/nimble/nimble/nimble/host/services/ias/include", "host/nimble/nimble/nimble/host/services/ipss/include", "host/nimble/nimble/nimble/host/services/lls/include", "host/nimble/nimble/nimble/host/services/prox/include", "host/nimble/nimble/nimble/host/services/cts/include", "host/nimble/nimble/nimble/host/services/tps/include", "host/nimble/nimble/nimble/host/services/hid/include", "host/nimble/nimble/nimble/host/services/sps/include", "host/nimble/nimble/nimble/host/services/cte/include", "host/nimble/nimble/nimble/host/util/include", "host/nimble/nimble/nimble/host/store/ram/include", "host/nimble/nimble/nimble/host/store/config/include", "host/nimble/nimble/porting/nimble/include", "host/nimble/port/include", "host/nimble/nimble/nimble/transport/include", "host/nimble/nimble/nimble/include" ]
         },
         "cmock": {
             "alias": "idf::cmock",
@@ -114,7 +114,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/cmock/libcmock.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/cmock/libcmock.a",
             "sources": [ "/opt/esp-idf/components/cmock/CMock/src/cmock.c" ],
             "include_dirs": [ "CMock/src" ]
         },
@@ -129,7 +129,7 @@
             "priv_reqs": [ "esp_driver_uart", "esp_driver_usb_serial_jtag" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/console/libconsole.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/console/libconsole.a",
             "sources": [ "/opt/esp-idf/components/console/commands.c", "/opt/esp-idf/components/console/esp_console_common.c", "/opt/esp-idf/components/console/esp_console_repl_internal.c", "/opt/esp-idf/components/console/split_argv.c", "/opt/esp-idf/components/console/linenoise/linenoise.c", "/opt/esp-idf/components/console/esp_console_repl_chip.c", "/opt/esp-idf/components/console/argtable3/arg_cmd.c", "/opt/esp-idf/components/console/argtable3/arg_date.c", "/opt/esp-idf/components/console/argtable3/arg_dbl.c", "/opt/esp-idf/components/console/argtable3/arg_dstr.c", "/opt/esp-idf/components/console/argtable3/arg_end.c", "/opt/esp-idf/components/console/argtable3/arg_file.c", "/opt/esp-idf/components/console/argtable3/arg_hashtable.c", "/opt/esp-idf/components/console/argtable3/arg_int.c", "/opt/esp-idf/components/console/argtable3/arg_lit.c", "/opt/esp-idf/components/console/argtable3/arg_rem.c", "/opt/esp-idf/components/console/argtable3/arg_rex.c", "/opt/esp-idf/components/console/argtable3/arg_str.c", "/opt/esp-idf/components/console/argtable3/arg_utils.c", "/opt/esp-idf/components/console/argtable3/argtable3.c" ],
             "include_dirs": [ "/opt/esp-idf/components/console" ]
         },
@@ -144,7 +144,7 @@
             "priv_reqs": [ "esp_system", "pthread" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/cxx/libcxx.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/cxx/libcxx.a",
             "sources": [ "/opt/esp-idf/components/cxx/cxx_exception_stubs.cpp", "/opt/esp-idf/components/cxx/cxx_guards.cpp", "/opt/esp-idf/components/cxx/cxx_init.cpp" ],
             "include_dirs": []
         },
@@ -159,7 +159,7 @@
             "priv_reqs": [ "efuse", "esp_timer", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/driver/libdriver.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/driver/libdriver.a",
             "sources": [ "/opt/esp-idf/components/driver/deprecated/adc_legacy.c", "/opt/esp-idf/components/driver/deprecated/adc_dma_legacy.c", "/opt/esp-idf/components/driver/deprecated/timer_legacy.c", "/opt/esp-idf/components/driver/i2c/i2c.c", "/opt/esp-idf/components/driver/deprecated/i2s_legacy.c", "/opt/esp-idf/components/driver/deprecated/mcpwm_legacy.c", "/opt/esp-idf/components/driver/deprecated/pcnt_legacy.c", "/opt/esp-idf/components/driver/deprecated/rmt_legacy.c", "/opt/esp-idf/components/driver/deprecated/sigma_delta_legacy.c", "/opt/esp-idf/components/driver/deprecated/rtc_temperature_legacy.c", "/opt/esp-idf/components/driver/twai/twai.c" ],
             "include_dirs": [ "deprecated", "i2c/include", "touch_sensor/include", "twai/include" ]
         },
@@ -174,7 +174,7 @@
             "priv_reqs": [ "bootloader_support", "soc", "spi_flash", "esp_system", "esp_partition", "esp_app_format" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/efuse/libefuse.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/efuse/libefuse.a",
             "sources": [ "/opt/esp-idf/components/efuse/esp32h2/esp_efuse_table.c", "/opt/esp-idf/components/efuse/esp32h2/esp_efuse_table_v0.0_v1.1.c", "/opt/esp-idf/components/efuse/esp32h2/esp_efuse_fields.c", "/opt/esp-idf/components/efuse/esp32h2/esp_efuse_rtc_calib.c", "/opt/esp-idf/components/efuse/esp32h2/esp_efuse_utility.c", "/opt/esp-idf/components/efuse/src/esp_efuse_api.c", "/opt/esp-idf/components/efuse/src/esp_efuse_fields.c", "/opt/esp-idf/components/efuse/src/esp_efuse_utility.c", "/opt/esp-idf/components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c", "/opt/esp-idf/components/efuse/src/esp_efuse_startup.c" ],
             "include_dirs": [ "include", "esp32h2/include" ]
         },
@@ -189,7 +189,7 @@
             "priv_reqs": [ "http_parser", "esp_timer", "lwip" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp-tls/libesp-tls.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp-tls/libesp-tls.a",
             "sources": [ "/opt/esp-idf/components/esp-tls/esp_tls.c", "/opt/esp-idf/components/esp-tls/esp-tls-crypto/esp_tls_crypto.c", "/opt/esp-idf/components/esp-tls/esp_tls_error_capture.c", "/opt/esp-idf/components/esp-tls/esp_tls_platform_port.c", "/opt/esp-idf/components/esp-tls/esp_tls_mbedtls.c" ],
             "include_dirs": [ "/opt/esp-idf/components/esp-tls", "esp-tls-crypto" ]
         },
@@ -204,7 +204,7 @@
             "priv_reqs": [ "esp_driver_gpio", "efuse", "esp_pm", "esp_ringbuf", "esp_mm", "driver" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_adc/libesp_adc.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_adc/libesp_adc.a",
             "sources": [ "/opt/esp-idf/components/esp_adc/adc_oneshot.c", "/opt/esp-idf/components/esp_adc/adc_common.c", "/opt/esp-idf/components/esp_adc/adc_cali.c", "/opt/esp-idf/components/esp_adc/adc_cali_curve_fitting.c", "/opt/esp-idf/components/esp_adc/deprecated/esp_adc_cal_common_legacy.c", "/opt/esp-idf/components/esp_adc/adc_continuous.c", "/opt/esp-idf/components/esp_adc/adc_monitor.c", "/opt/esp-idf/components/esp_adc/gdma/adc_dma.c", "/opt/esp-idf/components/esp_adc/adc_filter.c", "/opt/esp-idf/components/esp_adc/esp32h2/curve_fitting_coefficients.c" ],
             "include_dirs": [ "include", "interface", "esp32h2/include", "deprecated/include" ]
         },
@@ -219,7 +219,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_app_format/libesp_app_format.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_app_format/libesp_app_format.a",
             "sources": [ "/opt/esp-idf/components/esp_app_format/esp_app_desc.c" ],
             "include_dirs": [ "include" ]
         },
@@ -234,7 +234,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_bootloader_format/libesp_bootloader_format.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_bootloader_format/libesp_bootloader_format.a",
             "sources": [ "/opt/esp-idf/components/esp_bootloader_format/esp_bootloader_desc.c" ],
             "include_dirs": [ "include" ]
         },
@@ -243,14 +243,14 @@
             "target": "___idf_esp_coex",
             "prefix": "idf",
             "dir": "/opt/esp-idf/components/esp_coex",
-            "type": "CONFIG_ONLY",
+            "type": "LIBRARY",
             "lib": "__idf_esp_coex",
             "reqs": [],
             "priv_reqs": [ "esp_timer", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "",
-            "sources": [],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_coex/libesp_coex.a",
+            "sources": [ "/opt/esp-idf/components/esp_coex/src/coexist.c", "/opt/esp-idf/components/esp_coex/src/lib_printf.c", "/opt/esp-idf/components/esp_coex/esp32h2/esp_coex_adapter.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_common": {
@@ -264,7 +264,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_common/libesp_common.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_common/libesp_common.a",
             "sources": [ "/opt/esp-idf/components/esp_common/src/esp_err_to_name.c" ],
             "include_dirs": [ "include" ]
         },
@@ -279,7 +279,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_ana_cmpr/libesp_driver_ana_cmpr.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_ana_cmpr/libesp_driver_ana_cmpr.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_ana_cmpr/ana_cmpr.c" ],
             "include_dirs": [ "include" ]
         },
@@ -309,7 +309,7 @@
             "priv_reqs": [ "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_cam/libesp_driver_cam.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_cam/libesp_driver_cam.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_cam/esp_cam_ctlr.c", "/opt/esp-idf/components/esp_driver_cam/dvp_share_ctrl.c" ],
             "include_dirs": [ "include", "interface" ]
         },
@@ -339,7 +339,7 @@
             "priv_reqs": [ "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_gpio/libesp_driver_gpio.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_gpio/libesp_driver_gpio.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_gpio/src/gpio.c", "/opt/esp-idf/components/esp_driver_gpio/src/gpio_glitch_filter_ops.c", "/opt/esp-idf/components/esp_driver_gpio/src/rtc_io.c", "/opt/esp-idf/components/esp_driver_gpio/src/dedic_gpio.c", "/opt/esp-idf/components/esp_driver_gpio/src/gpio_pin_glitch_filter.c", "/opt/esp-idf/components/esp_driver_gpio/src/gpio_flex_glitch_filter.c", "/opt/esp-idf/components/esp_driver_gpio/src/gpio_etm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -354,7 +354,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_gptimer/libesp_driver_gptimer.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_gptimer/libesp_driver_gptimer.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_gptimer/src/gptimer.c", "/opt/esp-idf/components/esp_driver_gptimer/src/gptimer_common.c", "/opt/esp-idf/components/esp_driver_gptimer/src/gptimer_etm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -369,7 +369,7 @@
             "priv_reqs": [ "esp_driver_gpio", "esp_pm", "esp_ringbuf" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_i2c/libesp_driver_i2c.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_i2c/libesp_driver_i2c.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_i2c/i2c_master.c", "/opt/esp-idf/components/esp_driver_i2c/i2c_common.c", "/opt/esp-idf/components/esp_driver_i2c/i2c_slave.c" ],
             "include_dirs": [ "include" ]
         },
@@ -384,7 +384,7 @@
             "priv_reqs": [ "esp_driver_gpio", "esp_pm", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_i2s/libesp_driver_i2s.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_i2s/libesp_driver_i2s.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_i2s/i2s_common.c", "/opt/esp-idf/components/esp_driver_i2s/i2s_std.c", "/opt/esp-idf/components/esp_driver_i2s/i2s_pdm.c", "/opt/esp-idf/components/esp_driver_i2s/i2s_tdm.c", "/opt/esp-idf/components/esp_driver_i2s/i2s_etm.c", "/opt/esp-idf/components/esp_driver_i2s/i2s_platform.c" ],
             "include_dirs": [ "include" ]
         },
@@ -429,7 +429,7 @@
             "priv_reqs": [ "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_ledc/libesp_driver_ledc.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_ledc/libesp_driver_ledc.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_ledc/src/ledc.c" ],
             "include_dirs": [ "include" ]
         },
@@ -444,7 +444,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_mcpwm/libesp_driver_mcpwm.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_mcpwm/libesp_driver_mcpwm.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_cap.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_cmpr.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_com.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_fault.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_gen.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_oper.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_sync.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_timer.c", "/opt/esp-idf/components/esp_driver_mcpwm/src/mcpwm_etm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -459,7 +459,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio", "esp_mm", "esp_driver_bitscrambler" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_parlio/libesp_driver_parlio.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_parlio/libesp_driver_parlio.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_parlio/src/parlio_common.c", "/opt/esp-idf/components/esp_driver_parlio/src/parlio_tx.c", "/opt/esp-idf/components/esp_driver_parlio/src/parlio_rx.c" ],
             "include_dirs": [ "include" ]
         },
@@ -474,7 +474,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_pcnt/libesp_driver_pcnt.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_pcnt/libesp_driver_pcnt.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_pcnt/src/pulse_cnt.c" ],
             "include_dirs": [ "include" ]
         },
@@ -504,7 +504,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio", "esp_driver_bitscrambler", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_rmt/libesp_driver_rmt.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_rmt/libesp_driver_rmt.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_rmt/src/rmt_common.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_encoder.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_encoder_bytes.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_encoder_copy.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_encoder_simple.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_rx.c", "/opt/esp-idf/components/esp_driver_rmt/src/rmt_tx.c" ],
             "include_dirs": [ "include" ]
         },
@@ -534,7 +534,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_sdm/libesp_driver_sdm.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_sdm/libesp_driver_sdm.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_sdm/src/sdm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -564,7 +564,7 @@
             "priv_reqs": [ "esp_timer", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_sdspi/libesp_driver_sdspi.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_sdspi/libesp_driver_sdspi.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_sdspi/src/sdspi_crc.c", "/opt/esp-idf/components/esp_driver_sdspi/src/sdspi_host.c", "/opt/esp-idf/components/esp_driver_sdspi/src/sdspi_transaction.c" ],
             "include_dirs": [ "include" ]
         },
@@ -579,7 +579,7 @@
             "priv_reqs": [ "esp_timer", "esp_mm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_spi/libesp_driver_spi.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_spi/libesp_driver_spi.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_spi/src/gpspi/spi_common.c", "/opt/esp-idf/components/esp_driver_spi/src/gpspi/spi_master.c", "/opt/esp-idf/components/esp_driver_spi/src/gpspi/spi_slave.c", "/opt/esp-idf/components/esp_driver_spi/src/gpspi/spi_slave_hd.c" ],
             "include_dirs": [ "include" ]
         },
@@ -609,7 +609,7 @@
             "priv_reqs": [ "efuse" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_tsens/libesp_driver_tsens.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_tsens/libesp_driver_tsens.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_tsens/src/temperature_sensor.c", "/opt/esp-idf/components/esp_driver_tsens/src/temperature_sensor_etm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -624,7 +624,7 @@
             "priv_reqs": [ "esp_driver_gpio", "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_twai/libesp_driver_twai.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_twai/libesp_driver_twai.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_twai/esp_twai.c", "/opt/esp-idf/components/esp_driver_twai/esp_twai_onchip.c" ],
             "include_dirs": [ "include" ]
         },
@@ -639,7 +639,7 @@
             "priv_reqs": [ "esp_pm", "esp_driver_gpio", "esp_ringbuf", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_uart/libesp_driver_uart.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_uart/libesp_driver_uart.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_uart/src/uart.c", "/opt/esp-idf/components/esp_driver_uart/src/uart_wakeup.c", "/opt/esp-idf/components/esp_driver_uart/src/uhci.c", "/opt/esp-idf/components/esp_driver_uart/src/uart_vfs.c" ],
             "include_dirs": [ "include" ]
         },
@@ -654,7 +654,7 @@
             "priv_reqs": [ "esp_driver_gpio", "esp_ringbuf", "esp_pm", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_usb_serial_jtag/libesp_driver_usb_serial_jtag.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_usb_serial_jtag/libesp_driver_usb_serial_jtag.a",
             "sources": [ "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c", "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_connection_monitor.c", "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_vfs.c" ],
             "include_dirs": [ "include" ]
         },
@@ -669,7 +669,7 @@
             "priv_reqs": [ "log", "esp_timer", "esp_driver_spi", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_eth/libesp_eth.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_eth/libesp_eth.a",
             "sources": [ "/opt/esp-idf/components/esp_eth/src/esp_eth.c", "/opt/esp-idf/components/esp_eth/src/phy/esp_eth_phy_802_3.c", "/opt/esp-idf/components/esp_eth/src/esp_eth_netif_glue.c" ],
             "include_dirs": [ "include" ]
         },
@@ -684,7 +684,7 @@
             "priv_reqs": [ "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_event/libesp_event.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_event/libesp_event.a",
             "sources": [ "/opt/esp-idf/components/esp_event/default_event_loop.c", "/opt/esp-idf/components/esp_event/esp_event.c", "/opt/esp-idf/components/esp_event/esp_event_private.c" ],
             "include_dirs": [ "include" ]
         },
@@ -699,7 +699,7 @@
             "priv_reqs": [ "soc", "esp_rom", "esp_system" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_gdbstub/libesp_gdbstub.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_gdbstub/libesp_gdbstub.a",
             "sources": [ "/opt/esp-idf/components/esp_gdbstub/src/gdbstub.c", "/opt/esp-idf/components/esp_gdbstub/src/gdbstub_transport.c", "/opt/esp-idf/components/esp_gdbstub/src/packet.c", "/opt/esp-idf/components/esp_gdbstub/src/port/riscv/gdbstub_riscv.c", "/opt/esp-idf/components/esp_gdbstub/src/port/riscv/rv_decode.c" ],
             "include_dirs": [ "include" ]
         },
@@ -714,8 +714,8 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_hid/libesp_hid.a",
-            "sources": [ "/opt/esp-idf/components/esp_hid/src/esp_hidd.c", "/opt/esp-idf/components/esp_hid/src/esp_hidh.c", "/opt/esp-idf/components/esp_hid/src/esp_hid_common.c" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_hid/libesp_hid.a",
+            "sources": [ "/opt/esp-idf/components/esp_hid/src/esp_hidd.c", "/opt/esp-idf/components/esp_hid/src/esp_hidh.c", "/opt/esp-idf/components/esp_hid/src/esp_hid_common.c", "/opt/esp-idf/components/esp_hid/src/nimble_hidd.c", "/opt/esp-idf/components/esp_hid/src/nimble_hidh.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_http_client": {
@@ -729,7 +729,7 @@
             "priv_reqs": [ "tcp_transport", "http_parser" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_http_client/libesp_http_client.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_http_client/libesp_http_client.a",
             "sources": [ "/opt/esp-idf/components/esp_http_client/esp_http_client.c", "/opt/esp-idf/components/esp_http_client/lib/http_auth.c", "/opt/esp-idf/components/esp_http_client/lib/http_header.c", "/opt/esp-idf/components/esp_http_client/lib/http_utils.c" ],
             "include_dirs": [ "include" ]
         },
@@ -744,7 +744,7 @@
             "priv_reqs": [ "mbedtls", "lwip", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_http_server/libesp_http_server.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_http_server/libesp_http_server.a",
             "sources": [ "/opt/esp-idf/components/esp_http_server/src/httpd_main.c", "/opt/esp-idf/components/esp_http_server/src/httpd_parse.c", "/opt/esp-idf/components/esp_http_server/src/httpd_sess.c", "/opt/esp-idf/components/esp_http_server/src/httpd_txrx.c", "/opt/esp-idf/components/esp_http_server/src/httpd_uri.c", "/opt/esp-idf/components/esp_http_server/src/httpd_ws.c", "/opt/esp-idf/components/esp_http_server/src/util/ctrl_sock.c" ],
             "include_dirs": [ "include" ]
         },
@@ -759,7 +759,7 @@
             "priv_reqs": [ "log", "app_update" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_https_ota/libesp_https_ota.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_https_ota/libesp_https_ota.a",
             "sources": [ "/opt/esp-idf/components/esp_https_ota/src/esp_https_ota.c" ],
             "include_dirs": [ "include" ]
         },
@@ -774,7 +774,7 @@
             "priv_reqs": [ "lwip" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_https_server/libesp_https_server.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_https_server/libesp_https_server.a",
             "sources": [ "/opt/esp-idf/components/esp_https_server/src/https_server.c" ],
             "include_dirs": [ "include" ]
         },
@@ -789,7 +789,7 @@
             "priv_reqs": [ "efuse", "spi_flash", "bootloader_support", "esp_security", "esp_driver_gpio", "esp_timer", "esp_pm", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_hw_support/libesp_hw_support.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_hw_support/libesp_hw_support.a",
             "sources": [ "/opt/esp-idf/components/esp_hw_support/cpu.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/esp_cpu_intr.c", "/opt/esp-idf/components/esp_hw_support/esp_memory_utils.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/cpu_region_protect.c", "/opt/esp-idf/components/esp_hw_support/esp_clk.c", "/opt/esp-idf/components/esp_hw_support/clk_ctrl_os.c", "/opt/esp-idf/components/esp_hw_support/hw_random.c", "/opt/esp-idf/components/esp_hw_support/intr_alloc.c", "/opt/esp-idf/components/esp_hw_support/mac_addr.c", "/opt/esp-idf/components/esp_hw_support/periph_ctrl.c", "/opt/esp-idf/components/esp_hw_support/revision.c", "/opt/esp-idf/components/esp_hw_support/rtc_module.c", "/opt/esp-idf/components/esp_hw_support/regi2c_ctrl.c", "/opt/esp-idf/components/esp_hw_support/esp_gpio_reserve.c", "/opt/esp-idf/components/esp_hw_support/sar_periph_ctrl_common.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/io_mux.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/esp_clk_tree.c", "/opt/esp-idf/components/esp_hw_support/dma/esp_dma_utils.c", "/opt/esp-idf/components/esp_hw_support/dma/gdma_link.c", "/opt/esp-idf/components/esp_hw_support/spi_bus_lock.c", "/opt/esp-idf/components/esp_hw_support/clk_utils.c", "/opt/esp-idf/components/esp_hw_support/port/esp_clk_tree_common.c", "/opt/esp-idf/components/esp_hw_support/spi_share_hw_ctrl.c", "/opt/esp-idf/components/esp_hw_support/adc_share_hw_ctrl.c", "/opt/esp-idf/components/esp_hw_support/sleep_retention.c", "/opt/esp-idf/components/esp_hw_support/sleep_modem.c", "/opt/esp-idf/components/esp_hw_support/sleep_modes.c", "/opt/esp-idf/components/esp_hw_support/sleep_console.c", "/opt/esp-idf/components/esp_hw_support/sleep_usb.c", "/opt/esp-idf/components/esp_hw_support/sleep_gpio.c", "/opt/esp-idf/components/esp_hw_support/sleep_event.c", "/opt/esp-idf/components/esp_hw_support/sleep_system_peripheral.c", "/opt/esp-idf/components/esp_hw_support/dma/gdma.c", "/opt/esp-idf/components/esp_hw_support/deprecated/gdma_legacy.c", "/opt/esp-idf/components/esp_hw_support/dma/gdma_sleep_retention.c", "/opt/esp-idf/components/esp_hw_support/dma/gdma_etm.c", "/opt/esp-idf/components/esp_hw_support/dma/esp_async_memcpy.c", "/opt/esp-idf/components/esp_hw_support/dma/async_memcpy_gdma.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/systimer.c", "/opt/esp-idf/components/esp_hw_support/esp_etm.c", "/opt/esp-idf/components/esp_hw_support/port/pau_regdma.c", "/opt/esp-idf/components/esp_hw_support/port/regdma_link.c", "/opt/esp-idf/components/esp_hw_support/modem_clock.c", "/opt/esp-idf/components/esp_hw_support/mspi_timing_tuning/mspi_timing_tuning.c", "/opt/esp-idf/components/esp_hw_support/sleep_wake_stub.c", "/opt/esp-idf/components/esp_hw_support/esp_clock_output.c", "/opt/esp-idf/components/esp_hw_support/power_supply/brownout.c", "/opt/esp-idf/components/esp_hw_support/power_supply/vbat.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/rtc_clk_init.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/rtc_clk.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/pmu_param.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/pmu_init.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/pmu_sleep.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/rtc_time.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/chip_info.c", "/opt/esp-idf/components/esp_hw_support/port/esp32h2/sar_periph_ctrl.c", "/opt/esp-idf/components/esp_hw_support/lowpower/port/esp32h2/sleep_cpu.c", "/opt/esp-idf/components/esp_hw_support/lowpower/port/esp32h2/sleep_cpu_asm.S", "/opt/esp-idf/components/esp_hw_support/lowpower/port/esp32h2/sleep_clock.c" ],
             "include_dirs": [ "include", "include/soc", "include/soc/esp32h2", "dma/include", "ldo/include", "debug_probe/include", "mspi_timing_tuning/include", "mspi_timing_tuning/tuning_scheme_impl/include", "power_supply/include" ]
         },
@@ -804,7 +804,7 @@
             "priv_reqs": [ "esp_mm", "esp_psram", "esp_pm", "esp_driver_i2s" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_lcd/libesp_lcd.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_lcd/libesp_lcd.a",
             "sources": [ "/opt/esp-idf/components/esp_lcd/src/esp_lcd_common.c", "/opt/esp-idf/components/esp_lcd/src/esp_lcd_panel_io.c", "/opt/esp-idf/components/esp_lcd/src/esp_lcd_panel_nt35510.c", "/opt/esp-idf/components/esp_lcd/src/esp_lcd_panel_ssd1306.c", "/opt/esp-idf/components/esp_lcd/src/esp_lcd_panel_st7789.c", "/opt/esp-idf/components/esp_lcd/src/esp_lcd_panel_ops.c", "/opt/esp-idf/components/esp_lcd/i2c/esp_lcd_panel_io_i2c_v1.c", "/opt/esp-idf/components/esp_lcd/i2c/esp_lcd_panel_io_i2c_v2.c", "/opt/esp-idf/components/esp_lcd/spi/esp_lcd_panel_io_spi.c", "/opt/esp-idf/components/esp_lcd/parl/esp_lcd_panel_io_parl.c" ],
             "include_dirs": [ "include", "interface" ]
         },
@@ -819,8 +819,8 @@
             "priv_reqs": [ "protobuf-c", "esp_netif" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_local_ctrl/libesp_local_ctrl.a",
-            "sources": [ "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_handler.c", "/opt/esp-idf/components/esp_local_ctrl/proto-c/esp_local_ctrl.pb-c.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_httpd.c" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_local_ctrl/libesp_local_ctrl.a",
+            "sources": [ "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_handler.c", "/opt/esp-idf/components/esp_local_ctrl/proto-c/esp_local_ctrl.pb-c.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_ble.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_httpd.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_mm": {
@@ -834,7 +834,7 @@
             "priv_reqs": [ "heap", "spi_flash" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_mm/libesp_mm.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_mm/libesp_mm.a",
             "sources": [ "/opt/esp-idf/components/esp_mm/esp_mmu_map.c", "/opt/esp-idf/components/esp_mm/port/esp32h2/ext_mem_layout.c", "/opt/esp-idf/components/esp_mm/esp_cache_msync.c", "/opt/esp-idf/components/esp_mm/esp_cache_utils.c", "/opt/esp-idf/components/esp_mm/heap_align_hw.c" ],
             "include_dirs": [ "include" ]
         },
@@ -849,7 +849,7 @@
             "priv_reqs": [ "esp_netif_stack" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_netif/libesp_netif.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_netif/libesp_netif.a",
             "sources": [ "/opt/esp-idf/components/esp_netif/esp_netif_handlers.c", "/opt/esp-idf/components/esp_netif/esp_netif_objects.c", "/opt/esp-idf/components/esp_netif/esp_netif_defaults.c", "/opt/esp-idf/components/esp_netif/lwip/esp_netif_lwip.c", "/opt/esp-idf/components/esp_netif/lwip/esp_netif_sntp.c", "/opt/esp-idf/components/esp_netif/lwip/esp_netif_lwip_defaults.c", "/opt/esp-idf/components/esp_netif/lwip/netif/wlanif.c", "/opt/esp-idf/components/esp_netif/lwip/netif/ethernetif.c", "/opt/esp-idf/components/esp_netif/lwip/netif/esp_pbuf_ref.c" ],
             "include_dirs": [ "include" ]
         },
@@ -879,7 +879,7 @@
             "priv_reqs": [ "esp_system", "spi_flash", "partition_table", "bootloader_support", "app_update" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_partition/libesp_partition.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_partition/libesp_partition.a",
             "sources": [ "/opt/esp-idf/components/esp_partition/partition.c", "/opt/esp-idf/components/esp_partition/partition_target.c" ],
             "include_dirs": [ "include" ]
         },
@@ -894,7 +894,7 @@
             "priv_reqs": [ "nvs_flash", "esp_driver_gpio", "efuse", "esp_timer", "esp_wifi" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_phy/libesp_phy.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_phy/libesp_phy.a",
             "sources": [ "/opt/esp-idf/components/esp_phy/src/phy_override.c", "/opt/esp-idf/components/esp_phy/src/lib_printf.c", "/opt/esp-idf/components/esp_phy/src/phy_common.c", "/opt/esp-idf/components/esp_phy/src/phy_init_esp32hxx.c", "/opt/esp-idf/components/esp_phy/src/btbb_init.c" ],
             "include_dirs": [ "include", "esp32h2/include" ]
         },
@@ -909,7 +909,7 @@
             "priv_reqs": [ "esp_system", "esp_driver_gpio", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_pm/libesp_pm.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_pm/libesp_pm.a",
             "sources": [ "/opt/esp-idf/components/esp_pm/pm_locks.c", "/opt/esp-idf/components/esp_pm/pm_trace.c", "/opt/esp-idf/components/esp_pm/pm_impl.c" ],
             "include_dirs": [ "include" ]
         },
@@ -939,7 +939,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_ringbuf/libesp_ringbuf.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_ringbuf/libesp_ringbuf.a",
             "sources": [ "/opt/esp-idf/components/esp_ringbuf/ringbuf.c" ],
             "include_dirs": [ "include" ]
         },
@@ -954,7 +954,7 @@
             "priv_reqs": [ "soc", "hal" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_rom/libesp_rom.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_rom/libesp_rom.a",
             "sources": [ "/opt/esp-idf/components/esp_rom/patches/esp_rom_sys.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_print.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_crc.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_uart.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_spiflash.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_efuse.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_gpio.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_regi2c_esp32h2.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_tlsf.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_multi_heap.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_systimer.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_wdt.c", "/opt/esp-idf/components/esp_rom/patches/esp_rom_usb_serial.c" ],
             "include_dirs": [ "include", "esp32h2/include", "esp32h2/include/esp32h2", "esp32h2" ]
         },
@@ -969,7 +969,7 @@
             "priv_reqs": [ "efuse", "esp_hw_support", "esp_system", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_security/libesp_security.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_security/libesp_security.a",
             "sources": [ "/opt/esp-idf/components/esp_security/src/init.c", "/opt/esp-idf/components/esp_security/src/esp_hmac.c", "/opt/esp-idf/components/esp_security/src/esp_ds.c", "/opt/esp-idf/components/esp_security/src/esp_dpa_protection.c", "/opt/esp-idf/components/esp_security/src/esp_crypto_lock.c", "/opt/esp-idf/components/esp_security/src/esp_crypto_periph_clk.c" ],
             "include_dirs": [ "include" ]
         },
@@ -984,8 +984,8 @@
             "priv_reqs": [ "spi_flash", "esp_timer", "esp_mm", "bootloader_support", "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_system/libesp_system.a",
-            "sources": [ "/opt/esp-idf/components/esp_system/esp_err.c", "/opt/esp-idf/components/esp_system/crosscore_int.c", "/opt/esp-idf/components/esp_system/esp_ipc.c", "/opt/esp-idf/components/esp_system/esp_system_console.c", "/opt/esp-idf/components/esp_system/freertos_hooks.c", "/opt/esp-idf/components/esp_system/int_wdt.c", "/opt/esp-idf/components/esp_system/panic.c", "/opt/esp-idf/components/esp_system/esp_system.c", "/opt/esp-idf/components/esp_system/startup.c", "/opt/esp-idf/components/esp_system/startup_funcs.c", "/opt/esp-idf/components/esp_system/system_time.c", "/opt/esp-idf/components/esp_system/stack_check.c", "/opt/esp-idf/components/esp_system/ubsan.c", "/opt/esp-idf/components/esp_system/xt_wdt.c", "/opt/esp-idf/components/esp_system/task_wdt/task_wdt.c", "/opt/esp-idf/components/esp_system/task_wdt/task_wdt_impl_timergroup.c", "/opt/esp-idf/components/esp_system/systick_etm.c", "/opt/esp-idf/components/esp_system/hw_stack_guard.c", "/opt/esp-idf/components/esp_system/port/cpu_start.c", "/opt/esp-idf/components/esp_system/port/panic_handler.c", "/opt/esp-idf/components/esp_system/port/esp_system_chip.c", "/opt/esp-idf/components/esp_system/port/image_process.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/expression_with_stack.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/panic_arch.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/debug_helpers.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/debug_stubs.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/clk.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/reset_reason.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/system_internal.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/cache_err_int.c" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_system/libesp_system.a",
+            "sources": [ "/opt/esp-idf/components/esp_system/esp_err.c", "/opt/esp-idf/components/esp_system/crosscore_int.c", "/opt/esp-idf/components/esp_system/esp_ipc.c", "/opt/esp-idf/components/esp_system/esp_system_console.c", "/opt/esp-idf/components/esp_system/freertos_hooks.c", "/opt/esp-idf/components/esp_system/int_wdt.c", "/opt/esp-idf/components/esp_system/panic.c", "/opt/esp-idf/components/esp_system/esp_system.c", "/opt/esp-idf/components/esp_system/startup.c", "/opt/esp-idf/components/esp_system/startup_funcs.c", "/opt/esp-idf/components/esp_system/system_time.c", "/opt/esp-idf/components/esp_system/stack_check.c", "/opt/esp-idf/components/esp_system/ubsan.c", "/opt/esp-idf/components/esp_system/xt_wdt.c", "/opt/esp-idf/components/esp_system/task_wdt/task_wdt.c", "/opt/esp-idf/components/esp_system/task_wdt/task_wdt_impl_timergroup.c", "/opt/esp-idf/components/esp_system/fp_unwind.c", "/opt/esp-idf/components/esp_system/systick_etm.c", "/opt/esp-idf/components/esp_system/hw_stack_guard.c", "/opt/esp-idf/components/esp_system/port/cpu_start.c", "/opt/esp-idf/components/esp_system/port/panic_handler.c", "/opt/esp-idf/components/esp_system/port/esp_system_chip.c", "/opt/esp-idf/components/esp_system/port/image_process.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/expression_with_stack.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/panic_arch.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/debug_helpers.c", "/opt/esp-idf/components/esp_system/port/arch/riscv/debug_stubs.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/clk.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/reset_reason.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/system_internal.c", "/opt/esp-idf/components/esp_system/port/soc/esp32h2/cache_err_int.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_tee": {
@@ -1014,7 +1014,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_timer/libesp_timer.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_timer/libesp_timer.a",
             "sources": [ "/opt/esp-idf/components/esp_timer/src/esp_timer.c", "/opt/esp-idf/components/esp_timer/src/esp_timer_init.c", "/opt/esp-idf/components/esp_timer/src/ets_timer_legacy.c", "/opt/esp-idf/components/esp_timer/src/system_time.c", "/opt/esp-idf/components/esp_timer/src/esp_timer_impl_common.c", "/opt/esp-idf/components/esp_timer/src/esp_timer_impl_systimer.c", "/opt/esp-idf/components/esp_timer/src/esp_timer_etm.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1029,7 +1029,7 @@
             "priv_reqs": [ "vfs", "esp_driver_uart", "esp_driver_usb_serial_jtag" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_vfs_console/libesp_vfs_console.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_vfs_console/libesp_vfs_console.a",
             "sources": [ "/opt/esp-idf/components/esp_vfs_console/vfs_console.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1044,7 +1044,7 @@
             "priv_reqs": [ "esptool_py", "esp_pm", "esp_timer", "nvs_flash", "wpa_supplicant", "hal", "lwip", "esp_coex" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_wifi/libesp_wifi.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_wifi/libesp_wifi.a",
             "sources": [ "/opt/esp-idf/components/esp_wifi/src/wifi_default.c", "/opt/esp-idf/components/esp_wifi/src/wifi_netif.c", "/opt/esp-idf/components/esp_wifi/src/wifi_default_ap.c" ],
             "include_dirs": [ "include", "wifi_apps/nan_app/include" ]
         },
@@ -1059,7 +1059,7 @@
             "priv_reqs": [ "esp_partition", "spi_flash", "bootloader_support", "mbedtls", "esp_rom", "soc", "esp_system", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/espcoredump/libespcoredump.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/espcoredump/libespcoredump.a",
             "sources": [ "/opt/esp-idf/components/espcoredump/src/core_dump_init.c", "/opt/esp-idf/components/espcoredump/src/core_dump_common.c", "/opt/esp-idf/components/espcoredump/src/core_dump_flash.c", "/opt/esp-idf/components/espcoredump/src/core_dump_uart.c", "/opt/esp-idf/components/espcoredump/src/core_dump_elf.c", "/opt/esp-idf/components/espcoredump/src/core_dump_binary.c", "/opt/esp-idf/components/espcoredump/src/core_dump_sha.c", "/opt/esp-idf/components/espcoredump/src/core_dump_crc.c", "/opt/esp-idf/components/espcoredump/src/port/riscv/core_dump_port.c" ],
             "include_dirs": [ "include", "include/port/riscv" ]
         },
@@ -1089,7 +1089,7 @@
             "priv_reqs": [ "vfs", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/fatfs/libfatfs.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/fatfs/libfatfs.a",
             "sources": [ "/opt/esp-idf/components/fatfs/diskio/diskio.c", "/opt/esp-idf/components/fatfs/diskio/diskio_rawflash.c", "/opt/esp-idf/components/fatfs/diskio/diskio_wl.c", "/opt/esp-idf/components/fatfs/src/ff.c", "/opt/esp-idf/components/fatfs/src/ffunicode.c", "/opt/esp-idf/components/fatfs/port/freertos/ffsystem.c", "/opt/esp-idf/components/fatfs/diskio/diskio_sdmmc.c", "/opt/esp-idf/components/fatfs/vfs/vfs_fat.c", "/opt/esp-idf/components/fatfs/vfs/vfs_fat_sdmmc.c", "/opt/esp-idf/components/fatfs/vfs/vfs_fat_spiflash.c" ],
             "include_dirs": [ "diskio", "src", "vfs" ]
         },
@@ -1104,7 +1104,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/freertos/libfreertos.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/freertos/libfreertos.a",
             "sources": [ "/opt/esp-idf/components/freertos/heap_idf.c", "/opt/esp-idf/components/freertos/app_startup.c", "/opt/esp-idf/components/freertos/port_common.c", "/opt/esp-idf/components/freertos/port_systick.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/list.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/timers.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/event_groups.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/stream_buffer.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/port.c", "/opt/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S", "/opt/esp-idf/components/freertos/esp_additions/freertos_compatibility.c", "/opt/esp-idf/components/freertos/esp_additions/idf_additions_event_groups.c", "/opt/esp-idf/components/freertos/esp_additions/idf_additions.c" ],
             "include_dirs": [ "config/include", "config/include/freertos", "config/riscv/include", "FreeRTOS-Kernel/include", "FreeRTOS-Kernel/portable/riscv/include", "FreeRTOS-Kernel/portable/riscv/include/freertos", "esp_additions/include" ]
         },
@@ -1119,7 +1119,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/hal/libhal.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/hal/libhal.a",
             "sources": [ "/opt/esp-idf/components/hal/hal_utils.c", "/opt/esp-idf/components/hal/efuse_hal.c", "/opt/esp-idf/components/hal/esp32h2/efuse_hal.c", "/opt/esp-idf/components/hal/lp_timer_hal.c", "/opt/esp-idf/components/hal/mmu_hal.c", "/opt/esp-idf/components/hal/cache_hal.c", "/opt/esp-idf/components/hal/color_hal.c", "/opt/esp-idf/components/hal/spi_flash_hal.c", "/opt/esp-idf/components/hal/spi_flash_hal_iram.c", "/opt/esp-idf/components/hal/spi_flash_encrypt_hal_iram.c", "/opt/esp-idf/components/hal/esp32h2/clk_tree_hal.c", "/opt/esp-idf/components/hal/uart_hal.c", "/opt/esp-idf/components/hal/uart_hal_iram.c", "/opt/esp-idf/components/hal/gpio_hal.c", "/opt/esp-idf/components/hal/rtc_io_hal.c", "/opt/esp-idf/components/hal/timer_hal.c", "/opt/esp-idf/components/hal/ledc_hal.c", "/opt/esp-idf/components/hal/ledc_hal_iram.c", "/opt/esp-idf/components/hal/i2c_hal.c", "/opt/esp-idf/components/hal/i2c_hal_iram.c", "/opt/esp-idf/components/hal/rmt_hal.c", "/opt/esp-idf/components/hal/pcnt_hal.c", "/opt/esp-idf/components/hal/mcpwm_hal.c", "/opt/esp-idf/components/hal/uhci_hal.c", "/opt/esp-idf/components/hal/twai_hal_sja1000.c", "/opt/esp-idf/components/hal/gdma_hal_top.c", "/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c", "/opt/esp-idf/components/hal/i2s_hal.c", "/opt/esp-idf/components/hal/sdm_hal.c", "/opt/esp-idf/components/hal/etm_hal.c", "/opt/esp-idf/components/hal/parlio_hal.c", "/opt/esp-idf/components/hal/adc_hal_common.c", "/opt/esp-idf/components/hal/adc_oneshot_hal.c", "/opt/esp-idf/components/hal/adc_hal.c", "/opt/esp-idf/components/hal/ecc_hal.c", "/opt/esp-idf/components/hal/ecdsa_hal.c", "/opt/esp-idf/components/hal/mpi_hal.c", "/opt/esp-idf/components/hal/sha_hal.c", "/opt/esp-idf/components/hal/aes_hal.c", "/opt/esp-idf/components/hal/esp32h2/modem_clock_hal.c", "/opt/esp-idf/components/hal/esp32h2/pau_hal.c", "/opt/esp-idf/components/hal/brownout_hal.c", "/opt/esp-idf/components/hal/vbat_hal.c", "/opt/esp-idf/components/hal/spi_hal.c", "/opt/esp-idf/components/hal/spi_hal_iram.c", "/opt/esp-idf/components/hal/spi_slave_hal.c", "/opt/esp-idf/components/hal/spi_slave_hal_iram.c", "/opt/esp-idf/components/hal/spi_slave_hd_hal.c", "/opt/esp-idf/components/hal/spi_flash_hal_gpspi.c", "/opt/esp-idf/components/hal/esp32h2/pmu_hal.c", "/opt/esp-idf/components/hal/apm_hal.c", "/opt/esp-idf/components/hal/hmac_hal.c", "/opt/esp-idf/components/hal/ds_hal.c", "/opt/esp-idf/components/hal/usb_serial_jtag_hal.c" ],
             "include_dirs": [ "platform_port/include", "esp32h2/include", "include" ]
         },
@@ -1134,7 +1134,7 @@
             "priv_reqs": [ "soc" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/heap/libheap.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/heap/libheap.a",
             "sources": [ "/opt/esp-idf/components/heap/heap_caps_base.c", "/opt/esp-idf/components/heap/heap_caps.c", "/opt/esp-idf/components/heap/heap_caps_init.c", "/opt/esp-idf/components/heap/multi_heap.c", "/opt/esp-idf/components/heap/port/memory_layout_utils.c", "/opt/esp-idf/components/heap/port/esp32h2/memory_layout.c" ],
             "include_dirs": [ "include", "tlsf" ]
         },
@@ -1149,7 +1149,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/http_parser/libhttp_parser.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/http_parser/libhttp_parser.a",
             "sources": [ "/opt/esp-idf/components/http_parser/http_parser.c" ],
             "include_dirs": [ "." ]
         },
@@ -1179,7 +1179,7 @@
             "priv_reqs": [ "esp_phy", "esp_timer", "soc", "hal", "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/ieee802154/libieee802154.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/ieee802154/libieee802154.a",
             "sources": [ "/opt/esp-idf/components/ieee802154/esp_ieee802154.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_ack.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_dev.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_event.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_frame.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_pib.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_util.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_sec.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_timer.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1194,7 +1194,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/json/libjson.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/json/libjson.a",
             "sources": [ "/opt/esp-idf/components/json/cJSON/cJSON.c", "/opt/esp-idf/components/json/cJSON/cJSON_Utils.c" ],
             "include_dirs": [ "cJSON" ]
         },
@@ -1209,7 +1209,7 @@
             "priv_reqs": [ "hal", "soc", "esp_hw_support" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/log/liblog.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/log/liblog.a",
             "sources": [ "/opt/esp-idf/components/log/src/os/log_timestamp.c", "/opt/esp-idf/components/log/src/log_timestamp_common.c", "/opt/esp-idf/components/log/src/os/log_lock.c", "/opt/esp-idf/components/log/src/buffer/log_buffers.c", "/opt/esp-idf/components/log/src/os/util.c", "/opt/esp-idf/components/log/src/util.c", "/opt/esp-idf/components/log/src/log_format_text.c", "/opt/esp-idf/components/log/src/log_print.c", "/opt/esp-idf/components/log/src/log.c", "/opt/esp-idf/components/log/src/os/log_write.c", "/opt/esp-idf/components/log/src/log_level/log_level.c", "/opt/esp-idf/components/log/src/log_level/tag_log_level/tag_log_level.c", "/opt/esp-idf/components/log/src/log_level/tag_log_level/linked_list/log_linked_list.c", "/opt/esp-idf/components/log/src/log_level/tag_log_level/cache/log_binary_heap.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1224,7 +1224,7 @@
             "priv_reqs": [ "vfs" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/lwip/liblwip.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/lwip/liblwip.a",
             "sources": [ "/opt/esp-idf/components/lwip/apps/sntp/sntp.c", "/opt/esp-idf/components/lwip/lwip/src/api/api_lib.c", "/opt/esp-idf/components/lwip/lwip/src/api/api_msg.c", "/opt/esp-idf/components/lwip/lwip/src/api/err.c", "/opt/esp-idf/components/lwip/lwip/src/api/if_api.c", "/opt/esp-idf/components/lwip/lwip/src/api/netbuf.c", "/opt/esp-idf/components/lwip/lwip/src/api/netdb.c", "/opt/esp-idf/components/lwip/lwip/src/api/netifapi.c", "/opt/esp-idf/components/lwip/lwip/src/api/sockets.c", "/opt/esp-idf/components/lwip/lwip/src/api/tcpip.c", "/opt/esp-idf/components/lwip/lwip/src/apps/sntp/sntp.c", "/opt/esp-idf/components/lwip/lwip/src/apps/netbiosns/netbiosns.c", "/opt/esp-idf/components/lwip/lwip/src/core/def.c", "/opt/esp-idf/components/lwip/lwip/src/core/dns.c", "/opt/esp-idf/components/lwip/lwip/src/core/inet_chksum.c", "/opt/esp-idf/components/lwip/lwip/src/core/init.c", "/opt/esp-idf/components/lwip/lwip/src/core/ip.c", "/opt/esp-idf/components/lwip/lwip/src/core/mem.c", "/opt/esp-idf/components/lwip/lwip/src/core/memp.c", "/opt/esp-idf/components/lwip/lwip/src/core/netif.c", "/opt/esp-idf/components/lwip/lwip/src/core/pbuf.c", "/opt/esp-idf/components/lwip/lwip/src/core/raw.c", "/opt/esp-idf/components/lwip/lwip/src/core/stats.c", "/opt/esp-idf/components/lwip/lwip/src/core/sys.c", "/opt/esp-idf/components/lwip/lwip/src/core/tcp.c", "/opt/esp-idf/components/lwip/lwip/src/core/tcp_in.c", "/opt/esp-idf/components/lwip/lwip/src/core/tcp_out.c", "/opt/esp-idf/components/lwip/lwip/src/core/timeouts.c", "/opt/esp-idf/components/lwip/lwip/src/core/udp.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/autoip.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/dhcp.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/etharp.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/icmp.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/igmp.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/ip4.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/ip4_napt.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/ip4_addr.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv4/ip4_frag.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/dhcp6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/ethip6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/icmp6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/inet6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/ip6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/ip6_addr.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/ip6_frag.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/mld6.c", "/opt/esp-idf/components/lwip/lwip/src/core/ipv6/nd6.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ethernet.c", "/opt/esp-idf/components/lwip/lwip/src/netif/bridgeif.c", "/opt/esp-idf/components/lwip/lwip/src/netif/bridgeif_fdb.c", "/opt/esp-idf/components/lwip/lwip/src/netif/slipif.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/auth.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/ccp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/chap-md5.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/chap-new.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/chap_ms.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/demand.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/eap.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/ecp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/eui64.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/fsm.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/ipcp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/ipv6cp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/lcp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/magic.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/mppe.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/multilink.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/ppp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/pppapi.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/pppcrypt.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/pppoe.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/pppol2tp.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/pppos.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/upap.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/utils.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/vj.c", "/opt/esp-idf/components/lwip/port/hooks/tcp_isn_default.c", "/opt/esp-idf/components/lwip/port/hooks/lwip_default_hooks.c", "/opt/esp-idf/components/lwip/port/debug/lwip_debug.c", "/opt/esp-idf/components/lwip/port/sockets_ext.c", "/opt/esp-idf/components/lwip/port/freertos/sys_arch.c", "/opt/esp-idf/components/lwip/port/if_index.c", "/opt/esp-idf/components/lwip/port/acd_dhcp_check.c", "/opt/esp-idf/components/lwip/port/esp32xx/vfs_lwip.c", "/opt/esp-idf/components/lwip/apps/ping/esp_ping.c", "/opt/esp-idf/components/lwip/apps/ping/ping.c", "/opt/esp-idf/components/lwip/apps/ping/ping_sock.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/polarssl/arc4.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/polarssl/des.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/polarssl/md4.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/polarssl/md5.c", "/opt/esp-idf/components/lwip/lwip/src/netif/ppp/polarssl/sha1.c", "/opt/esp-idf/components/lwip/apps/dhcpserver/dhcpserver.c" ],
             "include_dirs": [ "include", "include/apps", "include/apps/sntp", "lwip/src/include", "port/include", "port/freertos/include/", "port/esp32xx/include", "port/esp32xx/include/arch", "port/esp32xx/include/sys" ]
         },
@@ -1232,15 +1232,15 @@
             "alias": "idf::main",
             "target": "___idf_main",
             "prefix": "idf",
-            "dir": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main",
+            "dir": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main",
             "type": "LIBRARY",
             "lib": "__idf_main",
             "reqs": [],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main/main.c" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/main/libmain.a",
+            "sources": [ "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main/main.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {
@@ -1254,8 +1254,8 @@
             "priv_reqs": [ "soc", "esp_hw_support", "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mbedtls/libmbedtls.a",
-            "sources": [ "/opt/esp-idf/components/mbedtls/esp_crt_bundle/esp_crt_bundle.c", "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/x509_crt_bundle.S" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mbedtls/libmbedtls.a",
+            "sources": [ "/opt/esp-idf/components/mbedtls/esp_crt_bundle/esp_crt_bundle.c", "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/x509_crt_bundle.S" ],
             "include_dirs": [ "port/include", "mbedtls/include", "mbedtls/library", "esp_crt_bundle/include" ]
         },
         "mqtt": {
@@ -1269,7 +1269,7 @@
             "priv_reqs": [ "esp_timer", "http_parser", "esp_hw_support", "heap" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mqtt/libmqtt.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/mqtt/libmqtt.a",
             "sources": [ "/opt/esp-idf/components/mqtt/esp-mqtt/mqtt_client.c", "/opt/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_msg.c", "/opt/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_outbox.c", "/opt/esp-idf/components/mqtt/esp-mqtt/lib/platform_esp32_idf.c" ],
             "include_dirs": [ "/opt/esp-idf/components/mqtt/esp-mqtt/include" ]
         },
@@ -1284,7 +1284,7 @@
             "priv_reqs": [ "soc", "spi_flash" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/newlib/libnewlib.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/newlib/libnewlib.a",
             "sources": [ "/opt/esp-idf/components/newlib/src/init.c", "/opt/esp-idf/components/newlib/src/abort.c", "/opt/esp-idf/components/newlib/src/assert.c", "/opt/esp-idf/components/newlib/src/heap.c", "/opt/esp-idf/components/newlib/src/locks.c", "/opt/esp-idf/components/newlib/src/poll.c", "/opt/esp-idf/components/newlib/src/pthread.c", "/opt/esp-idf/components/newlib/src/random.c", "/opt/esp-idf/components/newlib/src/getentropy.c", "/opt/esp-idf/components/newlib/src/termios.c", "/opt/esp-idf/components/newlib/src/stdatomic.c", "/opt/esp-idf/components/newlib/src/time.c", "/opt/esp-idf/components/newlib/src/sysconf.c", "/opt/esp-idf/components/newlib/src/realpath.c", "/opt/esp-idf/components/newlib/src/scandir.c", "/opt/esp-idf/components/newlib/src/syscalls.c", "/opt/esp-idf/components/newlib/src/reent_syscalls.c", "/opt/esp-idf/components/newlib/src/port/esp_time_impl.c", "/opt/esp-idf/components/newlib/src/flockfile.c", "/opt/esp-idf/components/newlib/src/reent_init.c", "/opt/esp-idf/components/newlib/src/newlib_init.c", "/opt/esp-idf/components/newlib/src/port/esp_time_impl.c" ],
             "include_dirs": [ "platform_include" ]
         },
@@ -1299,7 +1299,7 @@
             "priv_reqs": [ "spi_flash", "newlib" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/nvs_flash/libnvs_flash.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/nvs_flash/libnvs_flash.a",
             "sources": [ "/opt/esp-idf/components/nvs_flash/src/nvs_api.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_cxx_api.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_item_hash_list.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_page.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_pagemanager.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_storage.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_handle_simple.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_handle_locked.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_partition.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_partition_lookup.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_partition_manager.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_types.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_platform.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_bootloader.c", "/opt/esp-idf/components/nvs_flash/src/nvs_encrypted_partition.cpp", "/opt/esp-idf/components/nvs_flash/src/nvs_bootloader_aes.c", "/opt/esp-idf/components/nvs_flash/src/nvs_bootloader_xts_aes.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1314,7 +1314,7 @@
             "priv_reqs": [ "bootloader_support", "efuse", "esp_partition", "nvs_flash" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/nvs_sec_provider/libnvs_sec_provider.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/nvs_sec_provider/libnvs_sec_provider.a",
             "sources": [ "/opt/esp-idf/components/nvs_sec_provider/nvs_sec_provider.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1359,7 +1359,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/protobuf-c/libprotobuf-c.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/protobuf-c/libprotobuf-c.a",
             "sources": [ "/opt/esp-idf/components/protobuf-c/protobuf-c/protobuf-c/protobuf-c.c" ],
             "include_dirs": [ "protobuf-c" ]
         },
@@ -1374,8 +1374,8 @@
             "priv_reqs": [ "protobuf-c", "mbedtls", "console", "esp_http_server", "esp_driver_uart" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/protocomm/libprotocomm.a",
-            "sources": [ "/opt/esp-idf/components/protocomm/src/common/protocomm.c", "/opt/esp-idf/components/protocomm/proto-c/constants.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec0.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec1.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec2.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/session.pb-c.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_console.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_httpd.c", "/opt/esp-idf/components/protocomm/src/security/security0.c", "/opt/esp-idf/components/protocomm/src/security/security1.c", "/opt/esp-idf/components/protocomm/src/security/security2.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp_mpi.c" ],
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/protocomm/libprotocomm.a",
+            "sources": [ "/opt/esp-idf/components/protocomm/src/common/protocomm.c", "/opt/esp-idf/components/protocomm/proto-c/constants.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec0.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec1.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec2.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/session.pb-c.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_console.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_httpd.c", "/opt/esp-idf/components/protocomm/src/security/security0.c", "/opt/esp-idf/components/protocomm/src/security/security1.c", "/opt/esp-idf/components/protocomm/src/security/security2.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp_mpi.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_nimble.c" ],
             "include_dirs": [ "include/common", "include/security", "include/transports", "include/crypto/srp6a", "proto-c" ]
         },
         "pthread": {
@@ -1389,7 +1389,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/pthread/libpthread.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/pthread/libpthread.a",
             "sources": [ "/opt/esp-idf/components/pthread/pthread.c", "/opt/esp-idf/components/pthread/pthread_cond_var.c", "/opt/esp-idf/components/pthread/pthread_local_storage.c", "/opt/esp-idf/components/pthread/pthread_rwlock.c", "/opt/esp-idf/components/pthread/pthread_semaphore.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1404,7 +1404,7 @@
             "priv_reqs": [ "soc", "hal" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/riscv/libriscv.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/riscv/libriscv.a",
             "sources": [ "/opt/esp-idf/components/riscv/instruction_decode.c", "/opt/esp-idf/components/riscv/interrupt.c", "/opt/esp-idf/components/riscv/rv_utils.c", "/opt/esp-idf/components/riscv/vectors.S", "/opt/esp-idf/components/riscv/interrupt_plic.c", "/opt/esp-idf/components/riscv/vectors_intc.S" ],
             "include_dirs": [ "include" ]
         },
@@ -1419,7 +1419,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/rt/librt.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/rt/librt.a",
             "sources": [ "/opt/esp-idf/components/rt/FreeRTOS_POSIX_mqueue.c", "/opt/esp-idf/components/rt/FreeRTOS_POSIX_utils.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1434,7 +1434,7 @@
             "priv_reqs": [ "soc", "esp_timer", "esp_mm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/sdmmc/libsdmmc.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/sdmmc/libsdmmc.a",
             "sources": [ "/opt/esp-idf/components/sdmmc/sdmmc_cmd.c", "/opt/esp-idf/components/sdmmc/sdmmc_common.c", "/opt/esp-idf/components/sdmmc/sdmmc_init.c", "/opt/esp-idf/components/sdmmc/sdmmc_io.c", "/opt/esp-idf/components/sdmmc/sdmmc_mmc.c", "/opt/esp-idf/components/sdmmc/sdmmc_sd.c", "/opt/esp-idf/components/sdmmc/sd_pwr_ctrl/sd_pwr_ctrl.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1449,7 +1449,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/soc/libsoc.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/soc/libsoc.a",
             "sources": [ "/opt/esp-idf/components/soc/lldesc.c", "/opt/esp-idf/components/soc/dport_access_common.c", "/opt/esp-idf/components/soc/esp32h2/interrupts.c", "/opt/esp-idf/components/soc/esp32h2/gpio_periph.c", "/opt/esp-idf/components/soc/esp32h2/uart_periph.c", "/opt/esp-idf/components/soc/esp32h2/adc_periph.c", "/opt/esp-idf/components/soc/esp32h2/ana_cmpr_periph.c", "/opt/esp-idf/components/soc/esp32h2/dedic_gpio_periph.c", "/opt/esp-idf/components/soc/esp32h2/etm_periph.c", "/opt/esp-idf/components/soc/esp32h2/gdma_periph.c", "/opt/esp-idf/components/soc/esp32h2/spi_periph.c", "/opt/esp-idf/components/soc/esp32h2/ledc_periph.c", "/opt/esp-idf/components/soc/esp32h2/pcnt_periph.c", "/opt/esp-idf/components/soc/esp32h2/rmt_periph.c", "/opt/esp-idf/components/soc/esp32h2/sdm_periph.c", "/opt/esp-idf/components/soc/esp32h2/i2s_periph.c", "/opt/esp-idf/components/soc/esp32h2/i2c_periph.c", "/opt/esp-idf/components/soc/esp32h2/temperature_sensor_periph.c", "/opt/esp-idf/components/soc/esp32h2/timer_periph.c", "/opt/esp-idf/components/soc/esp32h2/parlio_periph.c", "/opt/esp-idf/components/soc/esp32h2/mcpwm_periph.c", "/opt/esp-idf/components/soc/esp32h2/mpi_periph.c", "/opt/esp-idf/components/soc/esp32h2/twai_periph.c", "/opt/esp-idf/components/soc/esp32h2/wdt_periph.c", "/opt/esp-idf/components/soc/esp32h2/ieee802154_periph.c", "/opt/esp-idf/components/soc/esp32h2/rtc_io_periph.c", "/opt/esp-idf/components/soc/esp32h2/system_retention_periph.c", "/opt/esp-idf/components/soc/esp32h2/power_supply_periph.c" ],
             "include_dirs": [ "include", "esp32h2", "esp32h2/include", "esp32h2/register" ]
         },
@@ -1464,7 +1464,7 @@
             "priv_reqs": [ "bootloader_support", "app_update", "soc", "esp_mm", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/spi_flash/libspi_flash.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/spi_flash/libspi_flash.a",
             "sources": [ "/opt/esp-idf/components/spi_flash/flash_brownout_hook.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_drivers.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_generic.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_issi.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_mxic.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_gd.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_winbond.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_boya.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_mxic_opi.c", "/opt/esp-idf/components/spi_flash/spi_flash_chip_th.c", "/opt/esp-idf/components/spi_flash/memspi_host_driver.c", "/opt/esp-idf/components/spi_flash/cache_utils.c", "/opt/esp-idf/components/spi_flash/flash_mmap.c", "/opt/esp-idf/components/spi_flash/flash_ops.c", "/opt/esp-idf/components/spi_flash/spi_flash_wrap.c", "/opt/esp-idf/components/spi_flash/esp_flash_api.c", "/opt/esp-idf/components/spi_flash/esp_flash_spi_init.c", "/opt/esp-idf/components/spi_flash/spi_flash_os_func_app.c", "/opt/esp-idf/components/spi_flash/spi_flash_os_func_noos.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1479,7 +1479,7 @@
             "priv_reqs": [ "bootloader_support", "esptool_py", "vfs" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/spiffs/libspiffs.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/spiffs/libspiffs.a",
             "sources": [ "/opt/esp-idf/components/spiffs/spiffs_api.c", "/opt/esp-idf/components/spiffs/spiffs/src/spiffs_cache.c", "/opt/esp-idf/components/spiffs/spiffs/src/spiffs_check.c", "/opt/esp-idf/components/spiffs/spiffs/src/spiffs_gc.c", "/opt/esp-idf/components/spiffs/spiffs/src/spiffs_hydrogen.c", "/opt/esp-idf/components/spiffs/spiffs/src/spiffs_nucleus.c", "/opt/esp-idf/components/spiffs/esp_spiffs.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1494,7 +1494,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/tcp_transport/libtcp_transport.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/tcp_transport/libtcp_transport.a",
             "sources": [ "/opt/esp-idf/components/tcp_transport/transport.c", "/opt/esp-idf/components/tcp_transport/transport_ssl.c", "/opt/esp-idf/components/tcp_transport/transport_internal.c", "/opt/esp-idf/components/tcp_transport/transport_socks_proxy.c", "/opt/esp-idf/components/tcp_transport/transport_ws.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1524,7 +1524,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/unity/libunity.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/unity/libunity.a",
             "sources": [ "/opt/esp-idf/components/unity/unity/src/unity.c", "/opt/esp-idf/components/unity/unity_compat.c", "/opt/esp-idf/components/unity/unity_runner.c", "/opt/esp-idf/components/unity/unity_utils_freertos.c", "/opt/esp-idf/components/unity/unity_utils_cache.c", "/opt/esp-idf/components/unity/unity_utils_memory.c", "/opt/esp-idf/components/unity/unity_port_esp32.c", "/opt/esp-idf/components/unity/port/esp/unity_utils_memory_esp.c" ],
             "include_dirs": [ "include", "unity/src" ]
         },
@@ -1554,7 +1554,7 @@
             "priv_reqs": [ "esp_timer", "esp_driver_uart", "esp_driver_usb_serial_jtag", "esp_vfs_console" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/vfs/libvfs.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/vfs/libvfs.a",
             "sources": [ "/opt/esp-idf/components/vfs/vfs.c", "/opt/esp-idf/components/vfs/vfs_eventfd.c", "/opt/esp-idf/components/vfs/vfs_semihost.c", "/opt/esp-idf/components/vfs/nullfs.c" ],
             "include_dirs": [ "include" ]
         },
@@ -1569,7 +1569,7 @@
             "priv_reqs": [ "spi_flash" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/wear_levelling/libwear_levelling.a",
+            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/wear_levelling/libwear_levelling.a",
             "sources": [ "/opt/esp-idf/components/wear_levelling/Partition.cpp", "/opt/esp-idf/components/wear_levelling/SPI_Flash.cpp", "/opt/esp-idf/components/wear_levelling/WL_Ext_Perf.cpp", "/opt/esp-idf/components/wear_levelling/WL_Ext_Safe.cpp", "/opt/esp-idf/components/wear_levelling/WL_Flash.cpp", "/opt/esp-idf/components/wear_levelling/crc32.cpp", "/opt/esp-idf/components/wear_levelling/wear_levelling.cpp" ],
             "include_dirs": [ "include" ]
         },
@@ -1663,7 +1663,7 @@
             "priv_reqs": [ "nvs_flash", "soc", "esp_pm", "esp_phy", "esp_coex", "mbedtls", "esp_driver_uart", "vfs", "esp_ringbuf", "esp_driver_spi", "esp_driver_gpio", "esp_gdbstub" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": []
+            "include_dirs": [ "include/esp32h2/include", "common/osi/include", "common/api/include/api", "common/btc/profile/esp/blufi/include", "common/btc/profile/esp/include", "common/hci_log/include", "common/ble_log/include", "porting/include", "porting/npl/freertos/include", "porting/transport/include", "host/nimble/nimble/nimble/host/include", "host/nimble/nimble/nimble/include", "host/nimble/nimble/nimble/host/services/ans/include", "host/nimble/nimble/nimble/host/services/bas/include", "host/nimble/nimble/nimble/host/services/dis/include", "host/nimble/nimble/nimble/host/services/gap/include", "host/nimble/nimble/nimble/host/services/gatt/include", "host/nimble/nimble/nimble/host/services/hr/include", "host/nimble/nimble/nimble/host/services/htp/include", "host/nimble/nimble/nimble/host/services/ias/include", "host/nimble/nimble/nimble/host/services/ipss/include", "host/nimble/nimble/nimble/host/services/lls/include", "host/nimble/nimble/nimble/host/services/prox/include", "host/nimble/nimble/nimble/host/services/cts/include", "host/nimble/nimble/nimble/host/services/tps/include", "host/nimble/nimble/nimble/host/services/hid/include", "host/nimble/nimble/nimble/host/services/sps/include", "host/nimble/nimble/nimble/host/services/cte/include", "host/nimble/nimble/nimble/host/util/include", "host/nimble/nimble/nimble/host/store/ram/include", "host/nimble/nimble/nimble/host/store/config/include", "host/nimble/nimble/porting/nimble/include", "host/nimble/port/include", "host/nimble/nimble/nimble/transport/include", "host/nimble/nimble/nimble/include" ]
         },
         "cmock": {
             "alias": "idf::cmock",
@@ -2905,7 +2905,7 @@
             "alias": "idf::main",
             "target": "___idf_main",
             "prefix": "idf",
-            "dir": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main",
+            "dir": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main",
             "lib": "__idf_main",
             "reqs": [],
             "priv_reqs": [],
@@ -2916,10 +2916,10 @@
     },
     "debug_prefix_map_gdbinit": "",
     "gdbinit_files": {
-        "01_symbols": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/symbols",
-        "02_prefix_map": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/prefix_map",
-        "03_py_extensions": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/py_extensions",
-        "04_connect": "/home/reyaansh/Documents/Coding/Github/Speechster-ESP32-H2-Tesing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/connect"
+        "01_symbols": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/symbols",
+        "02_prefix_map": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/prefix_map",
+        "03_py_extensions": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/py_extensions",
+        "04_connect": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/gdbinit/connect"
     },
     "debug_arguments_openocd": "-f board/esp32h2-builtin.cfg"
 }

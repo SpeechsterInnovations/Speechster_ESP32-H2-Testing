@@ -1,0 +1,425 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix riscv32-esp-elf- --decode-coredumps info --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/INMP_441-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py'
+ESP-ROM:esp32h2-20221101
+Build:Nov  1 2022
+rst:0x15 (USB_UART_HPSYS),boot:0xa (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40017bcc
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x408460f0,len:0x1c04
+load:0x4083c2d0,len:0x1bc0
+load:0x4083efd0,len:0x4024
+entry 0x4083c2e8
+[0;32mI (9852) main_task: Started on CPU0[0m
+D (9855) pau_regdma: All link addresses 0x408143dc,0x408143dc,0x408143dc,0x408143dc
+D (9855) task_wdt: Task watchdog timer retention initialization
+[0;32mI (9856) main_task: Calling app_main()[0m
+[0;32mI (9856) APP: App init: hybrid logger + I2S capture (INMP441) demo[0m
+[0;32mI (9875) UART: UART initialized at 115200 baud (port 0)[0m
+[0;32mI (9876) I2S: Creating I2S channel (std-mode, master RX)...[0m
+D (9876) i2s_common: rx channel is registered on I2S0 successfully
+V (9877) i2s_common: desc addr: 0x4084f898	buffer addr:0x4084f8a8
+V (9877) i2s_common: desc addr: 0x4084fa8c	buffer addr:0x4084fa9c
+V (9878) i2s_common: desc addr: 0x4084fc80	buffer addr:0x4084fc90
+V (9878) i2s_common: desc addr: 0x4084fe74	buffer addr:0x40817350
+V (9879) i2s_common: desc addr: 0x4084fe84	buffer addr:0x40817534
+V (9879) i2s_common: desc addr: 0x4084fe94	buffer addr:0x40817718
+D (9879) i2s_common: DMA malloc info: dma_desc_num = 6, dma_desc_buf_size = dma_frame_num * slot_num * data_bit_width = 480
+D (9880) i2s_std: Clock division info: [sclk] 96000000 Hz [mdiv] 23 7/16 [mclk] 4096000 Hz [bdiv] 8 [bclk] 512000 Hz
+D (9881) gdma: new group (0) at 0x408178fc
+D (9882) pau_regdma: All link addresses 0x408143dc,0x408143dc,0x408143dc,0x408143dc
+D (9883) gdma: GDMA pair (0, 0) retention initialization
+D (9883) gdma: new pair (0,0) at 0x4081797c
+D (9883) gdma: new rx channel (0,0) at 0x4084fea4
+D (9891) gdma: install interrupt service for rx channel (0,0)
+D (9892) i2s_std: The rx channel on I2S0 has been initialized to STD mode successfully
+[0;32mI (9892) I2S: I2S initialized (sr=16000, bits=16, mono)[0m
+[0;32mI (9893) APP: [65 ms] MAIN  state=RUNNING[0m
+[0;32mI (9893) APP: [65 ms] I2S   state=IDLE frames=0[0m
+[0;32mI (9893) APP: [65 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (9894) APP: [65 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (9894) APP: Capture task starting for 5 seconds...[0m
+D (9895) i2s_common: i2s rx channel enabled
+[0;32mI (9895) APP: Initialization complete.[0m
+[0;32mI (9910) STREAM: Chunk 512 bytes (total 512 / 160000)[0m
+[0;32mI (9917) STREAM: Chunk 512 bytes (total 1024 / 160000)[0m
+[0;32mI (9925) STREAM: Chunk 512 bytes (total 1536 / 160000)[0m
+[0;32mI (9932) STREAM: Chunk 512 bytes (total 2048 / 160000)[0m
+[0;32mI (9940) STREAM: Chunk 512 bytes (total 2560 / 160000)[0m
+[0;32mI (9947) STREAM: Chunk 512 bytes (total 3072 / 160000)[0m
+[0;32mI (9955) STREAM: Chunk 512 bytes (total 3584 / 160000)[0m
+[0;32mI (9962) STREAM: Chunk 512 bytes (total 4096 / 160000)[0m
+[0;32mI (9992) STREAM: Chunk 512 bytes (total 4608 / 160000)[0m
+[0;32mI (10033) STREAM: Chunk 512 bytes (total 5120 / 160000)[0m
+[0;32mI (10084) STREAM: Chunk 512 bytes (total 5632 / 160000)[0m
+[0;32mI (10125) STREAM: Chunk 512 bytes (total 6144 / 160000)[0m
+[0;32mI (10166) STREAM: Chunk 512 bytes (total 6656 / 160000)[0m
+[0;32mI (10217) STREAM: Chunk 512 bytes (total 7168 / 160000)[0m
+[0;32mI (10258) STREAM: Chunk 512 bytes (total 7680 / 160000)[0m
+[0;32mI (10299) STREAM: Chunk 512 bytes (total 8192 / 160000)[0m
+[0;32mI (10350) STREAM: Chunk 512 bytes (total 8704 / 160000)[0m
+[0;32mI (10391) STREAM: Chunk 512 bytes (total 9216 / 160000)[0m
+[0;32mI (10432) STREAM: Chunk 512 bytes (total 9728 / 160000)[0m
+[0;32mI (10483) STREAM: Chunk 512 bytes (total 10240 / 160000)[0m
+[0;32mI (10524) STREAM: Chunk 512 bytes (total 10752 / 160000)[0m
+[0;32mI (10565) STREAM: Chunk 512 bytes (total 11264 / 160000)[0m
+[0;32mI (10617) STREAM: Chunk 512 bytes (total 11776 / 160000)[0m
+[0;32mI (10657) STREAM: Chunk 512 bytes (total 12288 / 160000)[0m
+[0;32mI (10709) STREAM: Chunk 512 bytes (total 12800 / 160000)[0m
+[0;32mI (10750) STREAM: Chunk 512 bytes (total 13312 / 160000)[0m
+[0;32mI (10791) STREAM: Chunk 512 bytes (total 13824 / 160000)[0m
+[0;32mI (10842) STREAM: Chunk 512 bytes (total 14336 / 160000)[0m
+[0;32mI (10883) STREAM: Chunk 512 bytes (total 14848 / 160000)[0m
+[0;32mI (10892) APP: [1065 ms] MAIN  state=RUNNING[0m
+[0;32mI (10893) APP: [1065 ms] I2S   state=RUNNING frames=29[0m
+[0;32mI (10893) APP: [1065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (10893) APP: [1065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (10924) STREAM: Chunk 512 bytes (total 15360 / 160000)[0m
+[0;32mI (10975) STREAM: Chunk 512 bytes (total 15872 / 160000)[0m
+[0;32mI (11016) STREAM: Chunk 512 bytes (total 16384 / 160000)[0m
+[0;32mI (11057) STREAM: Chunk 512 bytes (total 16896 / 160000)[0m
+[0;32mI (11108) STREAM: Chunk 512 bytes (total 17408 / 160000)[0m
+[0;32mI (11149) STREAM: Chunk 512 bytes (total 17920 / 160000)[0m
+[0;32mI (11190) STREAM: Chunk 512 bytes (total 18432 / 160000)[0m
+[0;32mI (11241) STREAM: Chunk 512 bytes (total 18944 / 160000)[0m
+[0;32mI (11282) STREAM: Chunk 512 bytes (total 19456 / 160000)[0m
+[0;32mI (11323) STREAM: Chunk 512 bytes (total 19968 / 160000)[0m
+[0;32mI (11374) STREAM: Chunk 512 bytes (total 20480 / 160000)[0m
+[0;32mI (11415) STREAM: Chunk 512 bytes (total 20992 / 160000)[0m
+[0;32mI (11456) STREAM: Chunk 512 bytes (total 21504 / 160000)[0m
+[0;32mI (11508) STREAM: Chunk 512 bytes (total 22016 / 160000)[0m
+[0;32mI (11549) STREAM: Chunk 512 bytes (total 22528 / 160000)[0m
+[0;32mI (11590) STREAM: Chunk 512 bytes (total 23040 / 160000)[0m
+[0;32mI (11641) STREAM: Chunk 512 bytes (total 23552 / 160000)[0m
+[0;32mI (11682) STREAM: Chunk 512 bytes (total 24064 / 160000)[0m
+[0;32mI (11723) STREAM: Chunk 512 bytes (total 24576 / 160000)[0m
+[0;32mI (11774) STREAM: Chunk 512 bytes (total 25088 / 160000)[0m
+[0;32mI (11815) STREAM: Chunk 512 bytes (total 25600 / 160000)[0m
+[0;32mI (11856) STREAM: Chunk 512 bytes (total 26112 / 160000)[0m
+[0;32mI (11892) APP: [2065 ms] MAIN  state=RUNNING[0m
+[0;32mI (11893) APP: [2065 ms] I2S   state=RUNNING frames=51[0m
+[0;32mI (11893) APP: [2065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (11893) APP: [2065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (11907) STREAM: Chunk 512 bytes (total 26624 / 160000)[0m
+[0;32mI (11948) STREAM: Chunk 512 bytes (total 27136 / 160000)[0m
+[0;32mI (11989) STREAM: Chunk 512 bytes (total 27648 / 160000)[0m
+[0;32mI (12040) STREAM: Chunk 512 bytes (total 28160 / 160000)[0m
+[0;32mI (12081) STREAM: Chunk 512 bytes (total 28672 / 160000)[0m
+[0;32mI (12122) STREAM: Chunk 512 bytes (total 29184 / 160000)[0m
+[0;32mI (12173) STREAM: Chunk 512 bytes (total 29696 / 160000)[0m
+[0;32mI (12214) STREAM: Chunk 512 bytes (total 30208 / 160000)[0m
+[0;32mI (12255) STREAM: Chunk 512 bytes (total 30720 / 160000)[0m
+[0;32mI (12306) STREAM: Chunk 512 bytes (total 31232 / 160000)[0m
+[0;32mI (12347) STREAM: Chunk 512 bytes (total 31744 / 160000)[0m
+[0;32mI (12388) STREAM: Chunk 512 bytes (total 32256 / 160000)[0m
+[0;32mI (12440) STREAM: Chunk 512 bytes (total 32768 / 160000)[0m
+[0;32mI (12481) STREAM: Chunk 512 bytes (total 33280 / 160000)[0m
+[0;32mI (12522) STREAM: Chunk 512 bytes (total 33792 / 160000)[0m
+[0;32mI (12573) STREAM: Chunk 512 bytes (total 34304 / 160000)[0m
+[0;32mI (12614) STREAM: Chunk 512 bytes (total 34816 / 160000)[0m
+[0;32mI (12655) STREAM: Chunk 512 bytes (total 35328 / 160000)[0m
+[0;32mI (12706) STREAM: Chunk 512 bytes (total 35840 / 160000)[0m
+[0;32mI (12747) STREAM: Chunk 512 bytes (total 36352 / 160000)[0m
+[0;32mI (12788) STREAM: Chunk 512 bytes (total 36864 / 160000)[0m
+[0;32mI (12839) STREAM: Chunk 512 bytes (total 37376 / 160000)[0m
+[0;32mI (12880) STREAM: Chunk 512 bytes (total 37888 / 160000)[0m
+[0;32mI (12892) APP: [3065 ms] MAIN  state=RUNNING[0m
+[0;32mI (12893) APP: [3065 ms] I2S   state=RUNNING frames=74[0m
+[0;32mI (12893) APP: [3065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (12894) APP: [3065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (12921) STREAM: Chunk 512 bytes (total 38400 / 160000)[0m
+[0;32mI (12972) STREAM: Chunk 512 bytes (total 38912 / 160000)[0m
+[0;32mI (13013) STREAM: Chunk 512 bytes (total 39424 / 160000)[0m
+[0;32mI (13054) STREAM: Chunk 512 bytes (total 39936 / 160000)[0m
+[0;32mI (13105) STREAM: Chunk 512 bytes (total 40448 / 160000)[0m
+[0;32mI (13146) STREAM: Chunk 512 bytes (total 40960 / 160000)[0m
+[0;32mI (13187) STREAM: Chunk 512 bytes (total 41472 / 160000)[0m
+[0;32mI (13238) STREAM: Chunk 512 bytes (total 41984 / 160000)[0m
+[0;32mI (13279) STREAM: Chunk 512 bytes (total 42496 / 160000)[0m
+[0;32mI (13331) STREAM: Chunk 512 bytes (total 43008 / 160000)[0m
+[0;32mI (13372) STREAM: Chunk 512 bytes (total 43520 / 160000)[0m
+[0;32mI (13413) STREAM: Chunk 512 bytes (total 44032 / 160000)[0m
+[0;32mI (13464) STREAM: Chunk 512 bytes (total 44544 / 160000)[0m
+[0;32mI (13505) STREAM: Chunk 512 bytes (total 45056 / 160000)[0m
+[0;32mI (13546) STREAM: Chunk 512 bytes (total 45568 / 160000)[0m
+[0;32mI (13597) STREAM: Chunk 512 bytes (total 46080 / 160000)[0m
+[0;32mI (13638) STREAM: Chunk 512 bytes (total 46592 / 160000)[0m
+[0;32mI (13679) STREAM: Chunk 512 bytes (total 47104 / 160000)[0m
+[0;32mI (13730) STREAM: Chunk 512 bytes (total 47616 / 160000)[0m
+[0;32mI (13771) STREAM: Chunk 512 bytes (total 48128 / 160000)[0m
+[0;32mI (13812) STREAM: Chunk 512 bytes (total 48640 / 160000)[0m
+[0;32mI (13863) STREAM: Chunk 512 bytes (total 49152 / 160000)[0m
+[0;32mI (13892) APP: [4065 ms] MAIN  state=RUNNING[0m
+[0;32mI (13893) APP: [4065 ms] I2S   state=RUNNING frames=96[0m
+[0;32mI (13893) APP: [4065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (13893) APP: [4065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (13904) STREAM: Chunk 512 bytes (total 49664 / 160000)[0m
+[0;32mI (13945) STREAM: Chunk 512 bytes (total 50176 / 160000)[0m
+[0;32mI (13996) STREAM: Chunk 512 bytes (total 50688 / 160000)[0m
+[0;32mI (14037) STREAM: Chunk 512 bytes (total 51200 / 160000)[0m
+[0;32mI (14078) STREAM: Chunk 512 bytes (total 51712 / 160000)[0m
+[0;32mI (14130) STREAM: Chunk 512 bytes (total 52224 / 160000)[0m
+[0;32mI (14171) STREAM: Chunk 512 bytes (total 52736 / 160000)[0m
+[0;32mI (14211) STREAM: Chunk 512 bytes (total 53248 / 160000)[0m
+[0;32mI (14263) STREAM: Chunk 512 bytes (total 53760 / 160000)[0m
+[0;32mI (14304) STREAM: Chunk 512 bytes (total 54272 / 160000)[0m
+[0;32mI (14345) STREAM: Chunk 512 bytes (total 54784 / 160000)[0m
+[0;32mI (14396) STREAM: Chunk 512 bytes (total 55296 / 160000)[0m
+[0;32mI (14437) STREAM: Chunk 512 bytes (total 55808 / 160000)[0m
+[0;32mI (14478) STREAM: Chunk 512 bytes (total 56320 / 160000)[0m
+[0;32mI (14529) STREAM: Chunk 512 bytes (total 56832 / 160000)[0m
+[0;32mI (14570) STREAM: Chunk 512 bytes (total 57344 / 160000)[0m
+[0;32mI (14611) STREAM: Chunk 512 bytes (total 57856 / 160000)[0m
+[0;32mI (14662) STREAM: Chunk 512 bytes (total 58368 / 160000)[0m
+[0;32mI (14703) STREAM: Chunk 512 bytes (total 58880 / 160000)[0m
+[0;32mI (14744) STREAM: Chunk 512 bytes (total 59392 / 160000)[0m
+[0;32mI (14795) STREAM: Chunk 512 bytes (total 59904 / 160000)[0m
+[0;32mI (14836) STREAM: Chunk 512 bytes (total 60416 / 160000)[0m
+[0;32mI (14877) STREAM: Chunk 512 bytes (total 60928 / 160000)[0m
+[0;32mI (14892) APP: [5065 ms] MAIN  state=RUNNING[0m
+[0;32mI (14893) APP: [5065 ms] I2S   state=RUNNING frames=119[0m
+[0;32mI (14893) APP: [5065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (14893) APP: [5065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (14928) STREAM: Chunk 512 bytes (total 61440 / 160000)[0m
+[0;32mI (14969) STREAM: Chunk 512 bytes (total 61952 / 160000)[0m
+[0;32mI (15010) STREAM: Chunk 512 bytes (total 62464 / 160000)[0m
+[0;32mI (15062) STREAM: Chunk 512 bytes (total 62976 / 160000)[0m
+[0;32mI (15103) STREAM: Chunk 512 bytes (total 63488 / 160000)[0m
+[0;32mI (15143) STREAM: Chunk 512 bytes (total 64000 / 160000)[0m
+[0;32mI (15195) STREAM: Chunk 512 bytes (total 64512 / 160000)[0m
+[0;32mI (15236) STREAM: Chunk 512 bytes (total 65024 / 160000)[0m
+[0;32mI (15277) STREAM: Chunk 512 bytes (total 65536 / 160000)[0m
+[0;32mI (15328) STREAM: Chunk 512 bytes (total 66048 / 160000)[0m
+[0;32mI (15369) STREAM: Chunk 512 bytes (total 66560 / 160000)[0m
+[0;32mI (15410) STREAM: Chunk 512 bytes (total 67072 / 160000)[0m
+[0;32mI (15461) STREAM: Chunk 512 bytes (total 67584 / 160000)[0m
+[0;32mI (15502) STREAM: Chunk 512 bytes (total 68096 / 160000)[0m
+[0;32mI (15543) STREAM: Chunk 512 bytes (total 68608 / 160000)[0m
+[0;32mI (15594) STREAM: Chunk 512 bytes (total 69120 / 160000)[0m
+[0;32mI (15635) STREAM: Chunk 512 bytes (total 69632 / 160000)[0m
+[0;32mI (15676) STREAM: Chunk 512 bytes (total 70144 / 160000)[0m
+[0;32mI (15727) STREAM: Chunk 512 bytes (total 70656 / 160000)[0m
+[0;32mI (15768) STREAM: Chunk 512 bytes (total 71168 / 160000)[0m
+[0;32mI (15809) STREAM: Chunk 512 bytes (total 71680 / 160000)[0m
+[0;32mI (15860) STREAM: Chunk 512 bytes (total 72192 / 160000)[0m
+[0;32mI (15892) APP: [6065 ms] MAIN  state=RUNNING[0m
+[0;32mI (15893) APP: [6065 ms] I2S   state=RUNNING frames=141[0m
+[0;32mI (15893) APP: [6065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (15893) APP: [6065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (15901) STREAM: Chunk 512 bytes (total 72704 / 160000)[0m
+[0;32mI (15953) STREAM: Chunk 512 bytes (total 73216 / 160000)[0m
+[0;32mI (15994) STREAM: Chunk 512 bytes (total 73728 / 160000)[0m
+[0;32mI (16035) STREAM: Chunk 512 bytes (total 74240 / 160000)[0m
+[0;32mI (16086) STREAM: Chunk 512 bytes (total 74752 / 160000)[0m
+[0;32mI (16127) STREAM: Chunk 512 bytes (total 75264 / 160000)[0m
+[0;32mI (16168) STREAM: Chunk 512 bytes (total 75776 / 160000)[0m
+[0;32mI (16219) STREAM: Chunk 512 bytes (total 76288 / 160000)[0m
+[0;32mI (16260) STREAM: Chunk 512 bytes (total 76800 / 160000)[0m
+[0;32mI (16301) STREAM: Chunk 512 bytes (total 77312 / 160000)[0m
+[0;32mI (16352) STREAM: Chunk 512 bytes (total 77824 / 160000)[0m
+[0;32mI (16393) STREAM: Chunk 512 bytes (total 78336 / 160000)[0m
+[0;32mI (16434) STREAM: Chunk 512 bytes (total 78848 / 160000)[0m
+[0;32mI (16485) STREAM: Chunk 512 bytes (total 79360 / 160000)[0m
+[0;32mI (16526) STREAM: Chunk 512 bytes (total 79872 / 160000)[0m
+[0;32mI (16567) STREAM: Chunk 512 bytes (total 80384 / 160000)[0m
+[0;32mI (16618) STREAM: Chunk 512 bytes (total 80896 / 160000)[0m
+[0;32mI (16659) STREAM: Chunk 512 bytes (total 81408 / 160000)[0m
+[0;32mI (16700) STREAM: Chunk 512 bytes (total 81920 / 160000)[0m
+[0;32mI (16751) STREAM: Chunk 512 bytes (total 82432 / 160000)[0m
+[0;32mI (16792) STREAM: Chunk 512 bytes (total 82944 / 160000)[0m
+[0;32mI (16833) STREAM: Chunk 512 bytes (total 83456 / 160000)[0m
+[0;32mI (16885) STREAM: Chunk 512 bytes (total 83968 / 160000)[0m
+[0;32mI (16892) APP: [7065 ms] MAIN  state=RUNNING[0m
+[0;32mI (16893) APP: [7065 ms] I2S   state=RUNNING frames=164[0m
+[0;32mI (16893) APP: [7065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (16893) APP: [7065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (16926) STREAM: Chunk 512 bytes (total 84480 / 160000)[0m
+[0;32mI (16967) STREAM: Chunk 512 bytes (total 84992 / 160000)[0m
+[0;32mI (17018) STREAM: Chunk 512 bytes (total 85504 / 160000)[0m
+[0;32mI (17059) STREAM: Chunk 512 bytes (total 86016 / 160000)[0m
+[0;32mI (17100) STREAM: Chunk 512 bytes (total 86528 / 160000)[0m
+[0;32mI (17151) STREAM: Chunk 512 bytes (total 87040 / 160000)[0m
+[0;32mI (17192) STREAM: Chunk 512 bytes (total 87552 / 160000)[0m
+[0;32mI (17233) STREAM: Chunk 512 bytes (total 88064 / 160000)[0m
+[0;32mI (17284) STREAM: Chunk 512 bytes (total 88576 / 160000)[0m
+[0;32mI (17325) STREAM: Chunk 512 bytes (total 89088 / 160000)[0m
+[0;32mI (17366) STREAM: Chunk 512 bytes (total 89600 / 160000)[0m
+[0;32mI (17417) STREAM: Chunk 512 bytes (total 90112 / 160000)[0m
+[0;32mI (17458) STREAM: Chunk 512 bytes (total 90624 / 160000)[0m
+[0;32mI (17499) STREAM: Chunk 512 bytes (total 91136 / 160000)[0m
+[0;32mI (17550) STREAM: Chunk 512 bytes (total 91648 / 160000)[0m
+[0;32mI (17591) STREAM: Chunk 512 bytes (total 92160 / 160000)[0m
+[0;32mI (17632) STREAM: Chunk 512 bytes (total 92672 / 160000)[0m
+[0;32mI (17684) STREAM: Chunk 512 bytes (total 93184 / 160000)[0m
+[0;32mI (17724) STREAM: Chunk 512 bytes (total 93696 / 160000)[0m
+[0;32mI (17765) STREAM: Chunk 512 bytes (total 94208 / 160000)[0m
+[0;32mI (17817) STREAM: Chunk 512 bytes (total 94720 / 160000)[0m
+[0;32mI (17858) STREAM: Chunk 512 bytes (total 95232 / 160000)[0m
+[0;32mI (17892) APP: [8065 ms] MAIN  state=RUNNING[0m
+[0;32mI (17893) APP: [8065 ms] I2S   state=RUNNING frames=186[0m
+[0;32mI (17893) APP: [8065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (17893) APP: [8065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (17899) STREAM: Chunk 512 bytes (total 95744 / 160000)[0m
+[0;32mI (17950) STREAM: Chunk 512 bytes (total 96256 / 160000)[0m
+[0;32mI (17991) STREAM: Chunk 512 bytes (total 96768 / 160000)[0m
+[0;32mI (18032) STREAM: Chunk 512 bytes (total 97280 / 160000)[0m
+[0;32mI (18083) STREAM: Chunk 512 bytes (total 97792 / 160000)[0m
+[0;32mI (18124) STREAM: Chunk 512 bytes (total 98304 / 160000)[0m
+[0;32mI (18165) STREAM: Chunk 512 bytes (total 98816 / 160000)[0m
+[0;32mI (18216) STREAM: Chunk 512 bytes (total 99328 / 160000)[0m
+[0;32mI (18257) STREAM: Chunk 512 bytes (total 99840 / 160000)[0m
+[0;32mI (18298) STREAM: Chunk 512 bytes (total 100352 / 160000)[0m
+[0;32mI (18349) STREAM: Chunk 512 bytes (total 100864 / 160000)[0m
+[0;32mI (18390) STREAM: Chunk 512 bytes (total 101376 / 160000)[0m
+[0;32mI (18431) STREAM: Chunk 512 bytes (total 101888 / 160000)[0m
+[0;32mI (18482) STREAM: Chunk 512 bytes (total 102400 / 160000)[0m
+[0;32mI (18523) STREAM: Chunk 512 bytes (total 102912 / 160000)[0m
+[0;32mI (18575) STREAM: Chunk 512 bytes (total 103424 / 160000)[0m
+[0;32mI (18616) STREAM: Chunk 512 bytes (total 103936 / 160000)[0m
+[0;32mI (18657) STREAM: Chunk 512 bytes (total 104448 / 160000)[0m
+[0;32mI (18708) STREAM: Chunk 512 bytes (total 104960 / 160000)[0m
+[0;32mI (18749) STREAM: Chunk 512 bytes (total 105472 / 160000)[0m
+[0;32mI (18790) STREAM: Chunk 512 bytes (total 105984 / 160000)[0m
+[0;32mI (18841) STREAM: Chunk 512 bytes (total 106496 / 160000)[0m
+[0;32mI (18882) STREAM: Chunk 512 bytes (total 107008 / 160000)[0m
+[0;32mI (18892) APP: [9065 ms] MAIN  state=RUNNING[0m
+[0;32mI (18893) APP: [9065 ms] I2S   state=RUNNING frames=209[0m
+[0;32mI (18893) APP: [9065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (18893) APP: [9065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (18923) STREAM: Chunk 512 bytes (total 107520 / 160000)[0m
+[0;32mI (18974) STREAM: Chunk 512 bytes (total 108032 / 160000)[0m
+[0;32mI (19015) STREAM: Chunk 512 bytes (total 108544 / 160000)[0m
+[0;32mI (19056) STREAM: Chunk 512 bytes (total 109056 / 160000)[0m
+[0;32mI (19107) STREAM: Chunk 512 bytes (total 109568 / 160000)[0m
+[0;32mI (19148) STREAM: Chunk 512 bytes (total 110080 / 160000)[0m
+[0;32mI (19189) STREAM: Chunk 512 bytes (total 110592 / 160000)[0m
+[0;32mI (19240) STREAM: Chunk 512 bytes (total 111104 / 160000)[0m
+[0;32mI (19281) STREAM: Chunk 512 bytes (total 111616 / 160000)[0m
+[0;32mI (19322) STREAM: Chunk 512 bytes (total 112128 / 160000)[0m
+[0;32mI (19373) STREAM: Chunk 512 bytes (total 112640 / 160000)[0m
+[0;32mI (19414) STREAM: Chunk 512 bytes (total 113152 / 160000)[0m
+[0;32mI (19455) STREAM: Chunk 512 bytes (total 113664 / 160000)[0m
+[0;32mI (19507) STREAM: Chunk 512 bytes (total 114176 / 160000)[0m
+[0;32mI (19548) STREAM: Chunk 512 bytes (total 114688 / 160000)[0m
+[0;32mI (19589) STREAM: Chunk 512 bytes (total 115200 / 160000)[0m
+[0;32mI (19640) STREAM: Chunk 512 bytes (total 115712 / 160000)[0m
+[0;32mI (19681) STREAM: Chunk 512 bytes (total 116224 / 160000)[0m
+[0;32mI (19722) STREAM: Chunk 512 bytes (total 116736 / 160000)[0m
+[0;32mI (19773) STREAM: Chunk 512 bytes (total 117248 / 160000)[0m
+[0;32mI (19814) STREAM: Chunk 512 bytes (total 117760 / 160000)[0m
+[0;32mI (19855) STREAM: Chunk 512 bytes (total 118272 / 160000)[0m
+[0;32mI (19892) APP: [10065 ms] MAIN  state=RUNNING[0m
+[0;32mI (19893) APP: [10065 ms] I2S   state=RUNNING frames=231[0m
+[0;32mI (19893) APP: [10065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (19893) APP: [10065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (19906) STREAM: Chunk 512 bytes (total 118784 / 160000)[0m
+[0;32mI (19947) STREAM: Chunk 512 bytes (total 119296 / 160000)[0m
+[0;32mI (19988) STREAM: Chunk 512 bytes (total 119808 / 160000)[0m
+[0;32mI (20039) STREAM: Chunk 512 bytes (total 120320 / 160000)[0m
+[0;32mI (20080) STREAM: Chunk 512 bytes (total 120832 / 160000)[0m
+[0;32mI (20121) STREAM: Chunk 512 bytes (total 121344 / 160000)[0m
+[0;32mI (20172) STREAM: Chunk 512 bytes (total 121856 / 160000)[0m
+[0;32mI (20213) STREAM: Chunk 512 bytes (total 122368 / 160000)[0m
+[0;32mI (20254) STREAM: Chunk 512 bytes (total 122880 / 160000)[0m
+[0;32mI (20305) STREAM: Chunk 512 bytes (total 123392 / 160000)[0m
+[0;32mI (20346) STREAM: Chunk 512 bytes (total 123904 / 160000)[0m
+[0;32mI (20387) STREAM: Chunk 512 bytes (total 124416 / 160000)[0m
+[0;32mI (20439) STREAM: Chunk 512 bytes (total 124928 / 160000)[0m
+[0;32mI (20480) STREAM: Chunk 512 bytes (total 125440 / 160000)[0m
+[0;32mI (20521) STREAM: Chunk 512 bytes (total 125952 / 160000)[0m
+[0;32mI (20572) STREAM: Chunk 512 bytes (total 126464 / 160000)[0m
+[0;32mI (20613) STREAM: Chunk 512 bytes (total 126976 / 160000)[0m
+[0;32mI (20654) STREAM: Chunk 512 bytes (total 127488 / 160000)[0m
+[0;32mI (20705) STREAM: Chunk 512 bytes (total 128000 / 160000)[0m
+[0;32mI (20746) STREAM: Chunk 512 bytes (total 128512 / 160000)[0m
+[0;32mI (20787) STREAM: Chunk 512 bytes (total 129024 / 160000)[0m
+[0;32mI (20838) STREAM: Chunk 512 bytes (total 129536 / 160000)[0m
+[0;32mI (20879) STREAM: Chunk 512 bytes (total 130048 / 160000)[0m
+[0;32mI (20892) APP: [11065 ms] MAIN  state=RUNNING[0m
+[0;32mI (20893) APP: [11065 ms] I2S   state=RUNNING frames=254[0m
+[0;32mI (20893) APP: [11065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (20893) APP: [11065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (20920) STREAM: Chunk 512 bytes (total 130560 / 160000)[0m
+[0;32mI (20971) STREAM: Chunk 512 bytes (total 131072 / 160000)[0m
+[0;32mI (21012) STREAM: Chunk 512 bytes (total 131584 / 160000)[0m
+[0;32mI (21053) STREAM: Chunk 512 bytes (total 132096 / 160000)[0m
+[0;32mI (21104) STREAM: Chunk 512 bytes (total 132608 / 160000)[0m
+[0;32mI (21145) STREAM: Chunk 512 bytes (total 133120 / 160000)[0m
+[0;32mI (21197) STREAM: Chunk 512 bytes (total 133632 / 160000)[0m
+[0;32mI (21238) STREAM: Chunk 512 bytes (total 134144 / 160000)[0m
+[0;32mI (21278) STREAM: Chunk 512 bytes (total 134656 / 160000)[0m
+[0;32mI (21330) STREAM: Chunk 512 bytes (total 135168 / 160000)[0m
+[0;32mI (21371) STREAM: Chunk 512 bytes (total 135680 / 160000)[0m
+[0;32mI (21412) STREAM: Chunk 512 bytes (total 136192 / 160000)[0m
+[0;32mI (21463) STREAM: Chunk 512 bytes (total 136704 / 160000)[0m
+[0;32mI (21504) STREAM: Chunk 512 bytes (total 137216 / 160000)[0m
+[0;32mI (21545) STREAM: Chunk 512 bytes (total 137728 / 160000)[0m
+[0;32mI (21596) STREAM: Chunk 512 bytes (total 138240 / 160000)[0m
+[0;32mI (21637) STREAM: Chunk 512 bytes (total 138752 / 160000)[0m
+[0;32mI (21678) STREAM: Chunk 512 bytes (total 139264 / 160000)[0m
+[0;32mI (21729) STREAM: Chunk 512 bytes (total 139776 / 160000)[0m
+[0;32mI (21770) STREAM: Chunk 512 bytes (total 140288 / 160000)[0m
+[0;32mI (21811) STREAM: Chunk 512 bytes (total 140800 / 160000)[0m
+[0;32mI (21862) STREAM: Chunk 512 bytes (total 141312 / 160000)[0m
+[0;32mI (21892) APP: [12065 ms] MAIN  state=RUNNING[0m
+[0;32mI (21893) APP: [12065 ms] I2S   state=RUNNING frames=276[0m
+[0;32mI (21893) APP: [12065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (21894) APP: [12065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (21903) STREAM: Chunk 512 bytes (total 141824 / 160000)[0m
+[0;32mI (21944) STREAM: Chunk 512 bytes (total 142336 / 160000)[0m
+[0;32mI (21995) STREAM: Chunk 512 bytes (total 142848 / 160000)[0m
+[0;32mI (22036) STREAM: Chunk 512 bytes (total 143360 / 160000)[0m
+[0;32mI (22077) STREAM: Chunk 512 bytes (total 143872 / 160000)[0m
+[0;32mI (22129) STREAM: Chunk 512 bytes (total 144384 / 160000)[0m
+[0;32mI (22170) STREAM: Chunk 512 bytes (total 144896 / 160000)[0m
+[0;32mI (22210) STREAM: Chunk 512 bytes (total 145408 / 160000)[0m
+[0;32mI (22262) STREAM: Chunk 512 bytes (total 145920 / 160000)[0m
+[0;32mI (22303) STREAM: Chunk 512 bytes (total 146432 / 160000)[0m
+[0;32mI (22344) STREAM: Chunk 512 bytes (total 146944 / 160000)[0m
+[0;32mI (22395) STREAM: Chunk 512 bytes (total 147456 / 160000)[0m
+[0;32mI (22436) STREAM: Chunk 512 bytes (total 147968 / 160000)[0m
+[0;32mI (22477) STREAM: Chunk 512 bytes (total 148480 / 160000)[0m
+[0;32mI (22528) STREAM: Chunk 512 bytes (total 148992 / 160000)[0m
+[0;32mI (22569) STREAM: Chunk 512 bytes (total 149504 / 160000)[0m
+[0;32mI (22610) STREAM: Chunk 512 bytes (total 150016 / 160000)[0m
+[0;32mI (22661) STREAM: Chunk 512 bytes (total 150528 / 160000)[0m
+[0;32mI (22702) STREAM: Chunk 512 bytes (total 151040 / 160000)[0m
+[0;32mI (22743) STREAM: Chunk 512 bytes (total 151552 / 160000)[0m
+[0;32mI (22794) STREAM: Chunk 512 bytes (total 152064 / 160000)[0m
+[0;32mI (22835) STREAM: Chunk 512 bytes (total 152576 / 160000)[0m
+[0;32mI (22876) STREAM: Chunk 512 bytes (total 153088 / 160000)[0m
+[0;32mI (22892) APP: [13065 ms] MAIN  state=RUNNING[0m
+[0;32mI (22893) APP: [13065 ms] I2S   state=RUNNING frames=299[0m
+[0;32mI (22893) APP: [13065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (22893) APP: [13065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (22927) STREAM: Chunk 512 bytes (total 153600 / 160000)[0m
+[0;32mI (22968) STREAM: Chunk 512 bytes (total 154112 / 160000)[0m
+[0;32mI (23009) STREAM: Chunk 512 bytes (total 154624 / 160000)[0m
+[0;32mI (23061) STREAM: Chunk 512 bytes (total 155136 / 160000)[0m
+[0;32mI (23102) STREAM: Chunk 512 bytes (total 155648 / 160000)[0m
+[0;32mI (23143) STREAM: Chunk 512 bytes (total 156160 / 160000)[0m
+[0;32mI (23194) STREAM: Chunk 512 bytes (total 156672 / 160000)[0m
+[0;32mI (23235) STREAM: Chunk 512 bytes (total 157184 / 160000)[0m
+[0;32mI (23276) STREAM: Chunk 512 bytes (total 157696 / 160000)[0m
+[0;32mI (23327) STREAM: Chunk 512 bytes (total 158208 / 160000)[0m
+[0;32mI (23368) STREAM: Chunk 512 bytes (total 158720 / 160000)[0m
+[0;32mI (23409) STREAM: Chunk 512 bytes (total 159232 / 160000)[0m
+[0;32mI (23460) STREAM: Chunk 512 bytes (total 159744 / 160000)[0m
+[0;32mI (23501) STREAM: Chunk 512 bytes (total 160256 / 160000)[0m
+D (23501) i2s_common: i2s rx channel disabled
+[0;32mI (23542) APP: Capture complete: total_bytes=160256 (expected 160000), dropped=0, uart_retries=0[0m
+[0;32mI (23892) APP: [14065 ms] MAIN  state=RUNNING[0m
+[0;32mI (23893) APP: [14065 ms] I2S   state=IDLE frames=313[0m
+[0;32mI (23893) APP: [14065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (23893) APP: [14065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (24892) APP: [15065 ms] MAIN  state=RUNNING[0m
+[0;32mI (24893) APP: [15065 ms] I2S   state=IDLE frames=313[0m
+[0;32mI (24893) APP: [15065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (24893) APP: [15065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (25892) APP: [16065 ms] MAIN  state=RUNNING[0m
+[0;32mI (25893) APP: [16065 ms] I2S   state=IDLE frames=313[0m
+[0;32mI (25893) APP: [16065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (25893) APP: [16065 ms] STREAM state=IDLE frames_sent=0[0m
+[0;32mI (26892) APP: [17065 ms] MAIN  state=RUNNING[0m
+[0;32mI (26893) APP: [17065 ms] I2S   state=IDLE frames=313[0m
+[0;32mI (26893) APP: [17065 ms] UART  state=RUNNING write_errors=0[0m
+[0;32mI (26893) APP: [17065 ms] STREAM state=IDLE frames_sent=0[0m
