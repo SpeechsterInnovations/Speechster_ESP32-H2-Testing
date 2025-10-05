@@ -1,0 +1,41 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix riscv32-esp-elf- --decode-coredumps info --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/INMP_441-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py'
+[0;33m--- esp-idf-monitor 1.8.0 on /dev/ttyACM0 115200[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+[0m--- 0x4000ba90: [0;33mrecv_packet[0m[0m in [0;32mROM[0m
+[0m--- 0x4083c2d0: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/opt/esp-idf/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m38[0m
+[0m--- 0x4083efd0: [0;33mesp_flash_encryption_enabled[0m[0m at [0;32m/opt/esp-idf/components/bootloader_support/src/flash_encrypt.c[0m[0m:[1;31m87[0m
+[0m--- 0x4083c2e8: [0;33mcall_start_cpu0[0m[0m at [0;32m/opt/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m25[0m
+[0m--- 0x408008d6: [0;33mheap_caps_aligned_alloc_base[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_caps_base.c[0m[0m:[1;31m105[0m
+[0;33m--- Stack dump detected[0m
+[0m--- 0x408022d4: [0;33mesp_heap_adjust_alignment_to_hw[0m[0m at [0;32m/opt/esp-idf/components/esp_mm/heap_align_hw.c[0m[0m:[1;31m26[0m
+[0m--- 0x408008f8: [0;33mheap_caps_aligned_alloc_base[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_caps_base.c[0m[0m:[1;31m113[0m
+[0m--- 0x400184be: [0;33mmemset[0m[0m in [0;32mROM[0m
+[0m--- 0x408092c2: [0;33mgdma_ahb_hal_append[0m[0m at [0;32m/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c[0m[0m:[1;31m37[0m
+[0m--- 0x4201f8a8: [0;33mgdma_ahb_hal_enable_burst[0m[0m at [0;32m/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c[0m[0m:[1;31m84[0m
+[0m--- 0x4201f856: [0;33mgdma_ahb_hal_disconnect_peri[0m[0m at [0;32m/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c[0m[0m:[1;31m75[0m
+[0m--- 0x4201fa74: [0;33mgdma_ahb_hal_connect_peri[0m[0m at [0;32m/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c[0m[0m:[1;31m64[0m
+[0m--- 0x4201f808: [0;33mgdma_ahb_hal_set_priority[0m[0m at [0;32m/opt/esp-idf/components/hal/gdma_hal_ahb_v1.c[0m[0m:[1;31m55[0m
+[0m--- 0x40800001: [0;33m_vector_table[0m[0m at [0;32m/opt/esp-idf/components/riscv/vectors_intc.S[0m[0m:[1;31m54[0m
+[0m--- 0x408022d4: [0;33mesp_heap_adjust_alignment_to_hw[0m[0m at [0;32m/opt/esp-idf/components/esp_mm/heap_align_hw.c[0m[0m:[1;31m26[0m
+[0m--- 0x40800832: [0;33mheap_caps_aligned_alloc[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_caps.c[0m[0m:[1;31m544[0m
+[0m--- 0x42006096: [0;33mregdma_link_new_addr_map[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/port/regdma_link.c[0m[0m:[1;31m43[0m
+[0m--- 0x4200614c: [0;33mregdma_link_init_addr_map_wrapper[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/port/regdma_link.c[0m[0m:[1;31m202[0m
+[0m--- 0x420067d0: [0;33mregdma_link_init[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/port/regdma_link.c[0m[0m:[1;31m314[0m
+[0m--- 0x42004e16: [0;33msleep_retention_entries_try_create[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/sleep_retention.c[0m[0m:[1;31m292[0m
+[0m--- (inlined by) [0;33msleep_retention_entries_create_impl[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/sleep_retention.c[0m[0m:[1;31m559[0m
+[0m--- 0x420053c4: [0;33msleep_retention_entries_create_wrapper[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/sleep_retention.c[0m[0m:[1;31m619[0m
+[0m--- (inlined by) [0;33msleep_retention_entries_create[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/sleep_retention.c[0m[0m:[1;31m644[0m
+[0m--- 0x42013414: [0;33msleep_gdma_channel_retention_init[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/dma/gdma_sleep_retention.c[0m[0m:[1;31m23[0m
+[0m--- 0x4200560e: [0;33msleep_retention_module_allocate[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/sleep_retention.c[0m[0m:[1;31m853[0m
+[0m--- 0x420134d6: [0;33mgdma_sleep_retention_init[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/dma/gdma_sleep_retention.c[0m[0m:[1;31m42[0m
+[0m--- 0x4201ce44: [0;33mdo_allocate_gdma_channel[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m120[0m
+[0m--- (inlined by) [0;33mgdma_new_ahb_channel[0m[0m at [0;32m/opt/esp-idf/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m208[0m
+[0m--- 0x42010b12: [0;33mi2s_init_dma_intr[0m[0m at [0;32m/opt/esp-idf/components/esp_driver_i2s/i2s_common.c[0m[0m:[1;31m812[0m
+[0m--- 0x4201216a: [0;33mi2s_channel_init_std_mode[0m[0m at [0;32m/opt/esp-idf/components/esp_driver_i2s/i2s_std.c[0m[0m:[1;31m247[0m
+[0m--- 0x4200d28a: [0;33mapp_main[0m[0m at [0;32m/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main/main.c[0m[0m:[1;31m48[0m
+[0m--- 0x4201f432: [0;33mmain_task[0m[0m at [0;32m/opt/esp-idf/components/freertos/app_startup.c[0m[0m:[1;31m210[0m
+[0m--- 0x408071da: [0;33mvPortTaskWrapper[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/port.c[0m[0m:[1;31m258[0m
+[0;33m--- Core dump started (further output muted)[0m
+[0;33m--- Received   1 kB...[0m[0;33m--- Received   2 kB...[0m[0;33m--- Received   3 kB...[0m[0;33m--- Received   4 kB...[0m[0;33m--- Received   5 kB...[0m[0;33m--- Received   6 kB...[0m[0;33m--- Received   7 kB...[0m[0;33m
+--- Core dump finished![0m
+[0m

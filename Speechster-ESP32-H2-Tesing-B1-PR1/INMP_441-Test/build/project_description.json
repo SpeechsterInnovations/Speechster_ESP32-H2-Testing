@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "INMP_441-Test",
-    "project_version":    "7c67421-dirty",
+    "project_version":    "2d2d735-dirty",
     "project_path":       "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test",
     "idf_path":           "/opt/esp-idf",
     "build_dir":          "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build",
@@ -93,15 +93,15 @@
             "target": "___idf_bt",
             "prefix": "idf",
             "dir": "/opt/esp-idf/components/bt",
-            "type": "LIBRARY",
+            "type": "CONFIG_ONLY",
             "lib": "__idf_bt",
             "reqs": [ "esp_timer", "esp_wifi" ],
             "priv_reqs": [ "nvs_flash", "soc", "esp_pm", "esp_phy", "esp_coex", "mbedtls", "esp_driver_uart", "vfs", "esp_ringbuf", "esp_driver_spi", "esp_driver_gpio", "esp_gdbstub" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/bt/libbt.a",
-            "sources": [ "/opt/esp-idf/components/bt/controller/esp32h2/bt.c", "/opt/esp-idf/components/bt/controller/esp32h2/ble.c", "/opt/esp-idf/components/bt/common/btc/core/btc_alarm.c", "/opt/esp-idf/components/bt/common/api/esp_blufi_api.c", "/opt/esp-idf/components/bt/common/hci_log/bt_hci_log.c", "/opt/esp-idf/components/bt/common/btc/core/btc_manage.c", "/opt/esp-idf/components/bt/common/btc/core/btc_task.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/blufi_prf.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/blufi_protocol.c", "/opt/esp-idf/components/bt/common/osi/alarm.c", "/opt/esp-idf/components/bt/common/osi/allocator.c", "/opt/esp-idf/components/bt/common/osi/buffer.c", "/opt/esp-idf/components/bt/common/osi/config.c", "/opt/esp-idf/components/bt/common/osi/fixed_queue.c", "/opt/esp-idf/components/bt/common/osi/pkt_queue.c", "/opt/esp-idf/components/bt/common/osi/fixed_pkt_queue.c", "/opt/esp-idf/components/bt/common/osi/future.c", "/opt/esp-idf/components/bt/common/osi/hash_functions.c", "/opt/esp-idf/components/bt/common/osi/hash_map.c", "/opt/esp-idf/components/bt/common/osi/list.c", "/opt/esp-idf/components/bt/common/osi/mutex.c", "/opt/esp-idf/components/bt/common/osi/thread.c", "/opt/esp-idf/components/bt/common/osi/osi.c", "/opt/esp-idf/components/bt/common/osi/semaphore.c", "/opt/esp-idf/components/bt/porting/mem/bt_osi_mem.c", "/opt/esp-idf/components/bt/common/ble_log/ble_log_spi_out.c", "/opt/esp-idf/components/bt/common/ble_log/ble_log_uhci_out.c", "/opt/esp-idf/components/bt/porting/npl/freertos/src/npl_os_freertos.c", "/opt/esp-idf/components/bt/porting/mem/os_msys_init.c", "/opt/esp-idf/components/bt/porting/transport/src/hci_transport.c", "/opt/esp-idf/components/bt/porting/transport/driver/vhci/hci_driver_nimble.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/transport/esp_ipc/src/hci_esp_ipc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/transport/src/transport.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/util/src/addr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/gatt/src/ble_svc_gatt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/tps/src/ble_svc_tps.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ias/src/ble_svc_ias.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ipss/src/ble_svc_ipss.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/ans/src/ble_svc_ans.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/hr/src/ble_svc_hr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/htp/src/ble_svc_htp.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/gap/src/ble_svc_gap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/bas/src/ble_svc_bas.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/dis/src/ble_svc_dis.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/lls/src/ble_svc_lls.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/prox/src/ble_svc_prox.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/cts/src/ble_svc_cts.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/hid/src/ble_svc_hid.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/sps/src/ble_svc_sps.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/services/cte/src/ble_svc_cte.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_conn.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_store_util.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_shutdown.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_sig_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_id.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_svr.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gatts_lcl.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_ibeacon.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_atomic.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_alg.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_stop.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_evt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_mqueue.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_periodic_sync.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_ead.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_aes_ccm.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_store.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_lgcy.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_cfg.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_clt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_coc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_mbuf.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_att_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_log.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_eddystone.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_startup.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap_sig.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_cmd.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_uuid.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_pvcy.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_flow.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_l2cap.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_sm_sc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_misc.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gatts.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_adv.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_hci_util.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_hs_resolv.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/ram/src/ble_store_ram.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/config/src/ble_store_config.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/store/config/src/ble_store_nvs.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc_cache.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_gattc_cache_conn.c", "/opt/esp-idf/components/bt/host/nimble/nimble/nimble/host/src/ble_eatt.c", "/opt/esp-idf/components/bt/host/nimble/nimble/porting/nimble/src/nimble_port.c", "/opt/esp-idf/components/bt/host/nimble/nimble/porting/npl/freertos/src/nimble_port_freertos.c", "/opt/esp-idf/components/bt/host/nimble/port/src/nvs_port.c", "/opt/esp-idf/components/bt/common/btc/profile/esp/blufi/nimble_host/esp_blufi.c" ],
-            "include_dirs": [ "include/esp32h2/include", "common/osi/include", "common/api/include/api", "common/btc/profile/esp/blufi/include", "common/btc/profile/esp/include", "common/hci_log/include", "common/ble_log/include", "porting/include", "porting/npl/freertos/include", "porting/transport/include", "host/nimble/nimble/nimble/host/include", "host/nimble/nimble/nimble/include", "host/nimble/nimble/nimble/host/services/ans/include", "host/nimble/nimble/nimble/host/services/bas/include", "host/nimble/nimble/nimble/host/services/dis/include", "host/nimble/nimble/nimble/host/services/gap/include", "host/nimble/nimble/nimble/host/services/gatt/include", "host/nimble/nimble/nimble/host/services/hr/include", "host/nimble/nimble/nimble/host/services/htp/include", "host/nimble/nimble/nimble/host/services/ias/include", "host/nimble/nimble/nimble/host/services/ipss/include", "host/nimble/nimble/nimble/host/services/lls/include", "host/nimble/nimble/nimble/host/services/prox/include", "host/nimble/nimble/nimble/host/services/cts/include", "host/nimble/nimble/nimble/host/services/tps/include", "host/nimble/nimble/nimble/host/services/hid/include", "host/nimble/nimble/nimble/host/services/sps/include", "host/nimble/nimble/nimble/host/services/cte/include", "host/nimble/nimble/nimble/host/util/include", "host/nimble/nimble/nimble/host/store/ram/include", "host/nimble/nimble/nimble/host/store/config/include", "host/nimble/nimble/porting/nimble/include", "host/nimble/port/include", "host/nimble/nimble/nimble/transport/include", "host/nimble/nimble/nimble/include" ]
+            "file": "",
+            "sources": [],
+            "include_dirs": []
         },
         "cmock": {
             "alias": "idf::cmock",
@@ -243,14 +243,14 @@
             "target": "___idf_esp_coex",
             "prefix": "idf",
             "dir": "/opt/esp-idf/components/esp_coex",
-            "type": "LIBRARY",
+            "type": "CONFIG_ONLY",
             "lib": "__idf_esp_coex",
             "reqs": [],
             "priv_reqs": [ "esp_timer", "esp_driver_gpio" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_coex/libesp_coex.a",
-            "sources": [ "/opt/esp-idf/components/esp_coex/src/coexist.c", "/opt/esp-idf/components/esp_coex/src/lib_printf.c", "/opt/esp-idf/components/esp_coex/esp32h2/esp_coex_adapter.c" ],
+            "file": "",
+            "sources": [],
             "include_dirs": [ "include" ]
         },
         "esp_common": {
@@ -655,7 +655,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_driver_usb_serial_jtag/libesp_driver_usb_serial_jtag.a",
-            "sources": [ "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c", "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_connection_monitor.c", "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_vfs.c" ],
+            "sources": [ "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c", "/opt/esp-idf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_connection_monitor.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_eth": {
@@ -715,7 +715,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_hid/libesp_hid.a",
-            "sources": [ "/opt/esp-idf/components/esp_hid/src/esp_hidd.c", "/opt/esp-idf/components/esp_hid/src/esp_hidh.c", "/opt/esp-idf/components/esp_hid/src/esp_hid_common.c", "/opt/esp-idf/components/esp_hid/src/nimble_hidd.c", "/opt/esp-idf/components/esp_hid/src/nimble_hidh.c" ],
+            "sources": [ "/opt/esp-idf/components/esp_hid/src/esp_hidd.c", "/opt/esp-idf/components/esp_hid/src/esp_hidh.c", "/opt/esp-idf/components/esp_hid/src/esp_hid_common.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_http_client": {
@@ -820,7 +820,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/esp_local_ctrl/libesp_local_ctrl.a",
-            "sources": [ "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_handler.c", "/opt/esp-idf/components/esp_local_ctrl/proto-c/esp_local_ctrl.pb-c.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_ble.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_httpd.c" ],
+            "sources": [ "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_handler.c", "/opt/esp-idf/components/esp_local_ctrl/proto-c/esp_local_ctrl.pb-c.c", "/opt/esp-idf/components/esp_local_ctrl/src/esp_local_ctrl_transport_httpd.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_mm": {
@@ -1173,14 +1173,14 @@
             "target": "___idf_ieee802154",
             "prefix": "idf",
             "dir": "/opt/esp-idf/components/ieee802154",
-            "type": "LIBRARY",
+            "type": "CONFIG_ONLY",
             "lib": "__idf_ieee802154",
             "reqs": [ "esp_coex" ],
             "priv_reqs": [ "esp_phy", "esp_timer", "soc", "hal", "esp_pm" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/ieee802154/libieee802154.a",
-            "sources": [ "/opt/esp-idf/components/ieee802154/esp_ieee802154.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_ack.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_dev.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_event.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_frame.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_pib.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_util.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_sec.c", "/opt/esp-idf/components/ieee802154/driver/esp_ieee802154_timer.c" ],
+            "file": "",
+            "sources": [],
             "include_dirs": [ "include" ]
         },
         "json": {
@@ -1375,7 +1375,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build/esp-idf/protocomm/libprotocomm.a",
-            "sources": [ "/opt/esp-idf/components/protocomm/src/common/protocomm.c", "/opt/esp-idf/components/protocomm/proto-c/constants.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec0.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec1.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec2.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/session.pb-c.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_console.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_httpd.c", "/opt/esp-idf/components/protocomm/src/security/security0.c", "/opt/esp-idf/components/protocomm/src/security/security1.c", "/opt/esp-idf/components/protocomm/src/security/security2.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp_mpi.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_nimble.c" ],
+            "sources": [ "/opt/esp-idf/components/protocomm/src/common/protocomm.c", "/opt/esp-idf/components/protocomm/proto-c/constants.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec0.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec1.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/sec2.pb-c.c", "/opt/esp-idf/components/protocomm/proto-c/session.pb-c.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_console.c", "/opt/esp-idf/components/protocomm/src/transports/protocomm_httpd.c", "/opt/esp-idf/components/protocomm/src/security/security0.c", "/opt/esp-idf/components/protocomm/src/security/security1.c", "/opt/esp-idf/components/protocomm/src/security/security2.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp.c", "/opt/esp-idf/components/protocomm/src/crypto/srp6a/esp_srp_mpi.c" ],
             "include_dirs": [ "include/common", "include/security", "include/transports", "include/crypto/srp6a", "proto-c" ]
         },
         "pthread": {
@@ -1663,7 +1663,7 @@
             "priv_reqs": [ "nvs_flash", "soc", "esp_pm", "esp_phy", "esp_coex", "mbedtls", "esp_driver_uart", "vfs", "esp_ringbuf", "esp_driver_spi", "esp_driver_gpio", "esp_gdbstub" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": [ "include/esp32h2/include", "common/osi/include", "common/api/include/api", "common/btc/profile/esp/blufi/include", "common/btc/profile/esp/include", "common/hci_log/include", "common/ble_log/include", "porting/include", "porting/npl/freertos/include", "porting/transport/include", "host/nimble/nimble/nimble/host/include", "host/nimble/nimble/nimble/include", "host/nimble/nimble/nimble/host/services/ans/include", "host/nimble/nimble/nimble/host/services/bas/include", "host/nimble/nimble/nimble/host/services/dis/include", "host/nimble/nimble/nimble/host/services/gap/include", "host/nimble/nimble/nimble/host/services/gatt/include", "host/nimble/nimble/nimble/host/services/hr/include", "host/nimble/nimble/nimble/host/services/htp/include", "host/nimble/nimble/nimble/host/services/ias/include", "host/nimble/nimble/nimble/host/services/ipss/include", "host/nimble/nimble/nimble/host/services/lls/include", "host/nimble/nimble/nimble/host/services/prox/include", "host/nimble/nimble/nimble/host/services/cts/include", "host/nimble/nimble/nimble/host/services/tps/include", "host/nimble/nimble/nimble/host/services/hid/include", "host/nimble/nimble/nimble/host/services/sps/include", "host/nimble/nimble/nimble/host/services/cte/include", "host/nimble/nimble/nimble/host/util/include", "host/nimble/nimble/nimble/host/store/ram/include", "host/nimble/nimble/nimble/host/store/config/include", "host/nimble/nimble/porting/nimble/include", "host/nimble/port/include", "host/nimble/nimble/nimble/transport/include", "host/nimble/nimble/nimble/include" ]
+            "include_dirs": []
         },
         "cmock": {
             "alias": "idf::cmock",

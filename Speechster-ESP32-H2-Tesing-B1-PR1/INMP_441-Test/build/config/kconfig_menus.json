@@ -11420,10 +11420,7 @@
                                 "help": "Defines maximum number of concurrent BLE connections. For ESP32, user\nis expected to configure BTDM_CTRL_BLE_MAX_CONN from controller menu\nalong with this option. Similarly for ESP32-C3 or ESP32-S3, user is expected to\nconfigure BT_CTRL_BLE_MAX_ACT from controller menu.\nFor ESP32C2, ESP32C6 and ESP32H2, each connection will take about 1k DRAM.",
                                 "id": "BT_NIMBLE_MAX_CONNECTIONS",
                                 "name": "BT_NIMBLE_MAX_CONNECTIONS",
-                                "range": [
-                                    1,
-                                    35
-                                ],
+                                "range": null,
                                 "title": "Maximum number of concurrent connections",
                                 "type": "int"
                             },
@@ -11453,10 +11450,7 @@
                                 "help": "Defines maximum number of BLE Connection Oriented Channels. When set to (0), BLE COC is not compiled in",
                                 "id": "BT_NIMBLE_L2CAP_COC_MAX_NUM",
                                 "name": "BT_NIMBLE_L2CAP_COC_MAX_NUM",
-                                "range": [
-                                    0,
-                                    9
-                                ],
+                                "range": null,
                                 "title": "Maximum number of connection oriented channels",
                                 "type": "int"
                             },
@@ -11928,10 +11922,7 @@
                                 "help": "Time interval between RPA address change.",
                                 "id": "BT_NIMBLE_RPA_TIMEOUT",
                                 "name": "BT_NIMBLE_RPA_TIMEOUT",
-                                "range": [
-                                    1,
-                                    41400
-                                ],
+                                "range": null,
                                 "title": "RPA timeout in seconds",
                                 "type": "int"
                             },
@@ -12096,10 +12087,7 @@
                                         "help": "Defines maximum number of connection reattempts.",
                                         "id": "BT_NIMBLE_MAX_CONN_REATTEMPT",
                                         "name": "BT_NIMBLE_MAX_CONN_REATTEMPT",
-                                        "range": [
-                                            1,
-                                            255
-                                        ],
+                                        "range": null,
                                         "title": "Maximum number connection reattempts",
                                         "type": "int"
                                     }
@@ -12236,10 +12224,7 @@
                                                         "help": "Set this option to set the upper limit for number of periodic sync\nconnections. This should be less than maximum connections allowed by\ncontroller.",
                                                         "id": "BT_NIMBLE_MAX_PERIODIC_SYNCS",
                                                         "name": "BT_NIMBLE_MAX_PERIODIC_SYNCS",
-                                                        "range": [
-                                                            0,
-                                                            8
-                                                        ],
+                                                        "range": null,
                                                         "title": "Maximum number of periodic advertising syncs",
                                                         "type": "int"
                                                     },
@@ -12249,10 +12234,7 @@
                                                         "help": "Set this option to set the upper limit for number of periodic advertiser list.",
                                                         "id": "BT_NIMBLE_MAX_PERIODIC_ADVERTISER_LIST",
                                                         "name": "BT_NIMBLE_MAX_PERIODIC_ADVERTISER_LIST",
-                                                        "range": [
-                                                            1,
-                                                            5
-                                                        ],
+                                                        "range": null,
                                                         "title": "Maximum number of periodic advertiser list",
                                                         "type": "int"
                                                     }
@@ -12402,10 +12384,7 @@
                                 "help": "BLE list size",
                                 "id": "BT_NIMBLE_WHITELIST_SIZE",
                                 "name": "BT_NIMBLE_WHITELIST_SIZE",
-                                "range": [
-                                    1,
-                                    31
-                                ],
+                                "range": null,
                                 "title": "BLE white list size",
                                 "type": "int"
                             },
@@ -14066,10 +14045,7 @@
                                 "help": "Configure the size of resolving list used in link layer.",
                                 "id": "BT_LE_LL_RESOLV_LIST_SIZE",
                                 "name": "BT_LE_LL_RESOLV_LIST_SIZE",
-                                "range": [
-                                    1,
-                                    5
-                                ],
+                                "range": null,
                                 "title": "BLE LL Resolving list size",
                                 "type": "int"
                             },
@@ -14152,10 +14128,7 @@
                                 "help": "config the max count of duplicate scan list",
                                 "id": "BT_LE_LL_DUP_SCAN_LIST_COUNT",
                                 "name": "BT_LE_LL_DUP_SCAN_LIST_COUNT",
-                                "range": [
-                                    5,
-                                    100
-                                ],
+                                "range": null,
                                 "title": "BLE duplicate scan list count",
                                 "type": "int"
                             },
@@ -14165,10 +14138,7 @@
                                 "help": "Sleep clock accuracy of our device (in ppm)",
                                 "id": "BT_LE_LL_SCA",
                                 "name": "BT_LE_LL_SCA",
-                                "range": [
-                                    0,
-                                    500
-                                ],
+                                "range": null,
                                 "title": "BLE Sleep clock accuracy",
                                 "type": "int"
                             },
@@ -14301,10 +14271,7 @@
                                         "help": "The number of unprocessed advertising report that bluetooth host can save.If you set\n`BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM` to a small value, this may cause adv packets lost.\nIf you set `BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM` to a large value, bluetooth host may cache a\nlot of adv packets and this may cause system memory run out. For example, if you set\nit to 50, the maximum memory consumed by host is 35 * 50 bytes. Please set\n`BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM` according to your system free memory and handle adv\npackets as fast as possible, otherwise it will cause adv packets lost.",
                                         "id": "BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM",
                                         "name": "BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM",
-                                        "range": [
-                                            50,
-                                            1000
-                                        ],
+                                        "range": null,
                                         "title": "BLE adv report flow control number",
                                         "type": "int"
                                     },
@@ -14314,10 +14281,7 @@
                                         "help": "When adv report flow control is enabled, The ADV lost event will be generated when the number\nof ADV packets lost in the controller reaches this threshold. It is better to set a larger value.\nIf you set `BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD` to a small value or printf every adv lost event, it\nmay cause adv packets lost more.",
                                         "id": "BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD",
                                         "name": "BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD",
-                                        "range": [
-                                            1,
-                                            1000
-                                        ],
+                                        "range": null,
                                         "title": "BLE adv lost event threshold value",
                                         "type": "int"
                                     }
@@ -14388,10 +14352,7 @@
                                         "help": "If the period value is non-zero, the controller will periodically clear the device information\nstored in the scan duuplicate filter. If it is 0, the scan duuplicate filter will not be cleared\nuntil the scanning is disabled. Duplicate advertisements for this period should not be sent to the\nHost in advertising report events.\nThere are two scenarios where the ADV packet will be repeatedly reported:\n1. The duplicate scan cache is full, the controller will delete the oldest device information and\nadd new device information.\n2. When the refresh period is up, the controller will clear all device information and start filtering\nagain.",
                                         "id": "BT_LE_SCAN_DUPL_CACHE_REFRESH_PERIOD",
                                         "name": "BT_LE_SCAN_DUPL_CACHE_REFRESH_PERIOD",
-                                        "range": [
-                                            0,
-                                            1000
-                                        ],
+                                        "range": null,
                                         "title": "Duplicate scan list refresh period (seconds)",
                                         "type": "int"
                                     }
@@ -14679,10 +14640,7 @@
                                 "help": "The value of upperlimitmax needs to be a power of 2.",
                                 "id": "BT_CTRL_SCAN_BACKOFF_UPPERLIMITMAX",
                                 "name": "BT_CTRL_SCAN_BACKOFF_UPPERLIMITMAX",
-                                "range": [
-                                    1,
-                                    256
-                                ],
+                                "range": null,
                                 "title": "The value of upperlimitmax during scan backoff procedure",
                                 "type": "int"
                             },
@@ -14734,10 +14692,7 @@
                                         "help": "This value sets the number the Controller will allocate for extended advertisement\ninstances at initialization process. If more extended advertisement instances are\nenabled, those memory will be dynamically allocated.\nUsing reduced amount of reserved memory will save heap size at the cost of extra\ntime consumption at advertising start process and possible advertising start failure\ndue to memory shortage.\nThe actual reserved memory count will be the minimum value between the maximum\nextended advertisement instances and the BT_LE_EXT_ADV_RESERVED_MEMORY_COUNT.",
                                         "id": "BT_LE_EXT_ADV_RESERVED_MEMORY_COUNT",
                                         "name": "BT_LE_EXT_ADV_RESERVED_MEMORY_COUNT",
-                                        "range": [
-                                            0,
-                                            4
-                                        ],
+                                        "range": null,
                                         "title": "The value of reserved EXT ADV memory count at initialization",
                                         "type": "int"
                                     },
@@ -14747,10 +14702,7 @@
                                         "help": "This value sets the number the Controller will allocate for connection instances\nat the initialization process. If more connection instances are enabled, those\nmemory will be dynamically allocated.\nUsing reduced amount of reserved memory will save heap size at the cost of extra\ntime consumption at connection establishment process and possible connection\nestablishment failure due to memory shortage.\nThe actual reserved memory count will be the minimum value between the maximum connection instances and\nthe BT_LE_CONN_RESERVED_MEMORY_COUNT.",
                                         "id": "BT_LE_CONN_RESERVED_MEMORY_COUNT",
                                         "name": "BT_LE_CONN_RESERVED_MEMORY_COUNT",
-                                        "range": [
-                                            0,
-                                            70
-                                        ],
+                                        "range": null,
                                         "title": "The value of reserved CONN memory count at initialization",
                                         "type": "int"
                                     }
@@ -22621,7 +22573,10 @@
                         "help": "This baud rate is used by both the ESP-IDF Bootloader and the app (including\nboot log output and default standard input/output/error of the app).\n\nThe app's maximum baud rate depends on the UART clock source. If Power Management is disabled,\nthe UART clock source is the APB clock and all baud rates in the available range will be sufficiently\naccurate. If Power Management is enabled, REF_TICK clock source is used so the baud rate is divided\nfrom 1MHz. Baud rates above 1Mbps are not possible and values between 500Kbps and 1Mbps may not be\naccurate.\n\nIf the configuration is different in the Bootloader binary compared to the app binary, UART\nis reconfigured after the bootloader exits and the app starts.",
                         "id": "ESP_CONSOLE_UART_BAUDRATE",
                         "name": "ESP_CONSOLE_UART_BAUDRATE",
-                        "range": null,
+                        "range": [
+                            1200,
+                            1000000
+                        ],
                         "title": "UART console baud rate",
                         "type": "int"
                     },
@@ -26435,10 +26390,7 @@
                                 "help": "The number of 802.15.4 receive buffers",
                                 "id": "IEEE802154_RX_BUFFER_SIZE",
                                 "name": "IEEE802154_RX_BUFFER_SIZE",
-                                "range": [
-                                    2,
-                                    100
-                                ],
+                                "range": null,
                                 "title": "The number of 802.15.4 receive buffers",
                                 "type": "int"
                             },
@@ -26508,10 +26460,7 @@
                                 "help": "set the CCA threshold, in dB",
                                 "id": "IEEE802154_CCA_THRESHOLD",
                                 "name": "IEEE802154_CCA_THRESHOLD",
-                                "range": [
-                                    -120,
-                                    0
-                                ],
+                                "range": null,
                                 "title": "CCA detection threshold",
                                 "type": "int"
                             },
@@ -26521,10 +26470,7 @@
                                 "help": "set the pending table size",
                                 "id": "IEEE802154_PENDING_TABLE_SIZE",
                                 "name": "IEEE802154_PENDING_TABLE_SIZE",
-                                "range": [
-                                    1,
-                                    100
-                                ],
+                                "range": null,
                                 "title": "Pending table size",
                                 "type": "int"
                             },
@@ -28288,7 +28234,7 @@
                         "id": "LWIP_TCPIP_TASK_STACK_SIZE",
                         "name": "LWIP_TCPIP_TASK_STACK_SIZE",
                         "range": [
-                            2560,
+                            2048,
                             65536
                         ],
                         "title": "TCP/IP Task Stack Size",
