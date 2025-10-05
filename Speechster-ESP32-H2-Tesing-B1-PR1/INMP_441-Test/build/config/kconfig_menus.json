@@ -7211,24 +7211,6 @@
     {
         "children": [
             {
-                "children": [],
-                "depends_on": null,
-                "help": "If enabled, the application will output extremely detailed debug logs,\nincluding per-chunk captures, retries, and low-level status.",
-                "id": "ENABLE_MAX_DEBUG",
-                "name": "ENABLE_MAX_DEBUG",
-                "range": null,
-                "title": "Enable Maximum Debug Verbosity",
-                "type": "bool"
-            }
-        ],
-        "depends_on": null,
-        "id": "app-options",
-        "title": "App Options",
-        "type": "menu"
-    },
-    {
-        "children": [
-            {
                 "children": [
                     {
                         "children": [],
