@@ -1,0 +1,8 @@
+menu "App Options"
+    config ENABLE_MAX_DEBUG
+        bool "Enable Maximum Debug Verbosity"
+        default n
+        help
+            If enabled, the application will output extremely detailed debug logs,
+            including per-chunk captures, retries, and low-level status.
+endmenu
