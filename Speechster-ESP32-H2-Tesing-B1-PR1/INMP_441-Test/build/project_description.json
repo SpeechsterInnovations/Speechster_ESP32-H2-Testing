@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "INMP_441-Test",
-    "project_version":    "7c67421-dirty",
+    "project_version":    "05c8656-dirty",
     "project_path":       "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test",
     "idf_path":           "/opt/esp-idf",
     "build_dir":          "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/build",
