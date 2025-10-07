@@ -115,29 +115,45 @@ static volatile bool fake_mode = false; // start with fake frames disabled
 /* ---------- I2S (INMP441) ---------- */
 static void i2s_init_inmp441(void) {
     i2s_config_t cfg = {
-        .mode = I2S_MODE_SLAVE | I2S_MODE_RX,
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = 16,
-        .communication_format = I2S_COMM_FORMAT_STAND_MSB, // modern constant, avoids deprecated enum
+        .mode = I2S_MODE_MASTER | I2S_MODE_RX,
+        .sample_rate = 16000,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,  // INMP441 outputs 24-bit in 32-bit slots
         .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .intr_alloc_flags = 0,
+        .communication_format = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB,
         .dma_buf_count = 6,
-        .dma_buf_len = 512,
+        .dma_buf_len = 256,
         .use_apll = false,
-        .tx_desc_auto_clear = false
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
     };
     i2s_pin_config_t pins = {
-        .bck_io_num = I2S_BCK_IO,
-        .ws_io_num = I2S_WS_IO,
+        .bck_io_num = 4,
+        .ws_io_num = 5,
         .data_out_num = I2S_PIN_NO_CHANGE,
-        .data_in_num = I2S_DATA_IN_IO
+        .data_in_num = 10
     };
     ESP_ERROR_CHECK(i2s_driver_install(I2S_PORT_NUM, &cfg, 0, NULL));
     ESP_ERROR_CHECK(i2s_set_pin(I2S_PORT_NUM, &pins));
-    ESP_ERROR_CHECK(i2s_set_clk(I2S_PORT_NUM, AUDIO_SAMPLE_RATE, 16, I2S_CHANNEL_MONO));
-    ESP_LOGI(TAG, "I2S init done (BCK=%d, WS=%d, SD=%d, SR=%d)",
-             I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO, AUDIO_SAMPLE_RATE);
+    ESP_ERROR_CHECK(i2s_set_clk(I2S_PORT_NUM, 16000, I2S_BITS_PER_SAMPLE_32BIT, I2S_CHANNEL_MONO));
+    ESP_LOGI(TAG, "INMP441 I2S configured: BCK=%d WS=%d SD=%d", 4, 5, 10);
 }
+
+static void mic_test_task(void *arg) {
+    int32_t sample = 0;
+    size_t bytes_read;
+    ESP_LOGI(TAG, "Mic test start: reading raw I2S samples...");
+    while (1) {
+        esp_err_t ret = i2s_read(I2S_PORT_NUM, &sample, sizeof(sample), &bytes_read, portMAX_DELAY);
+        if (ret == ESP_OK && bytes_read > 0) {
+            // Convert from 32-bit signed to 16-bit approximate PCM
+            int16_t s16 = (sample >> 14) & 0xFFFF; 
+            ESP_LOGI(TAG, "Mic raw: %d", s16);
+        } else {
+            ESP_LOGW(TAG, "I2S read failed: %d", ret);
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
 
 static void i2s_capture_task(void *arg) {
     ESP_LOGI(TAG, "i2s_capture_task start");
@@ -156,8 +172,26 @@ static void i2s_capture_task(void *arg) {
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
         }
-        size_t read = 0;
-        esp_err_t r = i2s_read(I2S_PORT_NUM, buf, AUDIO_READ_BYTES, &read, pdMS_TO_TICKS(200));
+
+        // Read 32-bit mic samples, but we only need lower 16 bits for BLE streaming
+        size_t bytes32 = AUDIO_FRAME_SAMPLES * sizeof(int32_t);
+        int32_t *i2s32 = (int32_t*) malloc(bytes32);
+        if (!i2s32) { ESP_LOGE(TAG, "malloc fail i2s32"); vTaskDelete(NULL); }
+
+        size_t read32 = 0;
+        esp_err_t r = i2s_read(I2S_PORT_NUM, i2s32, bytes32, &read32, pdMS_TO_TICKS(200));
+        if (r != ESP_OK || read32 == 0) {
+            free(i2s32);
+            continue;
+        }
+
+        // Convert 32-bit → 16-bit
+        size_t samples = read32 / sizeof(int32_t);
+        for (size_t i = 0; i < samples; i++) {
+            ((int16_t*)buf)[i] = (int16_t)(i2s32[i] >> 14); // keep significant bits
+        }
+        free(i2s32);
+        size_t read = samples * sizeof(int16_t);
         if (r != ESP_OK || read == 0) {
             continue;
         }
@@ -531,8 +565,10 @@ void app_main(void) {
 
     // start tasks
     xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
-    xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
+    //xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
     xTaskCreate(ble_sender_task, "ble_send", 8*1024, NULL, 5, NULL);
+
+    // xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Main started; advertising automatically, UART logs enabled");
 }
