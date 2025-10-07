@@ -110,6 +110,7 @@ static SemaphoreHandle_t state_lock = NULL;
 /* BLE state */
 static uint16_t g_conn_handle = 0;
 static uint16_t g_stream_attr_handle = 0; // populated on subscribe
+static volatile bool fake_mode = false; // start with fake frames disabled
 
 /* ---------- I2S (INMP441) ---------- */
 static void i2s_init_inmp441(void) {
@@ -225,6 +226,11 @@ static void fsr_task(void *arg) {
     }
 }
 
+/* --- Logging macros --- */
+#define LOG_CTRL(fmt, ...) ESP_LOGI(TAG, "[CTRL_IN] " fmt, ##__VA_ARGS__)
+#define LOG_JSON_PARSE(fmt, ...) ESP_LOGI(TAG, "[JSON_PARSE] " fmt, ##__VA_ARGS__)
+#define LOG_STREAM(fmt, ...) ESP_LOGI(TAG, "[STREAM_OUT] " fmt, ##__VA_ARGS__)
+
 /* ---------- GATT: control (write JSON) ---------- */
 static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
                                   struct ble_gatt_access_ctxt *ctxt, void *arg) {
@@ -234,11 +240,13 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     if (!json) return 0;
     os_mbuf_copydata(ctxt->om, 0, len, json);
     json[len] = '\0';
-    ESP_LOGI(TAG, "Control JSON: %s", json);
+
+    uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+    LOG_CTRL("ts=%u raw=%s", ts, json);
 
     cJSON *root = cJSON_Parse(json);
     if (!root) {
-        ESP_LOGW(TAG, "Invalid JSON in control");
+        ESP_LOGW(TAG, "[CTRL_ERR] Invalid JSON");
         free(json);
         return 0;
     }
@@ -248,21 +256,24 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     cJSON *jmic = cJSON_GetObjectItem(root, "mic");
     if (jmic && cJSON_IsBool(jmic)) {
         mic_enabled = cJSON_IsTrue(jmic);
-        ESP_LOGI(TAG, "mic_enabled=%d", mic_enabled);
+        LOG_JSON_PARSE("mic=%d", mic_enabled);
     }
 
     cJSON *jfsr = cJSON_GetObjectItem(root, "fsr");
     if (jfsr && cJSON_IsBool(jfsr)) {
         fsr_enabled = cJSON_IsTrue(jfsr);
-        ESP_LOGI(TAG, "fsr_enabled=%d", fsr_enabled);
+        LOG_JSON_PARSE("fsr=%d", fsr_enabled);
     }
 
     cJSON *jenc = cJSON_GetObjectItem(root, "encoder");
     if (jenc && cJSON_IsString(jenc)) {
         if (strcasecmp(jenc->valuestring, "pcm") == 0) {
-            current_encoder = ENC_PCM; ESP_LOGI(TAG,"encoder -> PCM");
+            current_encoder = ENC_PCM;
+            LOG_JSON_PARSE("encoder=PCM");
         } else if (strcasecmp(jenc->valuestring, "adpcm") == 0) {
-            current_encoder = ENC_ADPCM; adpcm_reset_state(); ESP_LOGI(TAG,"encoder -> ADPCM");
+            current_encoder = ENC_ADPCM;
+            adpcm_reset_state();
+            LOG_JSON_PARSE("encoder=ADPCM");
         }
     }
 
@@ -271,9 +282,16 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
         uint32_t v = (uint32_t) jint->valuedouble;
         if (v >= 10 && v <= 5000) {
             fsr_interval_ms = v;
-            ESP_LOGI(TAG, "fsr_interval_ms=%u", fsr_interval_ms);
+            LOG_JSON_PARSE("fsr_interval_ms=%u", fsr_interval_ms);
         }
     }
+
+    cJSON *jfake = cJSON_GetObjectItem(root, "fake");
+    if (jfake && cJSON_IsBool(jfake)) {
+        fake_mode = cJSON_IsTrue(jfake);
+        LOG_JSON_PARSE("fake_mode=%d", fake_mode);
+    }
+
 
     xSemaphoreGive(state_lock);
     cJSON_Delete(root);
@@ -281,11 +299,69 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     return 0;
 }
 
-static int gatt_stream_access_cb(uint16_t conn_handle, uint16_t attr_handle,
-                                 struct ble_gatt_access_ctxt *ctxt, void *arg) {
-    // Notify-only characteristic: reads not supported
-    return 0;
+/* ---------- BLE sender: hybrid fake + real streaming ---------- */
+
+static void ble_sender_task(void *arg) {
+    ESP_LOGI(TAG, "ble_sender_task start");
+
+    while (1) {
+        /* --- 1) Fallback: send fake frames when fake_mode is ON --- */
+        if (fake_mode && g_stream_attr_handle > 0) {
+            uint8_t fake_payload[4] = { 0x11, 0x22, 0x33, 0x44 };
+            uint8_t fake_frame[8 + sizeof(fake_payload)];
+            uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+            uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+            pack_header(fake_frame, 0x01, 0x00, seq, ts);
+            memcpy(fake_frame + 8, fake_payload, sizeof(fake_payload));
+
+            struct os_mbuf *om = ble_hs_mbuf_from_flat(fake_frame, sizeof(fake_frame));
+            if (om) {
+                int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
+                if (rc == 0) {
+                    ESP_LOGI(TAG, "[FAKE] Sent %u bytes (seq=%u)", (unsigned)sizeof(fake_frame), seq);
+                } else {
+                    ESP_LOGW(TAG, "[FAKE] notify rc=%d", rc);
+                }
+            }
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            continue;
+        }
+
+        /* --- 2) Real streaming: pull from ringbuffer and notify --- */
+        size_t item_size;
+        uint8_t *item = (uint8_t*) xRingbufferReceive(audio_rb, &item_size, pdMS_TO_TICKS(500));
+
+        if (!item) {
+            vTaskDelay(pdMS_TO_TICKS(10));
+            continue;
+        }
+
+        if (g_conn_handle == 0 || g_stream_attr_handle == 0) {
+            vPortFree(item);
+            continue;
+        }
+
+        uint8_t type = item[0];
+        uint16_t seq = item[2] | (item[3] << 8);
+        uint32_t ts  = item[4] | (item[5] << 8) | (item[6] << 16) | (item[7] << 24);
+        LOG_STREAM("ts=%u seq=%u type=0x%02X len=%u", ts, seq, type, (unsigned)item_size);
+
+        struct os_mbuf *om = ble_hs_mbuf_from_flat(item, item_size);
+        if (!om) {
+            ESP_LOGW(TAG, "mbuf alloc failed");
+            vPortFree(item);
+            continue;
+        }
+
+        int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
+        if (rc != 0) {
+            ESP_LOGW(TAG, "ble_gatts_notify_custom rc=%d", rc);
+        }
+        vPortFree(item);
+    }
 }
+
+
 
 /* ---------- GATT services ---------- */
 static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
@@ -304,7 +380,7 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
                 .uuid = BLE_UUID128_DECLARE(
                     0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,0x00,0x00,0x10,0x00,0x02,0x00,0xed,0xfe
                 ),
-                .access_cb = gatt_stream_access_cb,
+                .access_cb = gatt_control_access_cb,
                 .flags = BLE_GATT_CHR_F_NOTIFY,
             },
             { 0 }
@@ -387,12 +463,28 @@ static void start_advertise(void) {
 /* NimBLE sync callback */
 static void ble_on_sync(void) {
     ble_svc_gap_device_name_set("Speechster-H2");
+
     int rc = ble_gatts_count_cfg(gatt_svr_svcs);
-    if (rc != 0) ESP_LOGE(TAG, "ble_gatts_count_cfg rc=%d", rc);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "ble_gatts_count_cfg rc=%d", rc);
+        return;
+    }
+
     rc = ble_gatts_add_svcs(gatt_svr_svcs);
-    if (rc != 0) ESP_LOGE(TAG, "ble_gatts_add_svcs rc=%d", rc);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "ble_gatts_add_svcs rc=%d", rc);
+        return;
+    }
+
+    rc = ble_gatts_start();
+    if (rc != 0) {
+        ESP_LOGE(TAG, "ble_gatts_start rc=%d", rc);
+        return;
+    }
+
     start_advertise();
 }
+
 
 /* NimBLE host task */
 static void nimble_host_task(void *param) {
@@ -412,30 +504,6 @@ static void init_nimble(void) {
     ble_hs_cfg.gatts_register_cb = NULL;
     ble_hs_cfg.store_status_cb = NULL;
     nimble_port_freertos_init(nimble_host_task);
-}
-
-/* ---------- BLE sender: pop frames and notify ---------- */
-static void ble_sender_task(void *arg) {
-    ESP_LOGI(TAG, "ble_sender_task start");
-    while (1) {
-        size_t item_size;
-        uint8_t *item = (uint8_t*) xRingbufferReceive(audio_rb, &item_size, pdMS_TO_TICKS(500));
-        if (!item) { vTaskDelay(pdMS_TO_TICKS(10)); continue; }
-
-        if (g_conn_handle == 0 || g_stream_attr_handle == 0) {
-            vPortFree(item);
-            continue;
-        }
-
-        struct os_mbuf *om = ble_hs_mbuf_from_flat(item, item_size);
-        if (!om) { ESP_LOGW(TAG, "mbuf alloc failed"); vPortFree(item); continue; }
-
-        int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
-        if (rc != 0) {
-            ESP_LOGW(TAG, "ble_gatts_notify_custom rc=%d", rc);
-        }
-        vPortFree(item);
-    }
 }
 
 /* ---------- app_main ---------- */

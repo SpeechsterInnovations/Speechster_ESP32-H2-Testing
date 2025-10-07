@@ -1,0 +1,110 @@
+Command: ninja flash
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/esp-idf/esptool_py && /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.bin
+Bootloader binary size 0x56b0 bytes. 0x2950 bytes (32%) free.
+[2/10] No install step for 'bootloader'
+[3/10] Completed 'bootloader'
+[4/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/BT-Test.c.obj
+In file included from /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:36:
+/opt/esp-idf/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress legacy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+In file included from /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:37:
+/opt/esp-idf/components/driver/deprecated/driver/adc.h:19:2: warning: #warning "legacy adc driver is deprecated, please migrate to use esp_adc/adc_oneshot.h and esp_adc/adc_continuous.h for oneshot mode and continuous mode drivers respectively" [-Wcpp]
+   19 | #warning "legacy adc driver is deprecated, please migrate to use esp_adc/adc_oneshot.h and esp_adc/adc_continuous.h for oneshot mode and continuous mode drivers respectively"
+      |  ^~~~~~~
+In file included from /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:38:
+/opt/esp-idf/components/esp_adc/deprecated/include/esp_adc_cal.h:17:2: warning: #warning "legacy adc calibration driver is deprecated, please migrate to use esp_adc/adc_cali.h and esp_adc/adc_cali_scheme.h" [-Wcpp]
+   17 | #warning "legacy adc calibration driver is deprecated, please migrate to use esp_adc/adc_cali.h and esp_adc/adc_cali_scheme.h"
+      |  ^~~~~~~
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c: In function 'app_main':
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:514:5: warning: 'ADC_ATTEN_DB_11' is deprecated [-Wdeprecated-declarations]
+  514 |     adc1_config_channel_atten(FSR_ADC_CHANNEL, ADC_ATTEN_DB_11);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /opt/esp-idf/components/driver/deprecated/driver/adc_types_legacy.h:8,
+                 from /opt/esp-idf/components/driver/deprecated/driver/adc.h:15:
+/opt/esp-idf/components/hal/include/hal/adc_types.h:51:5: note: declared here
+   51 |     ADC_ATTEN_DB_11 __attribute__((deprecated)) = ADC_ATTEN_DB_12,  ///<This is deprecated, it behaves the same as `ADC_ATTEN_DB_12`
+      |     ^~~~~~~~~~~~~~~
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c: At top level:
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:79:20: warning: 'CHAR_STREAM_UUID_STR' defined but not used [-Wunused-variable]
+   79 | static const char *CHAR_STREAM_UUID_STR  = "0000feed-0002-0000-8000-00805f9b34fb";
+      |                    ^~~~~~~~~~~~~~~~~~~~
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:78:20: warning: 'CHAR_CONTROL_UUID_STR' defined but not used [-Wunused-variable]
+   78 | static const char *CHAR_CONTROL_UUID_STR = "0000feed-0001-0000-8000-00805f9b34fb";
+      |                    ^~~~~~~~~~~~~~~~~~~~~
+/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/main/BT-Test.c:77:20: warning: 'SERVICE_UUID_STR' defined but not used [-Wunused-variable]
+   77 | static const char *SERVICE_UUID_STR       = "0000feed-0000-1000-8000-00805f9b34fb";
+      |                    ^~~~~~~~~~~~~~~~
+[5/10] Linking C static library esp-idf/main/libmain.a
+[6/10] Generating esp-idf/esp_system/ld/sections.ld
+[7/10] Linking CXX executable BT-Test.elf
+[8/10] Generating binary image from built executable
+esptool.py v4.10.0
+Creating esp32h2 image...
+Merged 1 ELF section
+Successfully created esp32h2 image.
+Generated /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.bin
+[9/10] cd /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/esp-idf/esptool_py && /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/partition_table/partition-table.bin /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.bin
+BT-Test.bin binary size 0xad2d0 bytes. Smallest app partition is 0x100000 bytes. 0x52d30 bytes (32%) free.
+[9/10] cd /opt/esp-idf/components/esptool_py && /usr/bin/cmake -D IDF_PATH=/opt/esp-idf -D "SERIAL_TOOL=/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python;;/opt/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32h2" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build -P /opt/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32h2 -p /dev/ttyACM0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 48m --flash_size 2MB 0x0 bootloader/bootloader.bin 0x10000 BT-Test.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.10.0
+Serial port /dev/ttyACM0
+Connecting...
+Chip is ESP32-H2 (revision v0.1)
+Features: BLE, IEEE802.15.4
+Crystal is 32MHz
+USB mode: USB-Serial/JTAG
+MAC: 74:4d:bd:ff:fe:65:9f:d4
+BASE MAC: 74:4d:bd:65:9f:d4
+MAC_EXT: ff:fe
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x000bdfff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+SHA digest in image updated
+Compressed 22192 bytes to 13766...
+Writing at 0x00000000... (100 %)
+Wrote 22192 bytes (13766 compressed) at 0x00000000 in 0.3 seconds (effective 578.0 kbit/s)...
+Hash of data verified.
+Compressed 709328 bytes to 403248...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001c3e0... (8 %)
+Writing at 0x00025529... (12 %)
+Writing at 0x0002c132... (16 %)
+Writing at 0x00033b7e... (20 %)
+Writing at 0x0003b1d5... (24 %)
+Writing at 0x0004232a... (28 %)
+Writing at 0x00049213... (32 %)
+Writing at 0x0004f7a2... (36 %)
+Writing at 0x00055584... (40 %)
+Writing at 0x0005b645... (44 %)
+Writing at 0x00061b51... (48 %)
+Writing at 0x00067f66... (52 %)
+Writing at 0x0006df39... (56 %)
+Writing at 0x00073e4f... (60 %)
+Writing at 0x0007a1a2... (64 %)
+Writing at 0x00081467... (68 %)
+Writing at 0x00088518... (72 %)
+Writing at 0x0008eef5... (76 %)
+Writing at 0x00095cff... (80 %)
+Writing at 0x0009ba34... (84 %)
+Writing at 0x000a3a28... (88 %)
+Writing at 0x000ab224... (92 %)
+Writing at 0x000b13da... (96 %)
+Writing at 0x000b8335... (100 %)
+Wrote 709328 bytes (403248 compressed) at 0x00010000 in 4.3 seconds (effective 1330.3 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 103...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (effective 637.3 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
