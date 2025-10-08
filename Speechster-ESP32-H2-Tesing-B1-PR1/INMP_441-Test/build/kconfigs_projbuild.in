@@ -1,7 +1,0 @@
-source "/opt/esp-idf/components/bootloader/Kconfig.projbuild"
-source "/opt/esp-idf/components/esp_app_format/Kconfig.projbuild"
-source "/opt/esp-idf/components/esp_rom/Kconfig.projbuild"
-source "/opt/esp-idf/components/esp_tee/Kconfig.projbuild"
-source "/opt/esp-idf/components/esptool_py/Kconfig.projbuild"
-source "/opt/esp-idf/components/partition_table/Kconfig.projbuild"
-source "/home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/INMP_441-Test/main/Kconfig.projbuild"
