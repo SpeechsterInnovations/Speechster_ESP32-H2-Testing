@@ -50,18 +50,18 @@ async function connectBLE() {
     log('Enabling notifications...');
     await dataChar.startNotifications();
     dataChar.addEventListener('characteristicvaluechanged', e => {
-    const dv = e.target.value;
-    const type = dv.getUint8(0);
-    const flags = dv.getUint8(1);
-    const seq = dv.getUint16(2, true);
-    const ts = dv.getUint32(4, true);
-    const len = dv.byteLength;
+      const dv = e.target.value;
+      const type = dv.getUint8(0);
+      const flags = dv.getUint8(1);
+      const seq = dv.getUint16(2, true);
+      const ts = dv.getUint32(4, true);
+      const len = dv.byteLength;
 
-    // Optional: distinguish fake vs real
-    let label = "[📥 recv]";
-    if (len === 12 && type === 0x01 && flags === 0x00) label += " (FAKE)";
-    console.log(`${label} len=${len} type=0x${type.toString(16)} seq=${seq} ts=${ts} flags=${flags}`);
-});
+      // Optional: distinguish fake vs real
+      let label = "[📥 recv]";
+      if (len === 12 && type === 0x01 && flags === 0x00) label += " (FAKE)";
+      console.log(`${label} len=${len} type=0x${type.toString(16)} seq=${seq} ts=${ts} flags=${flags}`);
+    });
 
     log('✅ Connected and ready!');
   } catch (error) {

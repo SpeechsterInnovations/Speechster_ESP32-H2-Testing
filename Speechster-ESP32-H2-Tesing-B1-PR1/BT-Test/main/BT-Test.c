@@ -47,6 +47,7 @@
 #include "host/ble_gatt.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
+#include "host/ble_att.h"
 
 /* JSON parsing */
 #include "cJSON.h"
@@ -430,6 +431,20 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
         if (event->connect.status == 0) {
             g_conn_handle = event->connect.conn_handle;
             ESP_LOGI(TAG, "Connected (handle %d)", g_conn_handle);
+
+            // As a backup/request: call ble_att_set_preferred_mtu again for this connection
+            int rc = ble_att_set_preferred_mtu(247);
+            ESP_LOGI(TAG, "ble_att_set_preferred_mtu on connect rc=%d", rc);
+
+            /* Request conn params: 7.5 ms interval */
+            struct ble_gap_upd_params params;
+            params.itvl_min = 6;   // 6 * 1.25 ms = 7.5 ms
+            params.itvl_max = 6;   // keep fixed
+            params.latency  = 0;
+            params.supervision_timeout = 400; // 400 * 10ms = 4s
+            int upd_rc = ble_gap_update_params(g_conn_handle, &params);
+            ESP_LOGI(TAG, "ble_gap_update_params rc=%d", upd_rc);
+
         } else {
             ESP_LOGW(TAG, "Connect failed; status=%d", event->connect.status);
             ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, NULL, ble_gap_event, NULL);
@@ -452,6 +467,14 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
             if (g_stream_attr_handle == event->subscribe.attr_handle) g_stream_attr_handle = 0;
         }
         break;
+
+    case BLE_GAP_EVENT_MTU:
+        ESP_LOGI(TAG, "MTU exchange event: conn=%d mtu=%u", event->mtu.conn_handle, event->mtu.value);
+        // also query via API:
+        uint16_t cur_mtu = ble_att_mtu(g_conn_handle);
+        ESP_LOGI(TAG, "ble_att_mtu() => %u", cur_mtu);
+        break;
+
 
     default:
         break;
@@ -498,7 +521,13 @@ static void start_advertise(void) {
 static void ble_on_sync(void) {
     ble_svc_gap_device_name_set("Speechster-H2");
 
-    int rc = ble_gatts_count_cfg(gatt_svr_svcs);
+
+    // Request preferred ATT MTU (tells peer "I prefer 247")
+    int rc = ble_att_set_preferred_mtu(247);
+    ESP_LOGI(TAG, "ble_att_set_preferred_mtu rc=%d", rc);
+
+
+    rc = ble_gatts_count_cfg(gatt_svr_svcs);
     if (rc != 0) {
         ESP_LOGE(TAG, "ble_gatts_count_cfg rc=%d", rc);
         return;
