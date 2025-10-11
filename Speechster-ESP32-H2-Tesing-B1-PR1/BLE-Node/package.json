@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Speechster BLE Web Interface",
   "main": "server.js",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@abandonware/noble": "^1.9.2-26",
     "express": "^4.19.2",
+    "readline": "^1.3.0",
     "ws": "^8.18.3"
   }
 }
-

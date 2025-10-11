@@ -1,0 +1,23 @@
+| GPIO   | Pin # | Notes / Typical Use                     |
+| ------ | ----- | --------------------------------------- |
+| GPIO0  | 1     | Bootstrapping / IO                      |
+| GPIO1  | 2     | UART TX0                                |
+| GPIO2  | 5     | Your BCK (I2S), also used as general IO |
+| GPIO3  | 6     | UART RX0                                |
+| GPIO4  | 7     | General purpose IO                      |
+| GPIO5  | 8     | Your WS (I2S), general IO               |
+| GPIO6  | 9     | Flash (not for general IO)              |
+| GPIO7  | 10    | Flash (not for general IO)              |
+| GPIO8  | 11    | Flash (not for general IO)              |
+| GPIO9  | 12    | SDIO / Flash (not for general IO)       |
+| GPIO10 | 12    | Your SD (I2S Data)                      |
+| GPIO11 | 13    | Flash / not for general IO              |
+| GPIO12 | 14    | General purpose IO                      |
+| GPIO13 | 15    | General purpose IO                      |
+| GPIO14 | 16    | General purpose IO                      |
+| GPIO15 | 17    | General purpose IO                      |
+| GPIO16 | 18    | General purpose IO                      |
+| GPIO17 | 19    | General purpose IO                      |
+| GPIO18 | 20    | General purpose IO                      |
+| GPIO19 | 21    | General purpose IO                      |
+

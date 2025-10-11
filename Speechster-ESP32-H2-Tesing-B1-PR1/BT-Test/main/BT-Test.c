@@ -22,6 +22,7 @@
 #include "freertos/task.h"
 #include "freertos/ringbuf.h"
 #include "freertos/semphr.h"
+#include <math.h>
 
 #include "esp_log.h"
 #include "esp_system.h"
@@ -67,7 +68,7 @@ static const char *TAG = "speechster_h2";
 #define AUDIO_RINGBUF_SIZE   (64 * 1024)
 
 #define I2S_PORT_NUM         I2S_NUM_0
-#define I2S_BCK_IO           4
+#define I2S_BCK_IO           2
 #define I2S_WS_IO            5
 #define I2S_DATA_IN_IO       10
 
@@ -135,7 +136,7 @@ static void i2s_init_inmp441(void) {
     ESP_ERROR_CHECK(i2s_driver_install(I2S_PORT_NUM, &cfg, 0, NULL));
     ESP_ERROR_CHECK(i2s_set_pin(I2S_PORT_NUM, &pins));
     ESP_ERROR_CHECK(i2s_set_clk(I2S_PORT_NUM, 16000, I2S_BITS_PER_SAMPLE_32BIT, I2S_CHANNEL_MONO));
-    ESP_LOGI(TAG, "INMP441 I2S configured: BCK=%d WS=%d SD=%d", 4, 5, 10);
+    ESP_LOGI(TAG, "INMP441 I2S configured: BCK=%d WS=%d SD=%d", I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO);
 }
 
 static void mic_test_task(void *arg) {
@@ -158,6 +159,7 @@ static void mic_test_task(void *arg) {
 
 static void i2s_capture_task(void *arg) {
     ESP_LOGI(TAG, "i2s_capture_task start");
+    ESP_LOGI(TAG, "[MIC] Capture task initialized, waiting for mic_enabled=true...");
     uint8_t *buf = (uint8_t*) malloc(AUDIO_READ_BYTES);
     if (!buf) {
         ESP_LOGE(TAG, "malloc failed for i2s buffer");
@@ -169,11 +171,18 @@ static void i2s_capture_task(void *arg) {
     adpcm_init_state(&adpcm_state);
 
     while (1) {
+        static bool mic_was_enabled = false;
         if (!mic_enabled) {
+            if (mic_was_enabled) {
+                ESP_LOGI(TAG, "[MIC] Capture stopped");
+                mic_was_enabled = false;
+            }
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
+        } else if (!mic_was_enabled) {
+            ESP_LOGI(TAG, "[MIC] Capture started");
+            mic_was_enabled = true;
         }
-
         // Read 32-bit mic samples, but we only need lower 16 bits for BLE streaming
         size_t bytes32 = AUDIO_FRAME_SAMPLES * sizeof(int32_t);
         int32_t *i2s32 = (int32_t*) malloc(bytes32);
@@ -185,6 +194,11 @@ static void i2s_capture_task(void *arg) {
             free(i2s32);
             continue;
         }
+        if (r != ESP_OK) {
+            ESP_LOGE(TAG, "[MIC_ERR] i2s_read failed: %s", esp_err_to_name(r));
+        } else if (read32 == 0) {
+            ESP_LOGW(TAG, "[MIC_WARN] i2s_read returned 0 bytes");
+        }
 
         // Convert 32-bit → 16-bit
         size_t samples = read32 / sizeof(int32_t);
@@ -195,6 +209,30 @@ static void i2s_capture_task(void *arg) {
         size_t read = samples * sizeof(int16_t);
         if (r != ESP_OK || read == 0) {
             continue;
+        }
+
+        static uint32_t last_log_ms = 0;
+        uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000ULL);
+        if (now_ms - last_log_ms > 1000) {  // log once per second
+            int16_t first = ((int16_t*)buf)[0];
+            int16_t peak = 0;
+            for (size_t i = 0; i < samples; i++) {
+                int16_t v = ((int16_t*)buf)[i];
+                if (abs(v) > peak) peak = abs(v);
+            }
+
+        // --- RMS and dB calculation ---
+        double sum_sq = 0;
+        for (size_t i = 0; i < samples; i++) {
+            int16_t sample = ((int16_t*)buf)[i];
+            sum_sq += (double)sample * sample;
+        }
+        double rms = sqrt(sum_sq / samples);
+        double db = 20.0 * log10(rms / 32768.0 + 1e-9); // avoid log(0)
+        // --------------------------------
+
+            ESP_LOGI(TAG, "[MIC_DATA] %u samples, peak=%d, first=%d, dB=%.1f", (unsigned)samples, peak, first, db);
+            last_log_ms = now_ms;
         }
 
         encoder_t enc = current_encoder;
@@ -389,8 +427,11 @@ static void ble_sender_task(void *arg) {
         }
 
         int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
-        if (rc != 0) {
-            ESP_LOGW(TAG, "ble_gatts_notify_custom rc=%d", rc);
+        if (rc == 0) {
+            ESP_LOGI(TAG, "[BLE_SEND] type=0x%02X seq=%u ts=%u size=%u bytes",
+                    type, seq, ts, (unsigned)item_size);
+        } else {
+            ESP_LOGW(TAG, "[BLE_SEND_FAIL] rc=%d seq=%u size=%u", rc, seq, (unsigned)item_size);
         }
         vPortFree(item);
     }
