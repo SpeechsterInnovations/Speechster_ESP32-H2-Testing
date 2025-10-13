@@ -1,62 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Speechster BLE Debug Dashboard</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 { margin-bottom: 10px; color: #00bcd4; }
-    button {
-      background: #00bcd4; color: #121212;
-      border: none; padding: 10px 20px; margin: 5px;
-      border-radius: 8px; cursor: pointer; font-weight: 600;
-      transition: background 0.2s ease-in-out;
-    }
-    button:hover { background: #0097a7; }
-    #logBox {
-      width: 90%; height: 250px;
-      background: #1e1e1e; border: 1px solid #333;
-      border-radius: 10px; margin-top: 20px;
-      padding: 10px; overflow-y: auto;
-      font-family: monospace; font-size: 0.9em;
-      white-space: pre-wrap;
-    }
-    #commandInput {
-      width: 70%; padding: 8px;
-      border-radius: 8px; border: none; outline: none; margin-top: 10px;
-    }
-    .timestamp { color: #777; }
-    .error { color: #ff5252; }
-    .send { color: #4caf50; }
-    .recv { color: #2196f3; }
-  </style>
+<meta charset="UTF-8">
+<title>Speechster-H2 BLE Dashboard</title>
+<style>
+body { font-family: sans-serif; padding: 20px; }
+#logs { border: 1px solid #ccc; height: 200px; overflow-y: scroll; padding: 5px; }
+</style>
 </head>
 <body>
-  <h1>Speechster BLE Debug Dashboard</h1>
-  <div>
-    <button id="connectBtn">🔗 Connect</button>
-    <button id="disconnectBtn">❌ Disconnect</button>
-    <button id="clearBtn">🧹 Clear</button>
-  </div>
+<h1>BLE Device Selector</h1>
 
-  <div>
-    <input id="commandInput" type="text" placeholder='Enter JSON command (e.g., {"mic":true})' />
-    <button id="sendBtn">📤 Send</button>
-  </div>
+<select id="deviceSelect"></select>
+<button id="connectBtn">Connect</button>
 
-  <div id="logBox"></div>
-  <script type="module" src="ble.js"></script>
+<h2>Send Data</h2>
+<input id="dataInput" placeholder='Raw or JSON'>
+<button id="sendBtn">Send</button>
+
+<h2>Logs</h2>
+<div id="logs"></div>
+
+<script>
+const ws = new WebSocket('ws://localhost:8080');
+const deviceSelect = document.getElementById('deviceSelect');
+const connectBtn = document.getElementById('connectBtn');
+const sendBtn = document.getElementById('sendBtn');
+const dataInput = document.getElementById('dataInput');
+const logs = document.getElementById('logs');
+
+ws.onopen = () => log('WebSocket connected');
+ws.onmessage = event => {
+  const msg = JSON.parse(event.data);
+  if (msg.type === 'deviceList') {
+    deviceSelect.innerHTML = '';
+    msg.devices.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.text = `${d.name} (${d.address})`;
+      deviceSelect.appendChild(opt);
+    });
+  } else if (msg.type === 'services') {
+    log('Services: ' + JSON.stringify(msg.services, null, 2));
+  } else if (msg.type === 'notification') {
+    log('Notification: ' + msg.payload);
+  } else if (msg.type === 'disconnected') {
+    log('Device disconnected');
+  }
+};
+
+connectBtn.onclick = () => {
+  const id = deviceSelect.value;
+  if (id) ws.send(JSON.stringify({ type: 'connect', deviceId: id }));
+};
+
+sendBtn.onclick = () => {
+  const val = dataInput.value;
+  if (val) {
+    try {
+      ws.send(JSON.stringify({ type: 'send', payload: JSON.parse(val) }));
+    } catch {
+      ws.send(JSON.stringify({ type: 'send', payload: val }));
+    }
+  }
+};
+
+function log(msg) {
+  const div = document.createElement('div');
+  div.textContent = msg;
+  logs.appendChild(div);
+  logs.scrollTop = logs.scrollHeight;
+}
+</script>
 </body>
 </html>

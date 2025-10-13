@@ -72,7 +72,9 @@ static const char *TAG = "speechster_h2";
 #define I2S_DATA_IN_IO       10
 
 #define FSR_ADC_CHANNEL      ADC_CHANNEL_1
+#define CONSERVATIVE_LL_OCTETS 123
 static uint32_t fsr_interval_ms = 50; // default 50ms, can be changed via JSON
+adpcm_state_t adpcm_state;
 
 /* BLE custom UUIDs (browser should use the same strings when connecting) */
 static const char *SERVICE_UUID_STR       = "0000feed-0000-1000-8000-00805f9b34fb";
@@ -146,7 +148,7 @@ static void mic_test_task(void *arg) {
         esp_err_t ret = i2s_read(I2S_PORT_NUM, &sample, sizeof(sample), &bytes_read, portMAX_DELAY);
         if (ret == ESP_OK && bytes_read > 0) {
             // Convert from 32-bit signed to 16-bit approximate PCM
-            int16_t s16 = (sample >> 14) & 0xFFFF; 
+            int16_t s16 = (sample >> 14);
             ESP_LOGI(TAG, "Mic raw: %d", s16);
         } else {
             ESP_LOGW(TAG, "I2S read failed: %d", ret);
@@ -156,17 +158,17 @@ static void mic_test_task(void *arg) {
 }
 
 
+/* ---------- Heap-safe pre-allocated buffers ---------- */
+#define MAX_FRAME_SIZE   (8 + AUDIO_READ_BYTES)  // 8-byte header + PCM
+static uint8_t audio_frame_buf[MAX_FRAME_SIZE]; // pre-allocated buffer for PCM frames
+static uint8_t adpcm_buf[AUDIO_READ_BYTES/2 + 16]; // max ADPCM output size
+
+/* ---------- I2S capture task (heap-safe) ---------- */
 static void i2s_capture_task(void *arg) {
     ESP_LOGI(TAG, "i2s_capture_task start");
-    uint8_t *buf = (uint8_t*) malloc(AUDIO_READ_BYTES);
-    if (!buf) {
-        ESP_LOGE(TAG, "malloc failed for i2s buffer");
-        vTaskDelete(NULL);
-        return;
-    }
 
-    adpcm_state_t adpcm_state;
-    adpcm_init_state(&adpcm_state);
+    int32_t i2s32[AUDIO_FRAME_SAMPLES];  // pre-allocated input buffer
+    int16_t pcm16[AUDIO_FRAME_SAMPLES];  // temporary 16-bit PCM conversion
 
     while (1) {
         if (!mic_enabled) {
@@ -174,66 +176,41 @@ static void i2s_capture_task(void *arg) {
             continue;
         }
 
-        // Read 32-bit mic samples, but we only need lower 16 bits for BLE streaming
-        size_t bytes32 = AUDIO_FRAME_SAMPLES * sizeof(int32_t);
-        int32_t *i2s32 = (int32_t*) malloc(bytes32);
-        if (!i2s32) { ESP_LOGE(TAG, "malloc fail i2s32"); vTaskDelete(NULL); }
-
-        size_t read32 = 0;
-        esp_err_t r = i2s_read(I2S_PORT_NUM, i2s32, bytes32, &read32, pdMS_TO_TICKS(200));
-        if (r != ESP_OK || read32 == 0) {
-            free(i2s32);
-            continue;
-        }
+        size_t bytes_read = 0;
+        esp_err_t r = i2s_read(I2S_PORT_NUM, i2s32, sizeof(i2s32), &bytes_read, pdMS_TO_TICKS(200));
+        if (r != ESP_OK || bytes_read == 0) continue;
 
         // Convert 32-bit → 16-bit
-        size_t samples = read32 / sizeof(int32_t);
-        for (size_t i = 0; i < samples; i++) {
-            ((int16_t*)buf)[i] = (int16_t)(i2s32[i] >> 14); // keep significant bits
-        }
-        free(i2s32);
-        size_t read = samples * sizeof(int16_t);
-        if (r != ESP_OK || read == 0) {
-            continue;
-        }
+        size_t samples = bytes_read / sizeof(int32_t);
+        for (size_t i = 0; i < samples; i++) pcm16[i] = (int16_t)(i2s32[i] >> 14);
 
+        size_t frame_payload_bytes = samples * sizeof(int16_t);
         encoder_t enc = current_encoder;
         if (enc != ENC_PCM && enc != ENC_ADPCM) enc = default_encoder;
 
+        uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+        uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+
         if (enc == ENC_PCM) {
-            size_t frame_sz = 8 + read;
-            uint8_t *frame = (uint8_t*) pvPortMalloc(frame_sz);
-            if (!frame) { ESP_LOGW(TAG, "no mem for pcm frame"); continue; }
-            uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-            uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-            pack_header(frame, 0x01, 0x00, seq, ts);
-            memcpy(frame + 8, buf, read);
-            if (xRingbufferSend(audio_rb, frame, frame_sz, pdMS_TO_TICKS(50)) != pdTRUE) {
-                vPortFree(frame);
-            }
+            pack_header(audio_frame_buf, 0x01, 0x00, seq, ts);
+            memcpy(audio_frame_buf + 8, pcm16, frame_payload_bytes);
+
+            ESP_LOGI(TAG, "PCM Frame seq=%u ts=%u bytes=%u", seq, ts, frame_payload_bytes);
+
+            xRingbufferSend(audio_rb, audio_frame_buf, 8 + frame_payload_bytes, pdMS_TO_TICKS(50));
+
         } else { // ADPCM
-            const int16_t *pcm = (const int16_t*) buf;
-            size_t samples = read / 2;
-            size_t max_out = samples/2 + 16;
-            uint8_t *outb = (uint8_t*) pvPortMalloc(max_out);
-            if (!outb) { ESP_LOGW(TAG, "no mem adpcm out"); continue; }
-            size_t out_bytes = adpcm_encode(&adpcm_state, pcm, samples, outb);
-            size_t frame_sz = 8 + out_bytes;
-            uint8_t *frame = (uint8_t*) pvPortMalloc(frame_sz);
-            if (!frame) { vPortFree(outb); continue; }
-            uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-            uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-            pack_header(frame, 0x01, 0x01, seq, ts);
-            memcpy(frame + 8, outb, out_bytes);
-            vPortFree(outb);
-            if (xRingbufferSend(audio_rb, frame, frame_sz, pdMS_TO_TICKS(50)) != pdTRUE) {
-                vPortFree(frame);
-            }
+            size_t out_bytes = adpcm_encode(&adpcm_state, pcm16, samples, adpcm_buf);
+            pack_header(audio_frame_buf, 0x01, 0x01, seq, ts);
+            memcpy(audio_frame_buf + 8, adpcm_buf, out_bytes);
+
+            ESP_LOGI(TAG, "ADPCM Frame seq=%u ts=%u bytes=%u", seq, ts, frame_payload_bytes);
+
+            xRingbufferSend(audio_rb, audio_frame_buf, 8 + out_bytes, pdMS_TO_TICKS(50));
         }
     }
-    free(buf);
-    vTaskDelete(NULL);
 }
+
 
 /* ---------- FSR ADC polling ---------- */
 static void fsr_task(void *arg) {
@@ -307,7 +284,7 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
             LOG_JSON_PARSE("encoder=PCM");
         } else if (strcasecmp(jenc->valuestring, "adpcm") == 0) {
             current_encoder = ENC_ADPCM;
-            adpcm_reset_state();
+            adpcm_reset_state(&adpcm_state);
             LOG_JSON_PARSE("encoder=ADPCM");
         }
     }
@@ -334,13 +311,90 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     return 0;
 }
 
+/* helper: conservative LL payload limit until you confirm via btmon */
+#define CONSERVATIVE_LL_OCTETS 123
+
+static void send_chunked_notify(uint16_t conn_handle, uint16_t attr_handle,
+                                uint8_t *frame, size_t frame_len)
+{
+    if (conn_handle == 0 || attr_handle == 0) return;
+
+    // Get current ATT MTU
+    uint16_t att_mtu = ble_att_mtu(conn_handle);
+    if (att_mtu == 0) att_mtu = 23;
+    size_t att_payload_max = (att_mtu > 3) ? (att_mtu - 3) : 20;
+
+    // Use safe LL limit
+    size_t ll_payload_max = CONSERVATIVE_LL_OCTETS;
+
+    // Max payload per notification
+    size_t payload_max = att_payload_max < ll_payload_max ? att_payload_max : ll_payload_max;
+
+    // Reserve 8 bytes for header
+    if (payload_max > 8) payload_max -= 8;
+    else payload_max = 8;
+
+    size_t pos = 0;
+    bool first_chunk = true;
+
+    while (pos < frame_len) {
+        size_t remaining = frame_len - pos;
+        size_t take = (remaining > payload_max) ? payload_max : remaining;
+
+        uint8_t notify_buf[260]; // safe buffer
+
+        if (first_chunk) {
+            // Copy full header + first chunk
+            memcpy(notify_buf, frame, 8);
+            memcpy(notify_buf + 8, frame + pos, take);
+
+            // Set continuation flag if more chunks
+            if (pos + take < frame_len) notify_buf[1] |= 0x02;
+
+            struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + take);
+            if (om) {
+                int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
+                if (rc != 0) ESP_LOGW(TAG, "notify rc=%d", rc);
+            }
+
+            first_chunk = false;
+        } else {
+            // Mini-header for continuation chunks
+            uint8_t mini_hdr[8];
+            memcpy(mini_hdr, frame, 8);
+            mini_hdr[1] = 0x02; // continuation flag
+
+            memcpy(notify_buf, mini_hdr, 8);
+            memcpy(notify_buf + 8, frame + pos, take);
+
+            struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + take);
+            if (om) {
+                int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
+                if (rc != 0) ESP_LOGW(TAG, "notify rc=%d", rc);
+            }
+        }
+
+        pos += take;
+
+        // Tiny yield to avoid BLE queue congestion
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+}
+
+
+
 /* ---------- BLE sender: hybrid fake + real streaming ---------- */
 
+/* ---------- Pre-allocated notification buffer ---------- */
+#define MAX_NOTIFY_BUF  260
+static uint8_t notify_buf[MAX_NOTIFY_BUF];
+
+/* ---------- Heap-free BLE sender task ---------- */
 static void ble_sender_task(void *arg) {
     ESP_LOGI(TAG, "ble_sender_task start");
 
     while (1) {
-        /* --- 1) Fallback: send fake frames when fake_mode is ON --- */
+        /* --- Fake frames when fake_mode is ON --- */
         if (fake_mode && g_stream_attr_handle > 0) {
             uint8_t fake_payload[4] = { 0x11, 0x22, 0x33, 0x44 };
             uint8_t fake_frame[8 + sizeof(fake_payload)];
@@ -350,53 +404,60 @@ static void ble_sender_task(void *arg) {
             memcpy(fake_frame + 8, fake_payload, sizeof(fake_payload));
 
             struct os_mbuf *om = ble_hs_mbuf_from_flat(fake_frame, sizeof(fake_frame));
-            if (om) {
-                int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
-                if (rc == 0) {
-                    ESP_LOGI(TAG, "[FAKE] Sent %u bytes (seq=%u)", (unsigned)sizeof(fake_frame), seq);
-                } else {
-                    ESP_LOGW(TAG, "[FAKE] notify rc=%d", rc);
-                }
-            }
+            if (om) ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
             vTaskDelay(pdMS_TO_TICKS(2000));
             continue;
         }
 
-        /* --- 2) Real streaming: pull from ringbuffer and notify --- */
+        /* --- Real streaming --- */
         size_t item_size;
         uint8_t *item = (uint8_t*) xRingbufferReceive(audio_rb, &item_size, pdMS_TO_TICKS(500));
-
-        if (!item) {
-            vTaskDelay(pdMS_TO_TICKS(10));
-            continue;
-        }
-
+        if (!item) { vTaskDelay(pdMS_TO_TICKS(10)); continue; }
         if (g_conn_handle == 0 || g_stream_attr_handle == 0) {
-            vPortFree(item);
+            vRingbufferReturnItem(audio_rb, item);
             continue;
         }
 
-        uint8_t type = item[0];
-        uint16_t seq = item[2] | (item[3] << 8);
-        uint32_t ts  = item[4] | (item[5] << 8) | (item[6] << 16) | (item[7] << 24);
-        LOG_STREAM("ts=%u seq=%u type=0x%02X len=%u", ts, seq, type, (unsigned)item_size);
+        /* --- MTU-aware chunked notification --- */
+        uint16_t att_mtu = ble_att_mtu(g_conn_handle);
+        if (att_mtu == 0) att_mtu = 23;
+        size_t payload_max = (att_mtu - 3) < CONSERVATIVE_LL_OCTETS ? (att_mtu - 3) : CONSERVATIVE_LL_OCTETS;
+        if (payload_max > 8) payload_max -= 8; else payload_max = 8;
 
-        struct os_mbuf *om = ble_hs_mbuf_from_flat(item, item_size);
-        if (!om) {
-            ESP_LOGW(TAG, "mbuf alloc failed");
-            vPortFree(item);
-            continue;
+        size_t pos = 0;
+        bool first_chunk = true;
+
+        while (pos < item_size) {
+            size_t remaining = item_size - pos;
+            size_t take = remaining > payload_max ? payload_max : remaining;
+
+            // Copy header + payload into notify_buf
+            if (first_chunk) {
+                memcpy(notify_buf, item, 8);                  // header
+                memcpy(notify_buf + 8, item + pos, take);     // first chunk of payload
+                if (pos + take < item_size) notify_buf[1] |= 0x02; // continuation flag
+                first_chunk = false;
+            } else {
+                memcpy(notify_buf, item, 8);                  // mini-header
+                notify_buf[1] = 0x02;                         // continuation flag
+                memcpy(notify_buf + 8, item + pos, take);
+            }
+
+            struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + take);
+            if (om) {
+                int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
+                if (rc != 0) {
+                    ESP_LOGW(TAG, "BLE notify busy, rc=%d, dropping chunk", rc);
+                }
+            }
+
+            pos += take;
+            vTaskDelay(pdMS_TO_TICKS(1)); // yield to BLE queue
         }
 
-        int rc = ble_gatts_notify_custom(g_conn_handle, g_stream_attr_handle, om);
-        if (rc != 0) {
-            ESP_LOGW(TAG, "ble_gatts_notify_custom rc=%d", rc);
-        }
-        vPortFree(item);
+        vRingbufferReturnItem(audio_rb, item);
     }
 }
-
-
 
 /* ---------- GATT services ---------- */
 static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
@@ -427,58 +488,77 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
 /* ---------- BLE GAP events ---------- */
 static int ble_gap_event(struct ble_gap_event *event, void *arg) {
     switch (event->type) {
-    case BLE_GAP_EVENT_CONNECT:
-        if (event->connect.status == 0) {
-            g_conn_handle = event->connect.conn_handle;
-            ESP_LOGI(TAG, "Connected (handle %d)", g_conn_handle);
 
-            // As a backup/request: call ble_att_set_preferred_mtu again for this connection
-            int rc = ble_att_set_preferred_mtu(247);
-            ESP_LOGI(TAG, "ble_att_set_preferred_mtu on connect rc=%d", rc);
+        case BLE_GAP_EVENT_CONNECT:
+            if (event->connect.status == 0) {
+                g_conn_handle = event->connect.conn_handle;
+                ESP_LOGI(TAG, "Connected (handle %d)", g_conn_handle);
 
-            /* Request conn params: 7.5 ms interval */
-            struct ble_gap_upd_params params;
-            params.itvl_min = 6;   // 6 * 1.25 ms = 7.5 ms
-            params.itvl_max = 6;   // keep fixed
-            params.latency  = 0;
-            params.supervision_timeout = 400; // 400 * 10ms = 4s
-            int upd_rc = ble_gap_update_params(g_conn_handle, &params);
-            ESP_LOGI(TAG, "ble_gap_update_params rc=%d", upd_rc);
+                // Set preferred MTU
+                int mtu_rc = ble_att_set_preferred_mtu(517);
+                ESP_LOGI(TAG, "ble_att_set_preferred_mtu rc=%d", mtu_rc);
 
-        } else {
-            ESP_LOGW(TAG, "Connect failed; status=%d", event->connect.status);
+                // Request short connection interval: 7.5 ms
+                struct ble_gap_upd_params params = {
+                    .itvl_min = 6,   // 6 * 1.25 ms = 7.5 ms
+                    .itvl_max = 6,
+                    .latency  = 0,
+                    .supervision_timeout = 400, // 400 * 10 ms = 4 s
+                };
+                int upd_rc = ble_gap_update_params(g_conn_handle, &params);
+                ESP_LOGI(TAG, "ble_gap_update_params rc=%d", upd_rc);
+
+                // Request 2 Mbps PHY (NimBLE v5.x)
+                int phy_rc = ble_gap_set_prefered_le_phy(
+                    g_conn_handle,
+                    BLE_HCI_LE_PHY_2M_PREF_MASK,
+                    BLE_HCI_LE_PHY_2M_PREF_MASK,
+                    0
+                );
+                ESP_LOGI(TAG, "ble_gap_set_prefered_le_phy rc=%d", phy_rc);
+                ESP_LOGI(TAG, "ble_gap_set_preferred_phys rc=%d", phy_rc);
+
+            } else {
+                ESP_LOGW(TAG, "Connect failed; status=%d", event->connect.status);
+                // Restart advertising
+                ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, NULL, ble_gap_event, NULL);
+            }
+            break;
+
+        case BLE_GAP_EVENT_DISCONNECT:
+            ESP_LOGI(TAG, "Disconnected; reason=%d", event->disconnect.reason);
+            g_conn_handle = 0;
+            g_stream_attr_handle = 0;
+            // Restart advertising
             ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, NULL, ble_gap_event, NULL);
-        }
-        break;
+            break;
 
-    case BLE_GAP_EVENT_DISCONNECT:
-        ESP_LOGI(TAG, "Disconnected; reason=%d", event->disconnect.reason);
-        g_conn_handle = 0;
-        g_stream_attr_handle = 0;
-        ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, NULL, ble_gap_event, NULL);
-        break;
+        case BLE_GAP_EVENT_SUBSCRIBE:
+            ESP_LOGI(TAG, "Subscribe: conn=%d attr_handle=%d cur_notify=%d",
+                     event->subscribe.conn_handle,
+                     event->subscribe.attr_handle,
+                     event->subscribe.cur_notify);
+            if (event->subscribe.cur_notify) {
+                g_stream_attr_handle = event->subscribe.attr_handle;
+                ESP_LOGI(TAG, "Cached stream attr handle: %d", g_stream_attr_handle);
+            } else {
+                if (g_stream_attr_handle == event->subscribe.attr_handle) {
+                    g_stream_attr_handle = 0;
+                }
+            }
+            break;
 
-    case BLE_GAP_EVENT_SUBSCRIBE:
-        ESP_LOGI(TAG, "Subscribe: conn=%d attr_handle=%d cur_notify=%d", event->subscribe.conn_handle, event->subscribe.attr_handle, event->subscribe.cur_notify);
-        if (event->subscribe.cur_notify) {
-            g_stream_attr_handle = event->subscribe.attr_handle;
-            ESP_LOGI(TAG, "Cached stream attr handle: %d", g_stream_attr_handle);
-        } else {
-            if (g_stream_attr_handle == event->subscribe.attr_handle) g_stream_attr_handle = 0;
-        }
-        break;
+        case BLE_GAP_EVENT_MTU:
+            ESP_LOGI(TAG, "MTU exchange event: conn=%d mtu=%u",
+                     event->mtu.conn_handle, event->mtu.value);
+            uint16_t cur_mtu = ble_att_mtu(g_conn_handle);
+            ESP_LOGI(TAG, "ble_att_mtu() => %u", cur_mtu);
+            break;
 
-    case BLE_GAP_EVENT_MTU:
-        ESP_LOGI(TAG, "MTU exchange event: conn=%d mtu=%u", event->mtu.conn_handle, event->mtu.value);
-        // also query via API:
-        uint16_t cur_mtu = ble_att_mtu(g_conn_handle);
-        ESP_LOGI(TAG, "ble_att_mtu() => %u", cur_mtu);
-        break;
-
-
-    default:
-        break;
+        default:
+            break;
     }
+
     return 0;
 }
 
@@ -523,7 +603,7 @@ static void ble_on_sync(void) {
 
 
     // Request preferred ATT MTU (tells peer "I prefer 247")
-    int rc = ble_att_set_preferred_mtu(247);
+    int rc = ble_att_set_preferred_mtu(517);
     ESP_LOGI(TAG, "ble_att_set_preferred_mtu rc=%d", rc);
 
 
@@ -584,7 +664,7 @@ void app_main(void) {
 
     // ADC (legacy call) - acceptable here. If you want full migration, I will provide.
     adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten(FSR_ADC_CHANNEL, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(FSR_ADC_CHANNEL, ADC_ATTEN_DB_12);
 
     // I2S
     i2s_init_inmp441();
