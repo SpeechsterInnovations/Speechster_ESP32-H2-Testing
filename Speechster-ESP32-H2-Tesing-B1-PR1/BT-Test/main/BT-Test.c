@@ -149,36 +149,35 @@ static void i2s_init_inmp441(void) {
 }
 
 /* ---------- Mic test task ---------- */
-void mic_test_task(void *param)
+void mic_test_task(void *arg)
 {
-    mic_enabled = true;
     int32_t i2s_buf[SAMPLE_BUF_LEN];
-    ESP_LOGI(TAG, "Starting mic test task...");
+    uint16_t pcm16_buf[SAMPLE_BUF_LEN];  // 16-bit output buffer
+    size_t bytes_read;
+
+    printf("I2S raw data check started...\n");
 
     while (1) {
-        size_t bytes_read = 0;
-        esp_err_t ret = i2s_channel_read(rx_chan, i2s_buf, sizeof(i2s_buf), &bytes_read, portMAX_DELAY);
-        if (ret == ESP_OK && bytes_read > 0) {
-            size_t samples = bytes_read / sizeof(int32_t);
+        // Read 32-bit I2S samples
+        i2s_channel_read(rx_chan, i2s_buf, sizeof(i2s_buf), &bytes_read, portMAX_DELAY);
 
-            // Convert first sample to 16-bit PCM
-            int16_t s16 = (int16_t)(i2s_buf[0] >> 8);
+        int samples = bytes_read / sizeof(int32_t);
 
-            // Log the first sample and total samples
-            ESP_LOGI(TAG, "Mic first sample (s16) = %d (samples=%zu bytes=%zu)", s16, samples, bytes_read);
-
-            // Log first 10 samples in hex
-            printf("First 10 i2s32 samples: ");
-
-            for (int i = 0; i < 10 && i < samples; i++) {
-                printf("i2s32[%d] = 0x%08" PRIx32 "\n", i, i2s_buf[i]);
-            }
-            printf("\n");
-        } else {
-            ESP_LOGW(TAG, "I2S read failed: %d", ret);
+        // Convert 32-bit left-aligned to 16-bit PCM
+        for (int i = 0; i < samples; i++) {
+            // Shift right by 8 to drop least significant 8 bits
+            int32_t sample32 = i2s_buf[i];
+            int16_t sample16 = (int16_t)(sample32 >> 8);
+            pcm16_buf[i] = sample16;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        // Print first 16 samples in HEX
+        for (int i = 0; i < 16 && i < samples; i++) {
+            printf("%04X ", pcm16_buf[i]);
+        }
+        printf("\n");
+
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
