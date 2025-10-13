@@ -22,6 +22,7 @@
 #include "freertos/task.h"
 #include "freertos/ringbuf.h"
 #include "freertos/semphr.h"
+#include <math.h>
 
 #include "esp_log.h"
 #include "esp_system.h"
@@ -67,9 +68,12 @@ static const char *TAG = "speechster_h2";
 #define AUDIO_RINGBUF_SIZE   (64 * 1024)
 
 #define I2S_PORT_NUM         I2S_NUM_0
-#define I2S_BCK_IO           4
-#define I2S_WS_IO            5
+#define I2S_BCK_IO           2
+#define I2S_WS_IO            14
 #define I2S_DATA_IN_IO       10
+#define I2S_NUM         I2S_NUM_0
+#define SAMPLE_BUF_LEN  320  // Number of samples per read
+
 
 #define FSR_ADC_CHANNEL      ADC_CHANNEL_1
 #define CONSERVATIVE_LL_OCTETS 123
@@ -128,22 +132,27 @@ static void i2s_init_inmp441(void) {
         .use_apll = false,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
     };
+
     i2s_pin_config_t pins = {
-        .bck_io_num = 4,
-        .ws_io_num = 5,
+        .bck_io_num = I2S_BCK_IO,
+        .ws_io_num = I2S_WS_IO,
         .data_out_num = I2S_PIN_NO_CHANGE,
-        .data_in_num = 10
+        .data_in_num = I2S_DATA_IN_IO
     };
+    
     ESP_ERROR_CHECK(i2s_driver_install(I2S_PORT_NUM, &cfg, 0, NULL));
     ESP_ERROR_CHECK(i2s_set_pin(I2S_PORT_NUM, &pins));
     ESP_ERROR_CHECK(i2s_set_clk(I2S_PORT_NUM, 16000, I2S_BITS_PER_SAMPLE_32BIT, I2S_CHANNEL_MONO));
-    ESP_LOGI(TAG, "INMP441 I2S configured: BCK=%d WS=%d SD=%d", 4, 5, 10);
+    ESP_LOGI(TAG, "INMP441 I2S configured: BCK=%d WS=%d SD=%d", I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO);
 }
 
-static void mic_test_task(void *arg) {
-    int32_t sample = 0;
-    size_t bytes_read;
-    ESP_LOGI(TAG, "Mic test start: reading raw I2S samples...");
+
+void mic_test_task(void *param) {
+    mic_enabled = true;
+
+    int32_t i2s_buf[SAMPLE_BUF_LEN];
+    ESP_LOGI(TAG, "Starting mic test task...");
+
     while (1) {
         esp_err_t ret = i2s_read(I2S_PORT_NUM, &sample, sizeof(sample), &bytes_read, portMAX_DELAY);
         if (ret == ESP_OK && bytes_read > 0) {
@@ -171,9 +180,17 @@ static void i2s_capture_task(void *arg) {
     int16_t pcm16[AUDIO_FRAME_SAMPLES];  // temporary 16-bit PCM conversion
 
     while (1) {
+        static bool mic_was_enabled = false;
         if (!mic_enabled) {
+            if (mic_was_enabled) {
+                ESP_LOGI(TAG, "[MIC] Capture stopped");
+                mic_was_enabled = false;
+            }
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
+        } else if (!mic_was_enabled) {
+            ESP_LOGI(TAG, "[MIC] Capture started");
+            mic_was_enabled = true;
         }
 
         size_t bytes_read = 0;
@@ -662,7 +679,7 @@ void app_main(void) {
         return;
     }
 
-    // ADC (legacy call) - acceptable here. If you want full migration, I will provide.
+    // ADC (legacy call) - acceptable here.
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(FSR_ADC_CHANNEL, ADC_ATTEN_DB_12);
 
@@ -670,14 +687,14 @@ void app_main(void) {
     i2s_init_inmp441();
 
     // NimBLE
-    init_nimble();
+    // init_nimble();
 
     // start tasks
     xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
     //xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
-    xTaskCreate(ble_sender_task, "ble_send", 8*1024, NULL, 5, NULL);
+    // xTaskCreate(ble_sender_task, "ble_send", 8*1024, NULL, 5, NULL);
 
-    // xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
+    xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Main started; advertising automatically, UART logs enabled");
 }
