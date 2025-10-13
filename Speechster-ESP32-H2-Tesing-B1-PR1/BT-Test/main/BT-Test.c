@@ -517,14 +517,14 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
                 ESP_LOGI(TAG, "ble_gap_update_params rc=%d", upd_rc);
 
                 // Request 2 Mbps PHY (NimBLE v5.x)
-                int phy_rc = ble_gap_set_preferred_le_phy(
+                int phy_rc = ble_gap_set_prefered_le_phy(
                     g_conn_handle,
                     BLE_HCI_LE_PHY_2M_PREF_MASK,
                     BLE_HCI_LE_PHY_2M_PREF_MASK,
                     0
                 );
-                ESP_LOGI(TAG, "ble_gap_set_preferred_le_phy rc=%d", phy_rc);
-                ESP_LOGI(TAG, "ble_gap_set_preferred_phys rc=%d", phy_rc);
+                ESP_LOGI(TAG, "ble_gap_set_prefered_le_phy rc=%d", phy_rc);
+                ESP_LOGI(TAG, "ble_gap_set_prefered_phys rc=%d", phy_rc);
 
             } else {
                 ESP_LOGW(TAG, "Connect failed; status=%d", event->connect.status);
