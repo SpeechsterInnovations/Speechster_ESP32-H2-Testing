@@ -197,7 +197,6 @@ static void i2s_capture_task(void *arg) {
         esp_err_t r = i2s_read(I2S_PORT_NUM, i2s32, sizeof(i2s32), &bytes_read, pdMS_TO_TICKS(200));
         if (r != ESP_OK || bytes_read == 0) continue;
 
-        // Convert 32-bit → 16-bit
         size_t samples = bytes_read / sizeof(int32_t);
         for (size_t i = 0; i < samples; i++) pcm16[i] = (int16_t)(i2s32[i] >> 14);
 
