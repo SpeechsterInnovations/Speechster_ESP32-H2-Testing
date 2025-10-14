@@ -5,13 +5,18 @@
 // UART logging @115200, advertise automatically.
 // ADPCM encoder included (ima adpcm) and selectable at runtime via JSON control.
 // cJSON is used for control parsing (available in ESP-IDF).
+//
+// Build:
+//   idf.py set-target esp32h2
+//   idf.py menuconfig  -> enable NimBLE (component config), set MTU if desired
+//   idf.py build
+//   idf.py -p /dev/ttyACM0 flash monitor
 
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -24,9 +29,12 @@
 #include "nvs_flash.h"
 #include "esp_timer.h"
 
-/* --- Suppress deprecation warnings for legacy driver headers */
+/* --- Suppress deprecation warnings for legacy driver headers (keeps code compatible with current toolchain)
+       This avoids the noisy compiler warnings you saw while retaining the well-tested APIs you already used.
+       If you prefer a full migration to the new drivers (i2s_std, esp_adc/adc_oneshot), I can provide that separately. */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#include "driver/i2s_std.h"
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 #pragma GCC diagnostic pop
@@ -45,41 +53,46 @@
 /* JSON parsing */
 #include "cJSON.h"
 
-/* Mic I2S STD Driver */
-#include "driver/i2s_std.h"
-#include "driver/i2s_common.h" 
-
 /* ADPCM header (drop-in) */
 #include "adpcm.h"
 
 static const char *TAG = "speechster_h2";
 
 /* ---------- Defaults & config ---------- */
-#define UART_BAUD_RATE         115200
-#define AUDIO_SAMPLE_RATE      16000
-#define AUDIO_FRAME_MS         20
-#define AUDIO_FRAME_SAMPLES    ((AUDIO_SAMPLE_RATE/1000) * AUDIO_FRAME_MS) // 320
+#define UART_BAUD_RATE       115200
+#define AUDIO_SAMPLE_RATE    48000
+#define AUDIO_FRAME_MS       20
+#define AUDIO_FRAME_SAMPLES  ((AUDIO_SAMPLE_RATE/1000) * AUDIO_FRAME_MS) // 320
 #define AUDIO_BYTES_PER_SAMPLE 2
-#define AUDIO_READ_BYTES       (AUDIO_FRAME_SAMPLES * AUDIO_BYTES_PER_SAMPLE)
-#define AUDIO_RINGBUF_SIZE     (64 * 1024)
-#define USE_MIC_TEST_TASK      1
+#define AUDIO_READ_BYTES     (AUDIO_FRAME_SAMPLES * AUDIO_BYTES_PER_SAMPLE)
+#define AUDIO_RINGBUF_SIZE   (64 * 1024)
 
 #define I2S_PORT_NUM         I2S_NUM_0
 #define I2S_BCK_IO           3
 #define I2S_WS_IO            14
 #define I2S_DATA_IN_IO       10
-#define SAMPLE_BUF_LEN       AUDIO_FRAME_SAMPLES  // unified buffer size
+#define I2S_NUM         I2S_NUM_0
+#define SAMPLE_BUF_LEN  320  // Number of samples per read
 
-#define FSR_ADC_CHANNEL           ADC_CHANNEL_1
+
+#define FSR_ADC_CHANNEL      ADC_CHANNEL_1
+static uint16_t CONSERVATIVE_LL_OCTETS = 123;
 static uint32_t fsr_interval_ms = 50; // default 50ms, can be changed via JSON
 adpcm_state_t adpcm_state;
+static i2s_chan_handle_t rx_chan = NULL;
 
-/* BLE custom UUIDs */
-static const char *SERVICE_UUID_STR      = "0000feed-0000-1000-8000-00805f9b34fb";
+/* BLE custom UUIDs (browser should use the same strings when connecting) */
+static const char *SERVICE_UUID_STR       = "0000feed-0000-1000-8000-00805f9b34fb";
 static const char *CHAR_CONTROL_UUID_STR = "0000feed-0001-0000-8000-00805f9b34fb";
 static const char *CHAR_STREAM_UUID_STR  = "0000feed-0002-0000-8000-00805f9b34fb";
 
-/* Packet framing (8 byte header) */
+/* Packet framing (8 byte header):
+ * 0: type (0x01 audio, 0x02 sensor)
+ * 1: flags (bit0 = compressed ADPCM)
+ * 2-3: seq (uint16 little-endian)
+ * 4-7: ts_ms (uint32 little-endian)
+ * payload follows
+ */
 static inline void pack_header(uint8_t *buf, uint8_t type, uint8_t flags, uint16_t seq, uint32_t ts_ms) {
     buf[0] = type;
     buf[1] = flags;
@@ -93,8 +106,8 @@ static inline void pack_header(uint8_t *buf, uint8_t type, uint8_t flags, uint16
 
 /* runtime state */
 typedef enum { ENC_PCM = 0, ENC_ADPCM = 1 } encoder_t;
-static encoder_t default_encoder = ENC_PCM;
-static encoder_t current_encoder = ENC_PCM;
+static encoder_t default_encoder = ENC_PCM; // default used when JSON omits encoder
+static encoder_t current_encoder = ENC_PCM; // active encoder (settable via JSON)
 static volatile bool mic_enabled = false;
 static volatile bool fsr_enabled = false;
 static uint16_t seq_counter = 0;
@@ -104,121 +117,91 @@ static SemaphoreHandle_t state_lock = NULL;
 
 /* BLE state */
 static uint16_t g_conn_handle = 0;
-static uint16_t g_stream_attr_handle = 0;
-static volatile bool fake_mode = false;
-
-/* --- I2S Channel Handle --- */
-static i2s_chan_handle_t rx_chan = NULL; // Handle for the I2S receive channel
+static uint16_t g_stream_attr_handle = 0; // populated on subscribe
+static volatile bool fake_mode = false; // start with fake frames disabled
 
 /* ---------- I2S (INMP441) ---------- */
 static void i2s_init_inmp441(void) {
-    // 1. Channel Configuration (including DMA and role)
-    i2s_chan_config_t chan_cfg = {
-        .id = I2S_NUM_0,
-        .role = I2S_ROLE_MASTER,          // ESP32 is clock master (generates BCLK/WS)
-        .dma_desc_num = 8,                // Number of DMA descriptors
-        .dma_frame_num = AUDIO_FRAME_SAMPLES, // Frames per descriptor
-        .auto_clear = true,               // Clear old data when buffer is full
+i2s_chan_config_t chan_cfg = {
+        .id = I2S_PORT_NUM,
+        .role = I2S_ROLE_MASTER,
+        .dma_desc_num = 4,
+        .dma_frame_num = 32,
+        .auto_clear = true,
     };
-    
-    // Create the channel handle (NULL for TX handle implies RX channel).
+
     ESP_ERROR_CHECK(i2s_new_channel(&chan_cfg, NULL, &rx_chan));
 
-    // 2. Standard I2S Mode Configuration
     i2s_std_config_t std_cfg = {
-        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(AUDIO_SAMPLE_RATE),
-        // INMP441 data is read as 32-bit (MSB-aligned) on the ESP32.
-        .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO),
-        
-        // Use the nested structure AND the new, shortened member names:
+        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(48000),
+        .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
         .gpio_cfg = {
-            .bclk = I2S_BCK_IO,        // Changed from .bclk_io_num
-            .ws = I2S_WS_IO,          // Changed from .ws_io_num
-            .dout = I2S_GPIO_UNUSED, // Changed from .data_out_num
-            .din = I2S_DATA_IN_IO,  // Changed from .data_in_num
-    }};
-    
-    // Initialize the channel in standard I2S mode.
-    // This function only takes TWO arguments in your IDF version.
-    ESP_ERROR_CHECK(i2s_channel_init_std_mode(rx_chan, &std_cfg));
+            .bclk = I2S_BCK_IO,
+            .ws   = I2S_WS_IO,
+            .dout = I2S_GPIO_UNUSED,
+            .din  = I2S_DATA_IN_IO,
+        }
+    };
 
-    // 3. Enable the channel
+    ESP_ERROR_CHECK(i2s_channel_init_std_mode(rx_chan, &std_cfg));
     ESP_ERROR_CHECK(i2s_channel_enable(rx_chan));
 
-    ESP_LOGI(TAG, "INMP441 I2S Standard initialized: BCLK=%d WS=%d DIN=%d (I2S Channel 0)", I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO);
+    ESP_LOGI(TAG, "I2S initialized: BCLK=%d WS=%d DIN=%d", I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO);
 }
 
-/* ---------- Mic test task ---------- */
-void mic_test_task(void *arg)
-{
-    int32_t i2s_buf[SAMPLE_BUF_LEN];
-    uint16_t pcm16_buf[SAMPLE_BUF_LEN];  // 16-bit output buffer
+/* ---------- Heap-safe pre-allocated buffers ---------- */
+#define MAX_FRAME_SIZE   (8 + AUDIO_READ_BYTES)  // 8-byte header + PCM
+static uint8_t audio_frame_buf[MAX_FRAME_SIZE]; // pre-allocated buffer for PCM frames
+static uint8_t adpcm_buf[AUDIO_READ_BYTES/2 + 16]; // max ADPCM output size
+
+/* ---------- I2S capture task (heap-safe) ---------- */
+static void i2s_capture_task(void *arg) {
+    int16_t pcm16_buf[SAMPLE_BUF_LEN];
     size_t bytes_read;
 
-    printf("I2S raw data check started...\n");
+    ESP_LOGI(TAG, "I2S capture task started");
 
     while (1) {
-        // Read 32-bit I2S samples
-        i2s_channel_read(rx_chan, i2s_buf, sizeof(i2s_buf), &bytes_read, portMAX_DELAY);
+        // Read directly into 16-bit buffer
+        i2s_channel_read(rx_chan, pcm16_buf, sizeof(pcm16_buf), &bytes_read, portMAX_DELAY);
+        int samples = bytes_read / sizeof(int16_t);
 
-        int samples = bytes_read / sizeof(int32_t);
+        uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+        uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+        uint8_t flags = (current_encoder == ENC_ADPCM) ? 0x01 : 0x00;
 
-        // Convert 32-bit left-aligned to 16-bit PCM
+        int16_t min_val = INT16_MAX;
+        int16_t max_val = INT16_MIN;
+
         for (int i = 0; i < samples; i++) {
-            // Shift right by 8 to drop least significant 8 bits
-            int32_t sample32 = i2s_buf[i];
-            int16_t sample16 = (int16_t)(sample32 >> 8);
-            pcm16_buf[i] = sample16;
+            if (pcm16_buf[i] < min_val) min_val = pcm16_buf[i];
+            if (pcm16_buf[i] > max_val) max_val = pcm16_buf[i];
         }
 
-        // Print first 16 samples in HEX
-        for (int i = 0; i < 16 && i < samples; i++) {
-            printf("%04X ", pcm16_buf[i]);
+ESP_LOGI(TAG, "Sample range: min=%d max=%d", min_val, max_val);
+
+        if (current_encoder == ENC_PCM) {
+            size_t frame_payload_bytes = samples * sizeof(int16_t);
+            pack_header(audio_frame_buf, 0x01, flags, seq, ts);
+            memcpy(audio_frame_buf + 8, pcm16_buf, frame_payload_bytes);
+            xRingbufferSend(audio_rb, audio_frame_buf, 8 + frame_payload_bytes, pdMS_TO_TICKS(50));
+
+            if ((seq % 50) == 0)
+                ESP_LOGI(TAG, "PCM frame seq=%u len=%zu", seq, frame_payload_bytes);
+
+        } else { // ADPCM
+            size_t out_bytes = adpcm_encode(&adpcm_state, pcm16_buf, samples, adpcm_buf);
+            pack_header(audio_frame_buf, 0x01, flags, seq, ts);
+            memcpy(audio_frame_buf + 8, adpcm_buf, out_bytes);
+            xRingbufferSend(audio_rb, audio_frame_buf, 8 + out_bytes, pdMS_TO_TICKS(50));
+
+            if ((seq % 50) == 0)
+                ESP_LOGI(TAG, "ADPCM frame seq=%u len=%zu", seq, out_bytes);
         }
-        printf("\n");
-
-        vTaskDelay(pdMS_TO_TICKS(50));
-    }
-}
-
-
-/* ---------- I2S capture task ---------- */
-void i2s_capture_task(void *param)
-{
-    ESP_LOGI(TAG, "i2s_capture_task start");
-
-    int32_t i2s32[AUDIO_FRAME_SAMPLES];
-    int16_t pcm16[AUDIO_FRAME_SAMPLES];
-
-    while (1) {
-        static bool mic_was_enabled = false;
-        if (!mic_enabled) {
-            if (mic_was_enabled) {
-                ESP_LOGI(TAG, "[MIC] Capture stopped");
-                mic_was_enabled = false;
-            }
-            vTaskDelay(pdMS_TO_TICKS(20));
-            continue;
-        } else if (!mic_was_enabled) {
-            ESP_LOGI(TAG, "[MIC] Capture started");
-            mic_was_enabled = true;
-        }
-
-        size_t bytes_read = 0;
-        esp_err_t r = i2s_channel_read(rx_chan, i2s32, sizeof(i2s32), &bytes_read, pdMS_TO_TICKS(200));
-        if (r != ESP_OK || bytes_read == 0) continue;
-
-        size_t samples = bytes_read / sizeof(int32_t);
-        for (size_t i = 0; i < samples; i++) {
-            pcm16[i] = (int16_t)(i2s32[i] >> 8); // convert 32-bit to 16-bit PCM
-        }
-        // Placeholder: encode/send data (PCM/ADPCM)
-        ESP_LOGI(TAG, "Captured %u samples", (unsigned)samples);
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
-
 
 /* ---------- FSR ADC polling ---------- */
 static void fsr_task(void *arg) {
@@ -262,7 +245,7 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     json[len] = '\0';
 
     uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-    LOG_CTRL("ts=%u raw=%s", ts, json);
+    LOG_CTRL("ts=%zu raw=%s", ts, json);
 
     cJSON *root = cJSON_Parse(json);
     if (!root) {
@@ -302,7 +285,7 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
         uint32_t v = (uint32_t) jint->valuedouble;
         if (v >= 10 && v <= 5000) {
             fsr_interval_ms = v;
-            LOG_JSON_PARSE("fsr_interval_ms=%u", fsr_interval_ms);
+            LOG_JSON_PARSE("fsr_interval_ms=%zu", fsr_interval_ms);
         }
     }
 
@@ -484,7 +467,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
                 .uuid = BLE_UUID128_DECLARE(
                     0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,0x00,0x00,0x10,0x00,0x02,0x00,0xed,0xfe
                 ),
-                .access_cb = gatt_control_access_cb,
                 .flags = BLE_GATT_CHR_F_NOTIFY,
             },
             { 0 }
@@ -523,8 +505,14 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
                     BLE_HCI_LE_PHY_2M_PREF_MASK,
                     0
                 );
+                uint8_t tx_phy, rx_phy;
+                int rc = ble_gap_read_le_phy(g_conn_handle, &tx_phy, &rx_phy);
+                if (rc == 0)
+                    ESP_LOGI(TAG, "PHY active: TX=%u RX=%u", tx_phy, rx_phy);
+                else
+                    ESP_LOGW(TAG, "ble_gap_read_le_phy rc=%d", rc);
+
                 ESP_LOGI(TAG, "ble_gap_set_prefered_le_phy rc=%d", phy_rc);
-                ESP_LOGI(TAG, "ble_gap_set_prefered_phys rc=%d", phy_rc);
 
             } else {
                 ESP_LOGW(TAG, "Connect failed; status=%d", event->connect.status);
@@ -561,6 +549,11 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
                      event->mtu.conn_handle, event->mtu.value);
             uint16_t cur_mtu = ble_att_mtu(g_conn_handle);
             ESP_LOGI(TAG, "ble_att_mtu() => %u", cur_mtu);
+
+            if (att_mtu > 100) {
+                CONSERVATIVE_LL_OCTETS = att_mtu - 5;  // 3-byte ATT header + 2-byte GATT overhead
+                ESP_LOGI(TAG, "Dynamic payload limit adjusted to %d bytes", CONSERVATIVE_LL_OCTETS);
+            }
             break;
 
         default:
@@ -657,22 +650,33 @@ static void init_nimble(void) {
     nimble_port_freertos_init(nimble_host_task);
 }
 
-/* ---------- App main ---------- */
-
+/* ---------- app_main ---------- */
 void app_main(void) {
-    ESP_LOGI(TAG, "Main started; initializing...");
+    esp_log_level_set("*", ESP_LOG_INFO);
+    esp_log_level_set(TAG, ESP_LOG_DEBUG);
+    ESP_LOGI(TAG, "Speechster H2 starting");
 
-    nvs_flash_init();
     state_lock = xSemaphoreCreateMutex();
     audio_rb = xRingbufferCreate(AUDIO_RINGBUF_SIZE, RINGBUF_TYPE_BYTEBUF);
+    if (!audio_rb) {
+        ESP_LOGE(TAG, "ringbuffer create failed");
+        return;
+    }
+
+    // ADC (legacy call) - acceptable here.
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(FSR_ADC_CHANNEL, ADC_ATTEN_DB_12);
+
+    // I2S
     i2s_init_inmp441();
 
-    #if USE_MIC_TEST_TASK
-        xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
-    #else
-        xTaskCreate(i2s_capture_task, "i2s_capture", 8192, NULL, 5, NULL);
-    #endif
+    // NimBLE
+    init_nimble();
 
+    // start tasks
+    xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
+    //xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
     xTaskCreate(ble_sender_task, "ble_send", 8*1024, NULL, 5, NULL);
-    ESP_LOGI(TAG, "Task created; ready.");
+
+    ESP_LOGI(TAG, "Main started; advertising automatically, UART logs enabled");
 }
