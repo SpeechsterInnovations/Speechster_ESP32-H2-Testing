@@ -76,7 +76,7 @@ static const char *TAG = "speechster_h2";
 
 
 #define FSR_ADC_CHANNEL      ADC_CHANNEL_1
-static uint16_t CONSERVATIVE_LL_OCTETS = 123;
+static volatile uint16_t CONSERVATIVE_LL_OCTETS = 123;
 static uint32_t fsr_interval_ms = 50; // default 50ms, can be changed via JSON
 adpcm_state_t adpcm_state;
 static i2s_chan_handle_t rx_chan = NULL;
@@ -177,28 +177,30 @@ static void i2s_capture_task(void *arg) {
             if (pcm16_buf[i] < min_val) min_val = pcm16_buf[i];
             if (pcm16_buf[i] > max_val) max_val = pcm16_buf[i];
         }
+        
+        if (mic_enabled) {
+            if (current_encoder == ENC_PCM) {
+                size_t frame_payload_bytes = samples * sizeof(int16_t);
+                pack_header(audio_frame_buf, 0x01, flags, seq, ts);
+                memcpy(audio_frame_buf + 8, pcm16_buf, frame_payload_bytes);
+                xRingbufferSend(audio_rb, audio_frame_buf, 8 + frame_payload_bytes, pdMS_TO_TICKS(50));
+                
+                if ((seq % 50) == 0) {
+                    ESP_LOGI(TAG, "PCM frame seq=%u len=%zu", seq, frame_payload_bytes);
+                    ESP_LOGI(TAG, "Sample range: min=%d max=%d", min_val, max_val);
+                }
+                
 
-ESP_LOGI(TAG, "Sample range: min=%d max=%d", min_val, max_val);
+            } else { // ADPCM
+                size_t out_bytes = adpcm_encode(&adpcm_state, pcm16_buf, samples, adpcm_buf);
+                pack_header(audio_frame_buf, 0x01, flags, seq, ts);
+                memcpy(audio_frame_buf + 8, adpcm_buf, out_bytes);
+                xRingbufferSend(audio_rb, audio_frame_buf, 8 + out_bytes, pdMS_TO_TICKS(50));
 
-        if (current_encoder == ENC_PCM) {
-            size_t frame_payload_bytes = samples * sizeof(int16_t);
-            pack_header(audio_frame_buf, 0x01, flags, seq, ts);
-            memcpy(audio_frame_buf + 8, pcm16_buf, frame_payload_bytes);
-            xRingbufferSend(audio_rb, audio_frame_buf, 8 + frame_payload_bytes, pdMS_TO_TICKS(50));
-
-            if ((seq % 50) == 0)
-                ESP_LOGI(TAG, "PCM frame seq=%u len=%zu", seq, frame_payload_bytes);
-
-        } else { // ADPCM
-            size_t out_bytes = adpcm_encode(&adpcm_state, pcm16_buf, samples, adpcm_buf);
-            pack_header(audio_frame_buf, 0x01, flags, seq, ts);
-            memcpy(audio_frame_buf + 8, adpcm_buf, out_bytes);
-            xRingbufferSend(audio_rb, audio_frame_buf, 8 + out_bytes, pdMS_TO_TICKS(50));
-
-            if ((seq % 50) == 0)
-                ESP_LOGI(TAG, "ADPCM frame seq=%u len=%zu", seq, out_bytes);
+                if ((seq % 50) == 0)
+                    ESP_LOGI(TAG, "ADPCM frame seq=%u len=%zu", seq, out_bytes);
+            }
         }
-
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -301,9 +303,6 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     free(json);
     return 0;
 }
-
-/* helper: conservative LL payload limit until you confirm via btmon */
-#define CONSERVATIVE_LL_OCTETS 123
 
 static void send_chunked_notify(uint16_t conn_handle, uint16_t attr_handle,
                                 uint8_t *frame, size_t frame_len)
@@ -454,26 +453,33 @@ static void ble_sender_task(void *arg) {
 static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     {
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
-        .uuid = BLE_UUID16_DECLARE(0xFEED),
+        .uuid = BLE_UUID128_DECLARE(
+            0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,
+            0x00,0x00,0x10,0x00,0xed,0xfe,0x00,0x00
+        ),
         .characteristics = (struct ble_gatt_chr_def[]) {
             {
                 .uuid = BLE_UUID128_DECLARE(
-                    0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,0x00,0x00,0x10,0x00,0x01,0x00,0xed,0xfe
+                    0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,
+                    0x00,0x00,0x10,0x00,0x01,0x00,0xed,0xfe
                 ),
                 .access_cb = gatt_control_access_cb,
                 .flags = BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_WRITE_NO_RSP,
             },
             {
                 .uuid = BLE_UUID128_DECLARE(
-                    0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,0x00,0x00,0x10,0x00,0x02,0x00,0xed,0xfe
+                    0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,
+                    0x00,0x00,0x10,0x00,0x02,0x00,0xed,0xfe
                 ),
+                .access_cb = NULL,   // must explicitly set NULL
                 .flags = BLE_GATT_CHR_F_NOTIFY,
             },
-            { 0 }
+            {0} // terminator for characteristics
         },
     },
-    { 0 }
+    {0} // terminator for services
 };
+
 
 /* ---------- BLE GAP events ---------- */
 static int ble_gap_event(struct ble_gap_event *event, void *arg) {
@@ -550,8 +556,8 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
             uint16_t cur_mtu = ble_att_mtu(g_conn_handle);
             ESP_LOGI(TAG, "ble_att_mtu() => %u", cur_mtu);
 
-            if (att_mtu > 100) {
-                CONSERVATIVE_LL_OCTETS = att_mtu - 5;  // 3-byte ATT header + 2-byte GATT overhead
+            if (event->mtu.value > 100) {
+                CONSERVATIVE_LL_OCTETS = event->mtu.value - 5;
                 ESP_LOGI(TAG, "Dynamic payload limit adjusted to %d bytes", CONSERVATIVE_LL_OCTETS);
             }
             break;
@@ -656,8 +662,9 @@ void app_main(void) {
     esp_log_level_set(TAG, ESP_LOG_DEBUG);
     ESP_LOGI(TAG, "Speechster H2 starting");
 
-    state_lock = xSemaphoreCreateMutex();
-    audio_rb = xRingbufferCreate(AUDIO_RINGBUF_SIZE, RINGBUF_TYPE_BYTEBUF);
+    nvs_flash_erase(); // full erase
+    nvs_flash_init();
+
     if (!audio_rb) {
         ESP_LOGE(TAG, "ringbuffer create failed");
         return;
@@ -672,6 +679,10 @@ void app_main(void) {
 
     // NimBLE
     init_nimble();
+
+
+    state_lock = xSemaphoreCreateMutex();
+    audio_rb = xRingbufferCreate(AUDIO_RINGBUF_SIZE, RINGBUF_TYPE_BYTEBUF);
 
     // start tasks
     xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
