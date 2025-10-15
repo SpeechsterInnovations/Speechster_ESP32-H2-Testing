@@ -34,12 +34,14 @@ void i2s_init_test(void)
         .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(48000),
         .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO),
         .gpio_cfg = {
+            .mclk = I2S_GPIO_UNUSED,
             .bclk = I2S_BCK_IO,
             .ws   = I2S_WS_IO,
             .dout = I2S_GPIO_UNUSED,
             .din  = I2S_DATA_IN_IO,
         }
     };
+    std_cfg.slot_cfg.slot_mask = I2S_STD_SLOT_LEFT;
 
     ESP_ERROR_CHECK(i2s_channel_init_std_mode(rx_chan, &std_cfg));
     ESP_ERROR_CHECK(i2s_channel_enable(rx_chan));
@@ -50,32 +52,31 @@ void i2s_init_test(void)
 void i2s_test_task(void *arg)
 {
     int32_t i2s_buf[SAMPLE_BUF_LEN];
-    uint16_t pcm16_buf[SAMPLE_BUF_LEN];  // 16-bit output buffer
+    int16_t pcm16_buf[SAMPLE_BUF_LEN];
     size_t bytes_read;
 
     printf("I2S raw data check started...\n");
 
     while (1) {
-        // Read 32-bit I2S samples
         i2s_channel_read(rx_chan, i2s_buf, sizeof(i2s_buf), &bytes_read, portMAX_DELAY);
-
         int samples = bytes_read / sizeof(int32_t);
 
-        // Convert 32-bit left-aligned to 16-bit PCM
+        int32_t sum = 0;
         for (int i = 0; i < samples; i++) {
-            // Shift right by 8 to drop least significant 8 bits
             int32_t sample32 = i2s_buf[i];
-            int16_t sample16 = (int16_t)(sample32 >> 8);
+            int16_t sample16 = (int16_t)(sample32 >> 8);  // 24-bit -> 16-bit
             pcm16_buf[i] = sample16;
+            sum += abs(sample16);
         }
 
-        // Print first 16 samples in HEX
-        for (int i = 0; i < 16 && i < samples; i++) {
+        // Print first few samples and avg amplitude
+        printf("Samples: ");
+        for (int i = 0; i < 8 && i < samples; i++) {
             printf("%04X ", pcm16_buf[i]);
         }
-        printf("\n");
+        printf(" | Avg=%d\n", sum / samples);
 
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
