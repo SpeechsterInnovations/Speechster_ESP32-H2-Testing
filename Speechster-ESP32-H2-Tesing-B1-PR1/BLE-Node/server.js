@@ -1,157 +1,157 @@
 // server.js
-// Speechster-H2 BLE client (Node.js + noble)
-// Streams raw PCM16 frames into real-time WAV output
+// Speechster-H2 BLE PCM client (Node.js + noble)
+// Receives chunked PCM notifications, reconstructs frames, writes to WAV or plays live
 
 import noble from '@abandonware/noble';
-import readline from 'readline';
 import fs from 'fs';
 import process from 'process';
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: '> '
-});
+const SERVICE_UUID = '0000feed00001000800000805f9b34fb';
+const STREAM_UUID  = '0000feed00020000800000805f9b34fb';
+const CONTROL_UUID = '0000feed00010000800000805f9b34fb';
+
+const OUTPUT_FILE = 'mic_output.wav';  // or 'mic_output.raw'
+const writeStream = fs.createWriteStream(OUTPUT_FILE);
 
 let controlChar = null;
 let dataChar = null;
-let leftover = Buffer.alloc(0);
 
-// === WAV setup ===
-const WAV_FILE = 'stream.wav';
-const SAMPLE_RATE = 16000;
-let wavFd = fs.openSync(WAV_FILE, 'w');
-let totalSamples = 0;
+/* --- Frame reassembly state --- */
+let frameBuffer = Buffer.alloc(0);
+let expectedSeq = null;
+let incompleteFrame = null;
+let lastChunkTime = 0;
 
-writeWavHeader(wavFd);
+function parseHeader(buf) {
+  return {
+    type: buf[0],
+    flags: buf[1],
+    seq: buf.readUInt16LE(2),
+    ts: buf.readUInt32LE(4)
+  };
+}
 
-// Write placeholder WAV header
-function writeWavHeader(fd) {
+/* --- WAV header writer (16-bit PCM) --- */
+function writeWavHeader(stream, sampleRate = 48000, numSamples = 0) {
+  const blockAlign = 2;
+  const byteRate = sampleRate * blockAlign;
   const header = Buffer.alloc(44);
   header.write('RIFF', 0);
-  header.writeUInt32LE(36, 4); // placeholder
-  header.write('WAVE', 8);
-  header.write('fmt ', 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20); // PCM
-  header.writeUInt16LE(1, 22); // mono
-  header.writeUInt32LE(SAMPLE_RATE, 24);
-  header.writeUInt32LE(SAMPLE_RATE * 2, 28);
-  header.writeUInt16LE(2, 32);
+  header.writeUInt32LE(36 + numSamples * 2, 4);
+  header.write('WAVEfmt ', 8);
+  header.writeUInt32LE(16, 16); // PCM chunk size
+  header.writeUInt16LE(1, 20);  // PCM format
+  header.writeUInt16LE(1, 22);  // mono
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(byteRate, 28);
+  header.writeUInt16LE(blockAlign, 32);
   header.writeUInt16LE(16, 34);
   header.write('data', 36);
-  header.writeUInt32LE(0, 40);
-  fs.writeSync(fd, header, 0, 44, 0);
+  header.writeUInt32LE(numSamples * 2, 40);
+  stream.write(header);
 }
 
-// Update WAV header at exit
-function finalizeWav(fd) {
-  const dataSize = totalSamples * 2;
-  const fileSize = 36 + dataSize;
-  const buf = Buffer.alloc(8);
-  buf.writeUInt32LE(fileSize, 0);
-  fs.writeSync(fd, buf, 0, 4, 4); // RIFF size
-  buf.writeUInt32LE(dataSize, 0);
-  fs.writeSync(fd, buf, 0, 4, 40); // data size
+/* --- Stream reassembly --- */
+function handleNotify(data) {
+  const now = Date.now();
+  if (now - lastChunkTime > 1000) {
+    // reset if gap too long
+    incompleteFrame = null;
+    frameBuffer = Buffer.alloc(0);
+  }
+  lastChunkTime = now;
+
+  if (data.length < 8) return;
+  const hdr = parseHeader(data);
+  const continuation = (hdr.flags & 0x02) !== 0;
+
+  if (!incompleteFrame) {
+    // start of new frame
+    incompleteFrame = {
+      seq: hdr.seq,
+      ts: hdr.ts,
+      type: hdr.type,
+      flags: hdr.flags,
+      payloads: []
+    };
+  }
+
+  // Append payload
+  incompleteFrame.payloads.push(data.slice(8));
+
+  if (!continuation) {
+    // final chunk → assemble
+    const full = Buffer.concat(incompleteFrame.payloads);
+    const pcm = full;
+
+    // sanity check: small frames only (~960 samples)
+    if (pcm.length > 2000) {
+      console.log(`[WARN] Oversized frame seq=${hdr.seq} (${pcm.length} bytes)`);
+    }
+
+    // detect seq jumps
+    if (expectedSeq !== null && hdr.seq !== (expectedSeq & 0xffff)) {
+      console.log(`[DROP] Seq jump: expected=${expectedSeq} got=${hdr.seq}`);
+    }
+    expectedSeq = (hdr.seq + 1) & 0xffff;
+
+    // Write PCM data
+    writeStream.write(pcm);
+
+    incompleteFrame = null;
+    frameBuffer = Buffer.alloc(0);
+  }
 }
 
-// Helper to extract BLE frame
-function extractFrame(buf) {
-  if (buf.length < 8) return { frame: null, remaining: buf };
-  const type = buf[0],
-        flags = buf[1],
-        seq = buf.readUInt16LE(2),
-        ts = buf.readUInt32LE(4);
-  const payload = buf.slice(8);
-  return { frame: { type, flags, seq, ts, payload }, remaining: Buffer.alloc(0) };
-}
+/* --- BLE Setup --- */
+noble.on('stateChange', async (state) => {
+  console.log('Noble state:', state);
+  if (state === 'poweredOn') {
+    try {
+      console.log('Starting scan (no filters)...');
+      await noble.startScanningAsync([], false);
+      console.log('Scan started.');
+    } catch (e) {
+      console.error('Scan start failed:', e);
+    }
+  } else {
+    noble.stopScanning();
+  }
+});
+noble.on('discover', async (peripheral) => {
+  console.log(`Found ${peripheral.advertisement.localName || peripheral.id}`);
+  await noble.stopScanningAsync();
+  // Wait 1–2 seconds to let BlueZ fully stop scanning
+  await new Promise(r => setTimeout(r, 2000));
+  await peripheral.connectAsync();
+  console.log("Waiting for UUIDs")
+  const { services, characteristics } = await peripheral.discoverAllServicesAndCharacteristicsAsync();
 
-// === BLE scanning ===
-console.log('Scanning for Speechster-H2...');
+  for (const c of characteristics) {
+    if (c.uuid === CONTROL_UUID.replace(/-/g, '')) controlChar = c;
+    if (c.uuid === STREAM_UUID.replace(/-/g, '')) dataChar = c;
+  }
 
-noble.on('stateChange', state => {
-  if (state === 'poweredOn') noble.startScanning([], false);
-  else noble.stopScanning();
+  if (!dataChar) {
+    console.error('Stream characteristic not found.');
+    process.exit(1);
+  }
+
+  console.log('Connected. Subscribing to stream...');
+  dataChar.on('data', handleNotify);
+  await dataChar.subscribeAsync();
+
+  console.log('Enabling mic...');
+  const cmd = JSON.stringify({ mic: true });
+  await controlChar.writeAsync(Buffer.from(cmd), false);
+
+  writeWavHeader(writeStream, 48000);
+  console.log('Recording started.');
 });
 
-noble.on('discover', async peripheral => {
-  const name = peripheral.advertisement?.localName || 'Unnamed';
-  if (!name.toLowerCase().includes('speechster')) return;
-  console.log(`Found device: ${name} (${peripheral.id})`);
-  noble.stopScanning();
-  await connectDevice(peripheral);
-});
-
-async function connectDevice(peripheral) {
-  peripheral.connect(err => {
-    if (err) return console.error('Connection error:', err);
-    console.log(`Connected to ${peripheral.advertisement.localName}`);
-
-    peripheral.discoverAllServicesAndCharacteristics((err, _services, chars) => {
-      if (err) return console.error('Discovery error:', err);
-
-      controlChar = chars.find(c =>
-        c.properties.includes('write') || c.properties.includes('writeWithoutResponse')
-      );
-      dataChar = chars.find(c => c.properties.includes('notify'));
-
-      if (dataChar) {
-        console.log(`\nSubscribed to stream characteristic: ${dataChar.uuid}`);
-        dataChar.subscribe(err => {
-          if (err) console.error('Subscribe error:', err);
-        });
-
-        let lastSeq = -1;
-        dataChar.on('data', buf => {
-          leftover = Buffer.concat([leftover, buf]);
-          while (leftover.length >= 8) {
-            const { frame, remaining } = extractFrame(leftover);
-            if (!frame) break;
-
-            // LOGS:
-            console.log(
-              `Frame seq=${frame.seq} ts=${frame.ts} len=${frame.payload.length} bytes`
-            );
-
-            if (lastSeq >= 0 && frame.seq !== (lastSeq + 1) % 0x10000) {
-              console.warn(`⚠️ Frame loss? expected ${ (lastSeq + 1) % 0x10000 }, got ${frame.seq}`);
-            }
-            lastSeq = frame.seq;
-
-            // Write raw PCM16 payload directly
-            fs.writeSync(wavFd, frame.payload, 0, frame.payload.length, 44 + totalSamples * 2);
-            totalSamples += frame.payload.length / 2;
-            leftover = remaining;
-          }
-        });
-
-      }
-
-      if (controlChar) {
-        console.log('\nReady! Type JSON control commands (e.g. {"mic":true}):');
-        rl.prompt();
-
-        rl.on('line', line => {
-          const t = line.trim();
-          if (!t) return rl.prompt();
-          try {
-            controlChar.write(Buffer.from(t), false, err => {
-              if (err) console.error('Write error:', err);
-              else console.log(`Sent: ${t}`);
-            });
-          } catch (err) {
-            console.error('Invalid input:', err);
-          }
-          rl.prompt();
-        });
-      }
-    });
-  });
-}
-
-// Clean exit
+/* --- Exit handling --- */
 process.on('SIGINT', () => {
-  finalizeWav(wavFd);
-  console.log('\nWAV file finalized. Exiting.');
+  console.log('Stopping...');
+  writeStream.end();
   process.exit();
 });
