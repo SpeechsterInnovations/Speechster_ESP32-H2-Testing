@@ -1,19 +1,14 @@
-// main.c
-// ESP-IDF v5.5.1 (dirty) - NimBLE GATT server with JSON control + stream notify
+// ─────────────────────────────────────────────
+// Speechster-H2 BLE Audio Streamer — v1.0 STABLE
+// Oct-2025 build (ESP-IDF 5.5.1)
+// Safe aggregation, adaptive BLE pacing, heap-based buffers
+// ─────────────────────────────────────────────
 // INMP441 I2S pins: SD=GPIO10, SCK=GPIO3, WS=GPIO14 (L/R tied to GND -> left channel)
 // FSR402 ADC: ADC1 channel 1
-// UART logging @115200, advertise automatically.
-// ADPCM encoder included (ima adpcm) and selectable at runtime via JSON control.
-// cJSON is used for control parsing (available in ESP-IDF).
-//
-// Build:
-//   idf.py set-target esp32h2
-//   idf.py menuconfig  -> enable NimBLE (component config), set MTU if desired
-//   idf.py build
-//   idf.py -p /dev/ttyACM0 flash monitor
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-function"
+#pragma GCC diagnostic ignored "-Wcpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -57,10 +52,7 @@
 /* JSON parsing */
 #include "cJSON.h"
 
-/* ADPCM header (drop-in) */
-#include "adpcm.h"
-
-static const char *TAG = "speechster_h2";
+static const char *TAG = "speechster_b1";
 
 /* ---------- Defaults & config ---------- */
 #define UART_BAUD_RATE       115200
@@ -69,15 +61,15 @@ static const char *TAG = "speechster_h2";
 #define AUDIO_FRAME_SAMPLES   ((AUDIO_SAMPLE_RATE / 1000) * AUDIO_FRAME_MS)  // 960 at 48kHz
 #define AUDIO_BYTES_PER_SAMPLE 2
 #define AUDIO_READ_BYTES     (AUDIO_FRAME_SAMPLES * AUDIO_BYTES_PER_SAMPLE)
-#define AUDIO_RINGBUF_SIZE   (120 * 1024)
-#define STREAM_SLICE_MAX   (16 * 1024)
+#define AUDIO_RINGBUF_SIZE   (48 * 1024)
+#define STREAM_SLICE_MAX   (8 * 1024) // Smaller slice size reduces total number of chunks per logical frame
 #define I2S_BUF_SIZE 1024
 #define LOG_CTRL(fmt, ...) ESP_LOGI(TAG, "[CTRL_IN] " fmt, ##__VA_ARGS__)
 #define LOG_JSON_PARSE(fmt, ...) ESP_LOGI(TAG, "[JSON_PARSE] " fmt, ##__VA_ARGS__)
 #define LOG_STREAM(fmt, ...) ESP_LOGI(TAG, "[STREAM_OUT] " fmt, ##__VA_ARGS__)
 static i2s_chan_handle_t rx_chan = NULL; 
 static uint32_t rb_overflow_count = 0;
-static uint32_t ble_delay_ms = 10;
+static uint32_t ble_delay_ms = 15;
 
 #define I2S_PORT_NUM         I2S_NUM_0
 #define I2S_BCK_IO           3
@@ -90,7 +82,6 @@ static uint32_t ble_delay_ms = 10;
 #define FSR_ADC_CHANNEL      ADC_CHANNEL_1
 #define CONSERVATIVE_LL_OCTETS 220
 static uint32_t fsr_interval_ms = 50; // default 50ms, can be changed via JSON
-adpcm_state_t adpcm_state;
 
 /* BLE custom UUIDs (browser should use the same strings when connecting) */
 static const char *SERVICE_UUID_STR       = "0000feed-0000-1000-8000-00805f9b34fb";
@@ -99,10 +90,10 @@ static const char *CHAR_STREAM_UUID_STR  = "0000feed-0002-0000-8000-00805f9b34fb
 
 /* Packet framing (8 byte header):
  * 0: type (0x01 audio, 0x02 sensor)
- * 1: flags (bit0 = compressed ADPCM)
+ * 1: flags (reserved, currently always 0x00)
  * 2-3: seq (uint16 little-endian)
  * 4-7: ts_ms (uint32 little-endian)
- * payload follows
+ * 5: Payload
  */
 static inline void pack_header(uint8_t *buf, uint8_t type, uint8_t flags, uint16_t seq, uint32_t ts_ms) {
     buf[0] = type;
@@ -115,13 +106,24 @@ static inline void pack_header(uint8_t *buf, uint8_t type, uint8_t flags, uint16
     buf[7] = (ts_ms >> 24) & 0xff;
 }
 
+/* ---------- 16-bit additive checksum ---------- */
+static uint16_t calc_checksum16(const uint8_t *data, size_t len) {
+    uint32_t sum = 0;
+    for (size_t i = 0; i < len; i++) sum += data[i];
+    // Fold to 16 bits and wrap carry
+    while (sum >> 16)
+        sum = (sum & 0xFFFF) + (sum >> 16);
+    return (uint16_t)sum;
+}
+
+
 /* runtime state */
-typedef enum { ENC_PCM = 0, ENC_ADPCM = 1 } encoder_t;
-static encoder_t default_encoder = ENC_PCM; // default used when JSON omits encoder
-static encoder_t current_encoder = ENC_PCM; // active encoder (settable via JSON)
+static const uint8_t AUDIO_FLAG_PCM = 0x00;
 static volatile bool mic_enabled = false;
 static volatile bool fsr_enabled = false;
 static uint16_t seq_counter = 0;
+static volatile bool bt_connected = false;
+static uint8_t *agg_buf = NULL;
 
 static RingbufHandle_t audio_rb = NULL;
 static SemaphoreHandle_t state_lock = NULL;
@@ -197,25 +199,36 @@ void mic_test_task(void *param) {
 /* ---------- Heap-safe pre-allocated buffers ---------- */
 #define MAX_FRAME_SIZE   (8 + AUDIO_READ_BYTES)  // 8-byte header + PCM
 static uint8_t audio_frame_buf[MAX_FRAME_SIZE]; // pre-allocated buffer for PCM frames
-static uint8_t adpcm_buf[AUDIO_READ_BYTES/2 + 16]; // max ADPCM output size
 
 /* ---------- I2S capture task (heap-safe) ---------- */
-static void i2s_capture_task(void *arg)
-{
+static void i2s_capture_task(void *arg) {
+    // Now capturing at 48 kHz, but downsampling to 16 kHz PCM16 before BLE send.
+    // Effective BLE audio bandwidth ~32 kB/s (≈16 kHz mono).
+
     ESP_LOGI(TAG, "i2s_capture_task start");
 
-    const uint32_t frame_ms = 10;  // capture 10 ms slices instead of 20 ms
+    const uint32_t frame_ms = 5;  // capture 5 ms slices instead of 20 ms
     const size_t frame_samples = (AUDIO_SAMPLE_RATE / 1000) * frame_ms;
     const size_t pcm_bytes = frame_samples * sizeof(int16_t);
     const size_t frame_sz = 8 + pcm_bytes;
 
-    int32_t i2s_buf[frame_samples];
-    int16_t pcm_frame[frame_samples];
+    // heap-allocate buffers to avoid stack overflow in FreeRTOS tasks
+    int32_t *i2s_buf = (int32_t*) pvPortMalloc(frame_samples * sizeof(int32_t));
+    int16_t *pcm_down = (int16_t*) pvPortMalloc((frame_samples / 3 + 4) * sizeof(int16_t));
+    if (!i2s_buf || !pcm_down) {
+        ESP_LOGE(TAG, "i2s_capture_task: buffer alloc failed");
+        if (i2s_buf) vPortFree(i2s_buf);
+        if (pcm_down) vPortFree(pcm_down);
+        vTaskDelete(NULL);
+        return;
+    }
 
     while (1) {
-
-        size_t capped_bytes = pcm_bytes;
-        if (capped_bytes > 4096) capped_bytes = 4096;
+        if (audio_rb == NULL) {
+            ESP_LOGW(TAG, "audio_rb not ready yet");
+            vTaskDelay(pdMS_TO_TICKS(50));
+            continue;
+        }
 
         if (!mic_enabled) {
             vTaskDelay(pdMS_TO_TICKS(50));
@@ -241,26 +254,33 @@ static void i2s_capture_task(void *arg)
             continue;
         }
 
+        size_t samples_read = bytes_read / sizeof(int32_t);
+
         if (free_bytes < AUDIO_READ_BYTES * 2) {
             vTaskDelay(pdMS_TO_TICKS(ble_delay_ms)); // brief pause if buffer nearly full
             taskYIELD();
             continue;
         }
 
-        size_t samples_read = bytes_read / sizeof(int32_t);
-        for (size_t i = 0; i < samples_read; i++) {
-            pcm_frame[i] = (int16_t)(i2s_buf[i] >> 8);
+        // Downsample 48 kHz → 16 kHz by simple decimation (every 3rd sample).
+        // INMP441 has an internal low-pass filter, so no FIR filter needed here.
+        size_t j = 0;
+        for (size_t i = 0; i + 2 < samples_read; i += 3) {
+            int32_t s = (i2s_buf[i] >> 8);  // take one out of every 3 samples
+            pcm_down[j++] = (int16_t)s;
         }
+        size_t down_samples = j;
+        size_t down_bytes = down_samples * sizeof(int16_t);
 
-        uint8_t flags = (current_encoder == ENC_ADPCM) ? 0x01 : 0x00;
+        uint8_t flags = AUDIO_FLAG_PCM;
         uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
         uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
 
 
         pack_header(audio_frame_buf, 0x01, flags, seq, ts);
-        memcpy(audio_frame_buf + 8, pcm_frame, capped_bytes);
+        memcpy(audio_frame_buf + 8, pcm_down, down_bytes);
 
-        if (xRingbufferSend(audio_rb, audio_frame_buf, 8 + capped_bytes, pdMS_TO_TICKS(20)) != pdTRUE) {
+        if (xRingbufferSend(audio_rb, audio_frame_buf, 8 + down_bytes, pdMS_TO_TICKS(20)) != pdTRUE) {
             rb_overflow_count++;
         }
 
@@ -283,6 +303,11 @@ static void i2s_capture_task(void *arg)
         taskYIELD();
         vTaskDelay(pdMS_TO_TICKS(2)); // allow timer_task to run
     }
+
+    // (not reached in normal operation)
+    vPortFree(i2s_buf);
+    vPortFree(pcm_down);
+    vTaskDelete(NULL);
 }
 
 /* ---------- FSR ADC polling ---------- */
@@ -335,18 +360,6 @@ static void control_task(void *arg)
                     LOG_JSON_PARSE("fsr=%d", fsr_enabled);
                 }
 
-                cJSON *jenc = cJSON_GetObjectItem(root, "encoder");
-                if (jenc && cJSON_IsString(jenc)) {
-                    if (strcasecmp(jenc->valuestring, "pcm") == 0) {
-                        current_encoder = ENC_PCM;
-                        LOG_JSON_PARSE("encoder=PCM");
-                    } else if (strcasecmp(jenc->valuestring, "adpcm") == 0) {
-                        current_encoder = ENC_ADPCM;
-                        adpcm_reset_state(&adpcm_state);
-                        LOG_JSON_PARSE("encoder=ADPCM");
-                    }
-                }
-
                 cJSON *jdelay = cJSON_GetObjectItem(root, "ble_delay_ms");
                 if (jdelay && cJSON_IsNumber(jdelay)) {
                     uint32_t v = (uint32_t) jdelay->valuedouble;
@@ -382,7 +395,7 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
 
     /* Instead of parsing JSON here, just enqueue it */
     control_msg_t msg = { .len = len, .json = json };
-    if (xQueueSend(ctrl_queue, &msg, 0) != pdTRUE) {
+    if (xQueueSend(ctrl_queue, &msg, pdMS_TO_TICKS(10)) != pdTRUE) {
         ESP_LOGW(TAG, "Control queue full; dropping JSON");
         free(json);
     }
@@ -392,167 +405,268 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
 
 
 // -----------------------------------------------------------------------------
-//  send_chunked_notify()  --  WDT-safe BLE chunked sender for long frames
+//  send_chunked_notify()  --  Adaptive BLE chunked sender with pacing auto-tune
 // -----------------------------------------------------------------------------
 static void send_chunked_notify(uint16_t conn_handle,
                                 uint16_t attr_handle,
                                 const uint8_t *frame,
                                 size_t frame_len)
 {
-    const size_t payload_max = 120;  // safe BLE payload size for MTU 256
-    bool first_chunk = true;
-    size_t pos = 0;
-
-    // Safety: trim over-large frames to prevent WDT lockup
-    if (frame_len > STREAM_SLICE_MAX) {
-        ESP_LOGW(TAG, "Frame too large (%zu bytes) → slicing to %d", frame_len, STREAM_SLICE_MAX);
-        frame_len = STREAM_SLICE_MAX;  // send first slice only
-        pos = 0;                        // reset chunk index
-        first_chunk = true;
-    } else if (frame_len == 0) {
-        vTaskDelay(pdMS_TO_TICKS(5));
+    if (!bt_connected || attr_handle == 0) {
+        ESP_LOGW(TAG, "[SEND_CHUNKED_NOTIFY]: no active BLE client (conn=%d, attr=%d)",
+                 conn_handle, attr_handle);
         return;
     }
 
-    static float avg_notify_interval_us = 0.0f;
-    static const float alpha = 0.1f;
-    static uint32_t last_notify_time_us = 0;
+    static uint32_t adaptive_delay_ms = 20;  // start slightly slower
+    const uint32_t delay_min = 10;
+    const uint32_t delay_max = 60;
+
+    /* Determine max payload from MTU */
+    uint16_t cur_mtu = ble_att_mtu(conn_handle);
+    size_t payload_max = 120;
+    if (cur_mtu > 3) {
+        size_t candidate = (size_t)cur_mtu - 3;
+        if (candidate > 200) candidate = 200;   // cap smaller to reduce chunk count
+        payload_max = candidate;
+    }
+    if (payload_max < 64) payload_max = 64;
+
+    /* Safety clamp */
+    if (frame_len > STREAM_SLICE_MAX) {
+        ESP_LOGI(TAG, "Frame sliced (%zu → %d bytes)", frame_len, STREAM_SLICE_MAX);
+        frame_len = STREAM_SLICE_MAX;
+    }
+
+    bool first_chunk = true;
+    size_t pos = 0;
+
+    /* Adaptive pacing variables */
+    uint32_t backoff_ms = adaptive_delay_ms;
+    const uint32_t backoff_max = 400;
+    const uint32_t backoff_multiplier = 2;
+    uint32_t success_count = 0, fail_count = 0;
+    static int consecutive_failures = 0;
 
     while (pos < frame_len) {
         size_t remaining = frame_len - pos;
         size_t take = (remaining > payload_max) ? payload_max : remaining;
 
         uint8_t notify_buf[260];
-        memcpy(notify_buf, frame, 8);  // copy header (8 bytes)
-
-        // set continuation flags
-        if (!first_chunk)
-            notify_buf[1] |= 0x02;          // mid-chunk
-        else if (pos + take < frame_len)
-            notify_buf[1] |= 0x02;          // start but not last
+        memcpy(notify_buf, frame, 8);
+        if (!first_chunk || (pos + take) < frame_len)
+            notify_buf[1] |= 0x02;  // continuation flag
 
         memcpy(notify_buf + 8, frame + pos, take);
 
         struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + take);
-        if (om) {
-            int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
-            if (rc == 0) {
-                static uint32_t notify_count = 0;
-                if ((notify_count++ % 128) == 0) {
-                    ESP_LOGI(TAG, "Notify OK (avg=%.1f us, rb_free=%zu)",
-                             avg_notify_interval_us,
-                             xRingbufferGetCurFreeSize(audio_rb));
-                    vTaskDelay(pdMS_TO_TICKS(2)); // small extra slack between chunks
-                    taskYIELD();
-                }
+        if (!om) {
+            // mbuf pool exhausted — abort sending this aggregate and back off.
+            ESP_LOGW(TAG, "mbuf exhausted while sending seq=%u pos=%zu — abort aggregate, backing off %ums",
+                    /* seq */ (unsigned) ((frame_len >= 8) ? frame[2] | (frame[3]<<8) : 0),
+                    pos, backoff_ms);
+            // Cleanly drop the partially-sent aggregate (or you could requeue it).
+            // Back off before returning to main loop so the BLE stack recovers.
+            vTaskDelay(pdMS_TO_TICKS(backoff_ms));
+            // increase backoff but cap it
+            backoff_ms = backoff_ms < backoff_max ? backoff_ms * backoff_multiplier : backoff_max;
+            return; // abort sending the rest of this frame — caller will decide next action
+        }
 
-                // compute moving average of notify interval
-                uint32_t now = (uint32_t)esp_timer_get_time();
-                if (last_notify_time_us > 0) {
-                    float delta = (float)(now - last_notify_time_us);
-                    avg_notify_interval_us =
-                        (alpha * delta) + ((1.0f - alpha) * avg_notify_interval_us);
-                }
-                last_notify_time_us = now;
+        int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
+    
+        if (rc == 0) {
+            success_count++;
+            consecutive_failures = 0;
+            backoff_ms = adaptive_delay_ms;
 
-                // pacing between chunks
-                vTaskDelay(pdMS_TO_TICKS(ble_delay_ms));
-                taskYIELD();
-
-                // yield extra every few chunks
-                if (((pos / payload_max) % 4) == 0) {
-                    vTaskDelay(pdMS_TO_TICKS(1));
-                    taskYIELD();
-                }
-
-                // adaptive slowdown if RB nearly full
-                size_t free_bytes = xRingbufferGetCurFreeSize(audio_rb);
-                float fill_ratio =
-                    1.0f - ((float)free_bytes / (float)AUDIO_RINGBUF_SIZE);
-                if (fill_ratio > 0.75f) {
-                    ESP_LOGD(TAG, "[Congestion] rb_fill=%.1f%%",
-                             fill_ratio * 100.0f);
-                    vTaskDelay(pdMS_TO_TICKS(ble_delay_ms));
-                    taskYIELD();
-                }
-            } else {
-                ESP_LOGW(TAG, "Notify failed rc=%d (take=%zu pos=%zu/%zu)",
-                         rc, take, pos + take, frame_len);
-                vTaskDelay(pdMS_TO_TICKS(ble_delay_ms * 2));
-                taskYIELD();
+            if ((success_count % 128) == 0) {
+                ESP_LOGI(TAG, "Notify OK (rb_free=%zu) mtu=%u payload=%zu delay=%ums",
+                         xRingbufferGetCurFreeSize(audio_rb), cur_mtu, take, adaptive_delay_ms);
             }
         } else {
-            ESP_LOGE(TAG, "Failed to alloc mbuf (%zu bytes)", 8 + take);
-            // Give NimBLE stack time to recycle buffers
-            vTaskDelay(pdMS_TO_TICKS(ble_delay_ms * 4));
-            for (int i = 0; i < 3; i++) taskYIELD();
+            fail_count++;
+            consecutive_failures++;
+            ESP_LOGW(TAG, "Notify failed rc=%d (take=%zu pos=%zu/%zu) — backoff %ums",
+                     rc, take, pos + take, frame_len, backoff_ms);
+            vTaskDelay(pdMS_TO_TICKS(backoff_ms));
+            backoff_ms = MIN(backoff_ms * backoff_multiplier, backoff_max);
+
+            // Detect link loss or persistent failure
+            if (rc == BLE_HS_ENOTCONN || consecutive_failures > 10) {
+                ESP_LOGE(TAG, "BLE link lost (rc=%d) — forcing disconnect", rc);
+                ble_gap_terminate(conn_handle, BLE_ERR_REM_USER_CONN_TERM);
+                bt_connected = false;
+                g_conn_handle = 0;
+                g_stream_attr_handle = 0;
+                consecutive_failures = 0;
+                return;
+            }
             continue;
         }
 
         pos += take;
         first_chunk = false;
 
-        if (((pos / payload_max) % 8) == 0) {
-            vTaskDelay(pdMS_TO_TICKS(1));
-            taskYIELD();
+        /* === Auto-tune pacing based on success ratio === */
+        if ((success_count + fail_count) >= 64) {
+            float success_ratio = (float)success_count / (success_count + fail_count);
+            if (success_ratio < 0.80f && adaptive_delay_ms < delay_max) {
+                adaptive_delay_ms += 2;  // slow down a bit
+            } else if (success_ratio > 0.95f && adaptive_delay_ms > delay_min) {
+                adaptive_delay_ms -= 1;  // speed up slightly
+            }
+            success_count = fail_count = 0;
+            ble_delay_ms = adaptive_delay_ms;  // update global pacing
         }
 
+        vTaskDelay(pdMS_TO_TICKS(adaptive_delay_ms));
+        taskYIELD();
     }
-
 }
-
-
-
-/* ---------- BLE sender: hybrid fake + real streaming ---------- */
 
 /* ---------- Pre-allocated notification buffer ---------- */
 #define MAX_NOTIFY_BUF  260
 static uint8_t notify_buf[MAX_NOTIFY_BUF];
 
 /* ---------- Heap-free BLE sender task ---------- */
-static void ble_sender_task(void *arg) {
+static void ble_sender_task(void *arg)
+{
     ESP_LOGI(TAG, "ble_sender_task start");
 
     static uint32_t last_wdt = 0;
 
+    // Aggregate buffer: 8 KB payload + 8-byte header + 4-byte footer
+    #define AGGREGATE_BYTES  (18 * 1024)
+    uint8_t *cursor = agg_buf + 8;
+    size_t agg_used = 0;
+    uint32_t ts = 0;
+    uint16_t seq = 0;
+
     while (1) {
         taskYIELD();
 
-        /* --- Fake frames --- */
-        if (fake_mode && g_stream_attr_handle > 0) {
+        // Skip work when BLE is not connected
+        if (!bt_connected) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
+
+        // --- Drain any pending audio data when mic is disabled ---
+        if (!mic_enabled) {
+            uint8_t *drop_item;
+            size_t drop_size;
+
+            while ((drop_item = (uint8_t *)xRingbufferReceive(audio_rb, &drop_size, 0))) {
+                vRingbufferReturnItem(audio_rb, drop_item);
+            }
+
+            agg_used = 0;  // reset aggregation state
+            vTaskDelay(pdMS_TO_TICKS(200));  // gentle idle pacing
+            continue;  // skip sending loop
+        }
+
+        uint8_t *item = NULL;
+        size_t item_size = 0;
+
+        /* --- Fake mode --- */
+        if (fake_mode && g_stream_attr_handle > 0 && bt_connected) {
             uint8_t fake_payload[4] = { 0x11, 0x22, 0x33, 0x44 };
             uint8_t fake_frame[8 + sizeof(fake_payload)];
-            uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-            uint16_t seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-            pack_header(fake_frame, 0x01, 0x00, seq, ts);
+            uint32_t fts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+            uint16_t fseq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+            pack_header(fake_frame, 0x01, 0x00, fseq, fts);
             memcpy(fake_frame + 8, fake_payload, sizeof(fake_payload));
             send_chunked_notify(g_conn_handle, g_stream_attr_handle, fake_frame, sizeof(fake_frame));
             vTaskDelay(pdMS_TO_TICKS(10));
             continue;
         }
 
-        /* --- Real audio frames --- */
-        size_t item_size;
-        uint8_t *item = (uint8_t*) xRingbufferReceive(audio_rb, &item_size, pdMS_TO_TICKS(500));
-        if (!item) { vTaskDelay(pdMS_TO_TICKS(ble_delay_ms)); continue; }
+        /* --- Real audio aggregation --- */
+        item = (uint8_t *)xRingbufferReceive(audio_rb, &item_size, pdMS_TO_TICKS(50));
 
-        if (g_stream_attr_handle > 0) {
-            ESP_LOGI(TAG, "Streaming frame (%zu bytes)...", item_size);
-            // Use chunked notify for large audio frames
-            send_chunked_notify(g_conn_handle, g_stream_attr_handle, item, item_size);
-            vRingbufferReturnItem(audio_rb, item);  // ✅ release after sending
-            uint32_t now = esp_log_timestamp();
-            if (now - last_wdt > 2000) { // feed every 2s
-                last_wdt = now;
+        if (item && item_size >= 8) {
+            if (agg_used == 0) {
+                // start a new aggregate frame
+                ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+                seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+                cursor = agg_buf + 8;
+                agg_used = 0;
             }
-            vTaskDelay(pdMS_TO_TICKS(ble_delay_ms * 3));
-        } else {
-            // Not subscribed — return item immediately so ringbuffer doesn't fill up.
+
+            // skip 8-byte inner header; only append PCM payload
+            size_t payload_len = item_size - 8;
+
+            // if adding this would exceed the aggregate buffer, flush current batch first
+            if (agg_used + payload_len > AGGREGATE_BYTES) {
+                uint16_t footer_seq = seq;
+                uint16_t footer_crc = calc_checksum16(agg_buf + 8, agg_used);
+
+                memcpy(agg_buf + 8 + agg_used, &footer_seq, sizeof(footer_seq));
+                memcpy(agg_buf + 8 + agg_used + sizeof(footer_seq), &footer_crc, sizeof(footer_crc));
+
+                size_t total_len = 8 + agg_used + 4; // header + payload + footer
+                pack_header(agg_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
+                send_chunked_notify(g_conn_handle, g_stream_attr_handle, agg_buf, total_len);
+
+                agg_used = 0;
+                cursor = agg_buf + 8;
+                ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+                seq++;
+            }
+
+            if (agg_used + payload_len <= AGGREGATE_BYTES) {
+                memcpy(cursor, item + 8, payload_len);
+                cursor += payload_len;
+                agg_used += payload_len;
+            } else {
+                ESP_LOGI(TAG, "Aggregate overflow prevented (%u+%u > %u)",
+                        (unsigned)agg_used, (unsigned)payload_len, (unsigned)AGGREGATE_BYTES);
+                agg_used = AGGREGATE_BYTES; // force flush next loop
+            }
+
+
             vRingbufferReturnItem(audio_rb, item);
-            // Small sleep to avoid tight loop reading the ringbuffer when nobody's listening
-            vTaskDelay(pdMS_TO_TICKS(10));
+            item = NULL;
+        } else {
+            // timeout or no data → flush whatever aggregate exists
+            if (agg_used > 0 && g_stream_attr_handle > 0 && bt_connected) {
+                uint16_t footer_seq = seq;
+                uint16_t footer_crc = calc_checksum16(agg_buf + 8, agg_used);
+
+                memcpy(agg_buf + 8 + agg_used, &footer_seq, sizeof(footer_seq));
+                memcpy(agg_buf + 8 + agg_used + sizeof(footer_seq), &footer_crc, sizeof(footer_crc));
+
+                size_t total_len = 8 + agg_used + 4;
+                pack_header(agg_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
+                send_chunked_notify(g_conn_handle, g_stream_attr_handle, agg_buf, total_len);
+
+                agg_used = 0;
+                cursor = agg_buf + 8;
+            }
+            else if (item && item_size < 8) {
+                // only return if not processed
+                vRingbufferReturnItem(audio_rb, item);
+                item = NULL;
+            }
+
+            // no active client or idle → small sleep
+            vTaskDelay(pdMS_TO_TICKS(ble_delay_ms));
         }
 
+        /* Feed WDT and pacing */
+        uint32_t now = esp_log_timestamp();
+        if (now - last_wdt > 2000) {
+            last_wdt = now;
+        }
+
+        UBaseType_t watermark = uxTaskGetStackHighWaterMark(NULL);
+        if (watermark < 512) {
+            ESP_LOGW(TAG, "[STACK] ble_sender low watermark: %u words", watermark);
+        }
+
+        // mild pacing between aggregate flushes
+        vTaskDelay(pdMS_TO_TICKS(ble_delay_ms * 2));
     }
 }
 
@@ -589,26 +703,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     { 0 }
 };
 
-/* ---- Safe delayed test notification (runs outside NimBLE context) ---- */
-static void delayed_test_notify_task(void *arg) {
-    vTaskDelay(pdMS_TO_TICKS(1000));  // wait 1 second safely in task context
-
-    if (g_conn_handle && g_stream_attr_handle) {
-        uint8_t test_frame[16];
-        for (int i = 0; i < 16; i++) {
-            test_frame[i] = (uint8_t)i;
-        }
-
-        ESP_LOGI(TAG, "Sending delayed test notify on conn=%d attr=%d",
-                 g_conn_handle, g_stream_attr_handle);
-        send_chunked_notify(g_conn_handle, g_stream_attr_handle,
-                            test_frame, sizeof(test_frame));
-        ESP_LOGI(TAG, "Delayed test notification sent");
-    }
-
-    vTaskDelete(NULL);  // clean up after itself
-}
-
 
 /* ---------- BLE GAP events ---------- */
 static int ble_gap_event(struct ble_gap_event *event, void *arg) {
@@ -617,6 +711,7 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
         case BLE_GAP_EVENT_CONNECT:
             if (event->connect.status == 0) {
                 g_conn_handle = event->connect.conn_handle;
+                bt_connected = true;
                 ESP_LOGI(TAG, "Connected (handle %d)", g_conn_handle);
 
                 // Set preferred MTU
@@ -651,10 +746,17 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
             break;
 
         case BLE_GAP_EVENT_DISCONNECT:
-            ESP_LOGI(TAG, "Disconnected; reason=%d", event->disconnect.reason);
-            g_conn_handle = 0;
+            ESP_LOGW(TAG, "Client disconnected (reason=%d)", event->disconnect.reason);
+
+            // Clear runtime connection state
+            bt_connected = false;
             g_stream_attr_handle = 0;
-            // Restart advertising
+
+            // Allow NimBLE a short window to finalize cleanup
+            vTaskDelay(pdMS_TO_TICKS(200));
+
+            // Restart advertising automatically
+            ESP_LOGI(TAG, "Restarting advertising after disconnect...");
             ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, NULL, ble_gap_event, NULL);
             break;
 
@@ -669,22 +771,6 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
                 ESP_LOGI(TAG, "Cached stream attr handle: %d", g_stream_attr_handle);
             } else if (g_stream_attr_handle == event->subscribe.attr_handle) {
                 g_stream_attr_handle = 0;
-            }
-
-            if (g_stream_attr_handle > 0) {
-                ESP_LOGI(TAG, "Spawning delayed test notify task...");
-                BaseType_t ok = xTaskCreate(
-                    delayed_test_notify_task,  // ✅ the helper above
-                    "test_notify",              // task name
-                    3072,                       // stack size
-                    NULL,                       // arg
-                    4,                          // priority
-                    NULL                        // task handle (not needed)
-                );
-
-                if (ok != pdPASS) {
-                    ESP_LOGW(TAG, "Failed to spawn delayed_test_notify_task");
-                }
             }
             break;
 
@@ -707,7 +793,7 @@ static void start_advertise(void) {
     struct ble_hs_adv_fields fields;
     memset(&fields, 0, sizeof(fields));
 
-    const char *name = "Speechster-H2";
+    const char *name = "Speechster-B1";
     fields.flags = BLE_HS_ADV_F_DISC_GEN | BLE_HS_ADV_F_BREDR_UNSUP;
     fields.name = (uint8_t*) name;
     fields.name_len = strlen(name);
@@ -739,10 +825,10 @@ static void start_advertise(void) {
 
 /* NimBLE sync callback */
 static void ble_on_sync(void) {
-    ble_svc_gap_device_name_set("Speechster-H2");
+    ble_svc_gap_device_name_set("Speechster-B1");
 
 
-    // Request preferred ATT MTU (tells peer "I prefer 247")
+    // Request preferred ATT MTU
     int rc = ble_att_set_preferred_mtu(517);
     ESP_LOGI(TAG, "ble_att_set_preferred_mtu rc=%d", rc);
 
@@ -792,9 +878,9 @@ static void telemetry_task(void *arg) {
     while (1) {
         size_t free_bytes = xRingbufferGetCurFreeSize(audio_rb);
         float fill = 100.0f * (1.0f - ((float)free_bytes / AUDIO_RINGBUF_SIZE));
-        ESP_LOGI(TAG, "[Health] rb_fill=%.1f%% overflows=%lu delay=%ums",
-         fill, rb_overflow_count, ble_delay_ms);
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        UBaseType_t waiting_items = uxQueueMessagesWaiting(audio_rb);
+        ESP_LOGI(TAG, "[Health] rb_fill=%.1f%% free=%u waiting=%u", fill, free_bytes, waiting_items);
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
@@ -803,13 +889,15 @@ static void telemetry_task(void *arg) {
 void app_main(void) {
 
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
-    ESP_LOGI(TAG, "Speechster H2 starting");
+    ESP_LOGI(TAG, "Speechster B1 Starting Up");
 
     state_lock = xSemaphoreCreateMutex();
     audio_rb = xRingbufferCreate(AUDIO_RINGBUF_SIZE, RINGBUF_TYPE_BYTEBUF);
     if (!audio_rb) {
-        ESP_LOGE(TAG, "ringbuffer create failed");
+        ESP_LOGE(TAG, "Failed to create Ringbuffer, audio_rb: %d", audio_rb);
         return;
+    } else {
+        ESP_LOGI(TAG, "audio_rb: %d", audio_rb);
     }
 
     // ADC (legacy call) - acceptable here.
@@ -819,17 +907,30 @@ void app_main(void) {
     // I2S
     i2s_init_inmp441();
 
+    // Start ctrl_queue early
+    ctrl_queue = xQueueCreate(CTRL_QUEUE_LEN, sizeof(control_msg_t));
+
+    if (!ctrl_queue) {
+        ESP_LOGE(TAG, "Failed to create ctrl_queue");
+        return;
+    }
+
+    xTaskCreate(control_task, "ctrl_task", 4096, NULL, 5, NULL);
+
     // NimBLE
     init_nimble();
 
-    // start tasks
+    agg_buf = heap_caps_malloc(8 + AGGREGATE_BYTES + 4, MALLOC_CAP_8BIT);
+    if (!agg_buf) {
+        ESP_LOGE(TAG, "Failed to allocate agg_buf");
+        return;
+    }
+    memset(agg_buf, 0, 8 + AGGREGATE_BYTES + 4);
 
-    ctrl_queue = xQueueCreate(CTRL_QUEUE_LEN, sizeof(control_msg_t));
-    xTaskCreate(control_task, "ctrl_task", 4096, NULL, 5, NULL);
-    
+    // Start Tasks
     xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
-    //xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
-    xTaskCreate(ble_sender_task, "ble_send", 10*1024, NULL, 3, NULL);
+    xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
+    xTaskCreate(ble_sender_task, "ble_send", 20*1024, NULL, 3, NULL);
 
     //xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
     // xTaskCreate(telemetry_task, "telemetry", 4096, NULL, 1, NULL);

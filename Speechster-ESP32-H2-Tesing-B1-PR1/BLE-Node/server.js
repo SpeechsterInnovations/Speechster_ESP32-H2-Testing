@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────────
 // Speechster-H2 BLE PCM Stream Logger
-// Version: 1.0 (Stable PCM Baseline)
-// Date: 2025-10-17
-// 
+// Version: 1.1 (adds 16-bit seq + checksum verification)
+// Date: 2025-10-21
+//
 // Description:
 // Connects to Speechster-H2 over BLE (NimBLE GATT),
 // receives PCM16 audio stream notifications,
-// verifies continuity (seq/loss check),
+// verifies integrity (seq/loss + checksum),
 // and saves to valid WAV file (stream.wav).
 //
 // Usage:
@@ -15,11 +15,11 @@
 //   3. Stop with Ctrl+C — WAV auto-finalizes
 //
 // Notes:
-//   - Tested with ESP-IDF v5.5.1 GATT stream server
+//   - Compatible with firmware that adds 4-byte footer
+//     [2-byte seq][2-byte checksum16] at frame end
 //   - Sample rate: 48 kHz mono PCM16
 //   - Writes one WAV per session
 // ─────────────────────────────────────────────────────────────
-
 
 import noble from '@abandonware/noble';
 import readline from 'readline';
@@ -35,8 +35,6 @@ const rl = readline.createInterface({
 let controlChar = null;
 let dataChar = null;
 
-// Store pending partial fragments (for ADPCM or split notifications)
-
 const WAV_FILE = 'stream.wav';
 const SAMPLE_RATE = 48000; // matches ESP32 I2S
 let wavFd = fs.openSync(WAV_FILE, 'w');
@@ -46,7 +44,6 @@ let totalFrames = 0;
 let lostFrames = 0;
 let totalSamples = 0;
 let pending = new Map(); // holds partial frame chunks
-
 
 // ──────────────────────────── WAV HEADER ────────────────────────────
 writeWavHeader(wavFd);
@@ -89,7 +86,7 @@ function parseHeader(buf) {
   };
 }
 
-console.log('🔍 Scanning for Speechster-H2...');
+console.log('🔍 Scanning for Speechster-B1...');
 
 noble.on('stateChange', (state) => {
   if (state === 'poweredOn') noble.startScanning([], false);
@@ -137,7 +134,6 @@ async function connectDevice(peripheral) {
           const cont = (header.flags & 0x02) !== 0;
           const compressed = (header.flags & 0x01) !== 0;
 
-          // --- Aggregation-aware logic ---
           const key = header.seq;
 
           // Start or continue accumulating a frame
@@ -149,15 +145,39 @@ async function connectDevice(peripheral) {
           frame.chunks.push(payload);
           frame.total += payload.length;
 
-          // (optional) temporary debug log per chunk
-          // console.log(`🧩 seq=${header.seq} cont=${cont ? 'yes':'no'} len=${payload.length}`);
+          console.log(`[DATA_IN]: seq=${header.seq} cont=${cont ? 'yes' : 'no'} len=${payload.length}`);
 
           // When cont=0 => frame finished
           if (!cont) {
-            const fullPayload = Buffer.concat(frame.chunks);
+            let fullPayload = Buffer.concat(frame.chunks);
             pending.delete(key);
 
-            // Verify continuity once per frame
+            // ---- Footer verification (seq + checksum16) ----
+            if (fullPayload.length >= 4) {
+              const payloadData = fullPayload.slice(0, fullPayload.length - 4);
+              const footerSeq = fullPayload.readUInt16LE(fullPayload.length - 4);
+              const footerCRC = fullPayload.readUInt16LE(fullPayload.length - 2);
+
+              // Compute checksum16 (same as ESP)
+              let sum = 0;
+              for (let i = 0; i < payloadData.length; i++) sum += payloadData[i];
+              while (sum >> 16) sum = (sum & 0xffff) + (sum >> 16);
+              const calcCRC = sum & 0xffff;
+
+              // Verify both sequence and CRC
+              if (footerSeq !== header.seq)
+                console.warn(`⚠️ Footer seq mismatch: header=${header.seq} footer=${footerSeq}`);
+
+              if (calcCRC !== footerCRC)
+                console.warn(`⚠️ CRC mismatch seq=${footerSeq}: calc=${calcCRC} recv=${footerCRC}`);
+
+              // Trim footer for WAV write
+              fullPayload = payloadData;
+            } else {
+              console.warn('⚠️ Frame too small for footer validation');
+            }
+
+            // Verify continuity once per full frame
             if (!compressed) {
               if (lastSeq >= 0) {
                 const expected = (lastSeq + 1) % 0x10000;
@@ -191,7 +211,6 @@ async function connectDevice(peripheral) {
               );
             }
           }
-
         });
       }
 
@@ -205,7 +224,7 @@ async function connectDevice(peripheral) {
           try {
             controlChar.write(Buffer.from(t), false, (err) => {
               if (err) console.error('Write error:', err);
-              else console.log(`➡️ Sent: ${t}`);
+              else console.log(`[DATA_OUT]: ${t}`);
             });
           } catch (err) {
             console.error('Invalid input:', err);
@@ -221,6 +240,7 @@ async function connectDevice(peripheral) {
 process.on('SIGINT', () => {
   try {
     finalizeWav(wavFd);
+    console.log(`💾 WAV finalized (${totalSamples} samples, ${(totalSamples / SAMPLE_RATE).toFixed(2)} s)`);
   } catch (e) {
     console.error('Error finalizing WAV:', e);
   } finally {
