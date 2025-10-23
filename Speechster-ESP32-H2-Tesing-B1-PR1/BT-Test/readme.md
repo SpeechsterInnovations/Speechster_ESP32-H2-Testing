@@ -1,6 +1,5 @@
 ## 🧩 Speechster B1 — BLE PCM Stream Baseline (STABLE)
 
-**Commit:** `e9e5e66-dirty`  
 **Firmware Name:** `BT-Test`  
 **Build Target:** `esp32-h2`  
 **ESP-IDF:** `v5.5.1-dirty`  
