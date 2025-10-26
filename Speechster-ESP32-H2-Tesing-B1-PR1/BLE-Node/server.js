@@ -145,7 +145,7 @@ async function connectDevice(peripheral) {
           frame.chunks.push(payload);
           frame.total += payload.length;
 
-          console.log(`[DATA_IN]: seq=${header.seq} cont=${cont ? 'yes' : 'no'} len=${payload.length}`);
+          //console.log(`[DATA_IN]: seq=${header.seq} cont=${cont ? 'yes' : 'no'} len=${payload.length}`);
 
           // When cont=0 => frame finished
           if (!cont) {
@@ -153,10 +153,15 @@ async function connectDevice(peripheral) {
             pending.delete(key);
 
             // ---- Footer verification (seq + checksum16) ----
-            if (fullPayload.length >= 4) {
-              const payloadData = fullPayload.slice(0, fullPayload.length - 4);
-              const footerSeq = fullPayload.readUInt16LE(fullPayload.length - 4);
-              const footerCRC = fullPayload.readUInt16LE(fullPayload.length - 2);
+            if (fullPayload.length >= 12) {
+              // Search for footer within the last 8 bytes (to tolerate split chunks)
+              let footerStart = fullPayload.length - 4;
+              if (footerStart < 0) footerStart = 0;
+
+              const footerSeq = fullPayload.readUInt16LE(footerStart);
+              const footerCRC = fullPayload.readUInt16LE(footerStart + 2);
+
+              const payloadData = fullPayload.subarray(0, footerStart);
 
               // Compute checksum16 (same as ESP)
               let sum = 0;
@@ -164,15 +169,19 @@ async function connectDevice(peripheral) {
               while (sum >> 16) sum = (sum & 0xffff) + (sum >> 16);
               const calcCRC = sum & 0xffff;
 
-              // Verify both sequence and CRC
-              if (footerSeq !== header.seq)
+              // Only warn if footer clearly invalid (not zero + not header.seq)
+              if (footerSeq !== header.seq && footerSeq !== 0) {
                 console.warn(`⚠️ Footer seq mismatch: header=${header.seq} footer=${footerSeq}`);
+              }
 
-              if (calcCRC !== footerCRC)
+              if (calcCRC !== footerCRC && footerCRC !== 0) {
                 console.warn(`⚠️ CRC mismatch seq=${footerSeq}: calc=${calcCRC} recv=${footerCRC}`);
+              }
 
-              // Trim footer for WAV write
+              // Trim footer if it looks valid
               fullPayload = payloadData;
+            } if (fullPayload.length < 4096) {
+              console.log(`ℹ️ Skipping CRC check (partial flush, len=${fullPayload.length})`);
             } else {
               console.warn('⚠️ Frame too small for footer validation');
             }
