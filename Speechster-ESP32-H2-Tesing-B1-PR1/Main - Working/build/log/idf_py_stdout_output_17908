@@ -1,0 +1,391 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 921600 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+[0;32mI (105) esp_image: segment 1: paddr=000259f4 vaddr=40800000 sizeESP-ROM:esp32h2-20221101[0m
+Build:Nov  1 2022
+rst:0x15 (USB_UART_HPSYS),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x408098b4
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x408460f0,len:0x1700
+load:0x4083c2d0,len:0x1080
+load:0x4083efd0,len:0x34f4
+entry 0x4083c2e8
+[0;32mI (23) boot: ESP-IDF v5.5.1-dirty 2nd stage bootloader[0m
+[0;32mI (23) boot: compile time Oct 26 2025 13:56:57[0m
+[0;32mI (24) boot: chip revision: v0.1[0m
+[0;32mI (25) boot: efuse block revision: v0.3[0m
+[0;32mI (27) boot.esp32h2: SPI Speed      : 64MHz[0m
+[0;32mI (31) boot.esp32h2: SPI Mode       : DIO[0m
+[0;32mI (35) boot.esp32h2: SPI Flash Size : 2MB[0m
+[0;32mI (38) boot: Enabling RNG early entropy source...[0m
+[0;32mI (43) boot: Partition Table:[0m
+[0;32mI (45) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (52) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (58) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (65) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (72) boot: End of partition table[0m
+[0;32mI (75) esp_image: segment 0: paddr=00010020 vaddr=42090020 size=159cch ( 88524) map[0m
+[0;32mI (105) esp_image: segment 1: paddr=000259f4 vaddr=40800000 size=02624h (  9764) load[0m
+[0;32mI (109) esp_image: segment 2: paddr=00028020 vaddr=42000020 size=87ff0h (557040) map[0m
+[0;32mI (251) esp_image: segment 3: paddr=000b0018 vaddr=40802624 size=159a8h ( 88488) load[0m
+[0;32mI (283) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (284) boot: Disabling RNG early entropy source...[0m
+[0;32mI (294) cpu_start: Unicore app[0m
+[0;32mI (303) cpu_start: Pro cpu start user code[0m
+[0;32mI (303) cpu_start: cpu freq: 96000000 Hz[0m
+[0;32mI (304) app_init: Application information:[0m
+[0;32mI (304) app_init: Project name:     BT-Test[0m
+[0;32mI (307) app_init: App version:      1da8838-dirty[0m
+[0;32mI (311) app_init: Compile time:     Oct 26 2025 13:58:47[0m
+[0;32mI (316) app_init: ELF file SHA256:  28d76e49a...[0m
+[0;32mI (320) app_init: ESP-IDF:          v5.5.1-dirty[0m
+[0;32mI (325) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (329) efuse_init: Max chip rev:     v1.99 [0m
+[0;32mI (333) efuse_init: Chip rev:         v0.1[0m
+[0;32mI (337) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (343) heap_init: At 4081B2A0 len 000320E0 (200 KiB): RAM[0m
+[0;32mI (348) heap_init: At 4084D380 len 00002B60 (10 KiB): RAM[0m
+[0;32mI (353) heap_init: At 50000000 len 00000FE8 (3 KiB): RTCRAM[0m
+[0;32mI (360) spi_flash: detected chip: gd[0m
+[0;32mI (362) spi_flash: flash io: dio[0m
+[0;33mW (365) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (377) ADC: legacy driver is deprecated, please migrate to `esp_adc/adc_oneshot.h`[0m
+[0;32mI (384) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (391) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (397) coexist: coex firmware version: b0bcc39[0m
+[0;32mI (402) main_task: Started on CPU0[0m
+[0;32mI (402) main_task: Calling app_main()[0m
+[0;32mI (402) speechster_b1: Speechster B1 Starting Up[0m
+[0;32mI (402) speechster_b1: audio_rb: 1082448688[0m
+[0;32mI (412) speechster_b1: I2S initialized: BCLK=3 WS=14 DIN=10[0m
+[0;32mI (432) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (432) BLE_INIT: ble controller commit:[898f73c][0m
+[0;33mW (442) BLE_INIT: BLE modem sleep is enabled[0m
+[0;32mI (442) BLE_INIT: Bluetooth MAC: 74:4d:bd:65:9f:d4[0m
+[0;32mI (452) phy: phy_version: 323,2, a8ef10c, Aug  1 2025, 17:46:10[0m
+[0;32mI (462) phy: libbtbb version: 4515421, Aug  1 2025, 17:46:22[0m
+[0;32mI (472) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (482) speechster_b1: Advertising started (name=Speechster-B1)[0m
+[0;32mI (682) speechster_b1: i2s_capture_task start[0m
+[0;32mI (682) speechster_b1: fsr_task start (ADC channel 1)[0m
+[0;32mI (682) speechster_b1: ble_sender_task start[0m
+[0;32mI (682) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=53104 frames/s=0 bytes/s=0[0m
+[0;32mI (692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (692) speechster_b1: Main started; advertising automatically, UART logs enabled[0m
+[0;32mI (802) main_task: Returned from app_main()[0m
+[0;32mI (5692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55600 frames/s=0 bytes/s=0[0m
+[0;32mI (5692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (5692) CPU: [0m
+Task CPU usage:
+cpu_prof       	18		<1%
+IDLE           	5007024		93%
+i2s_cap        	3096		<1%
+fsr            	2052		<1%
+ble_send       	2679		<1%
+telemetry      	15379		<1%
+nimble_host    	5312		<1%
+ble_ll_task    	173092		3%
+esp_timer      	49446		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (10692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (10692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (10722) CPU: [0m
+Task CPU usage:
+cpu_prof       	27177		<1%
+IDLE           	9836300		94%
+i2s_cap        	5353		<1%
+fsr            	3758		<1%
+ble_send       	4378		<1%
+telemetry      	18264		<1%
+ble_ll_task    	330171		3%
+esp_timer      	54517		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (15692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (15692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (15732) CPU: [0m
+Task CPU usage:
+cpu_prof       	44644		<1%
+IDLE           	14656138		95%
+fsr            	5485		<1%
+telemetry      	21144		<1%
+ble_send       	6079		<1%
+i2s_cap        	7626		<1%
+ble_ll_task    	489086		3%
+esp_timer      	59760		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (20692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (20692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (20752) CPU: [0m
+Task CPU usage:
+cpu_prof       	64958		<1%
+IDLE           	19483098		95%
+fsr            	7193		<1%
+telemetry      	24042		<1%
+ble_send       	7766		<1%
+i2s_cap        	9899		<1%
+ble_ll_task    	648104		3%
+esp_timer      	64858		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (25692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (25692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (25772) CPU: [0m
+Task CPU usage:
+cpu_prof       	85269		<1%
+IDLE           	24311288		95%
+fsr            	8894		<1%
+telemetry      	26918		<1%
+ble_send       	9462		<1%
+i2s_cap        	12143		<1%
+ble_ll_task    	806004		3%
+esp_timer      	69940		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (30692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (30692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (30792) CPU: [0m
+Task CPU usage:
+cpu_prof       	105595		<1%
+IDLE           	29136789		95%
+fsr            	10627		<1%
+ble_send       	11205		<1%
+telemetry      	30048		<1%
+i2s_cap        	14427		<1%
+ble_ll_task    	966148		3%
+esp_timer      	75079		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (35692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (35692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (35812) CPU: [0m
+Task CPU usage:
+cpu_prof       	126267		<1%
+IDLE           	33965692		95%
+fsr            	12352		<1%
+ble_send       	12900		<1%
+telemetry      	32918		<1%
+i2s_cap        	16675		<1%
+ble_ll_task    	1122963		3%
+esp_timer      	80151		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (40692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (40692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (40832) CPU: [0m
+Task CPU usage:
+cpu_prof       	146987		<1%
+IDLE           	38796763		95%
+i2s_cap        	18984		<1%
+fsr            	14070		<1%
+telemetry      	35802		<1%
+ble_send       	14611		<1%
+ble_ll_task    	1277536		3%
+esp_timer      	85201		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (45692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55432 frames/s=0 bytes/s=0[0m
+[0;32mI (45692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (45852) CPU: [0m
+Task CPU usage:
+cpu_prof       	167813		<1%
+IDLE           	43622746		95%
+i2s_cap        	21240		<1%
+fsr            	15780		<1%
+telemetry      	38790		<1%
+ble_send       	16306		<1%
+ble_ll_task    	1436911		3%
+esp_timer      	90332		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (50692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (50692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (50872) CPU: [0m
+Task CPU usage:
+cpu_prof       	188575		<1%
+IDLE           	48447690		95%
+i2s_cap        	23509		<1%
+fsr            	17488		<1%
+telemetry      	41669		<1%
+ble_send       	18009		<1%
+ble_ll_task    	1597514		3%
+esp_timer      	95464		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (55692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (55692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (55892) CPU: [0m
+Task CPU usage:
+cpu_prof       	206871		<1%
+IDLE           	53277797		95%
+fsr            	19208		<1%
+ble_send       	19748		<1%
+telemetry      	44540		<1%
+i2s_cap        	25792		<1%
+ble_ll_task    	1755403		3%
+esp_timer      	100559		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (60692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (60692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (60912) CPU: [0m
+Task CPU usage:
+cpu_prof       	225200		<1%
+IDLE           	58109464		95%
+fsr            	20946		<1%
+ble_send       	21444		<1%
+telemetry      	47413		<1%
+i2s_cap        	28030		<1%
+esp_timer      	105554		<1%
+ble_ll_task    	1912187		3%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (65692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (65692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (65932) CPU: [0m
+Task CPU usage:
+cpu_prof       	245340		<1%
+IDLE           	62936677		95%
+i2s_cap        	30307		<1%
+fsr            	22679		<1%
+telemetry      	50309		<1%
+ble_send       	23161		<1%
+ble_ll_task    	2070775		3%
+esp_timer      	110706		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (70692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (70692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (70952) CPU: [0m
+Task CPU usage:
+cpu_prof       	263723		<1%
+IDLE           	67764066		95%
+i2s_cap        	32574		<1%
+fsr            	24390		<1%
+telemetry      	53336		<1%
+ble_send       	24858		<1%
+esp_timer      	115826		<1%
+ble_ll_task    	2231145		3%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (75692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55432 frames/s=0 bytes/s=0[0m
+[0;32mI (75692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (75972) CPU: [0m
+Task CPU usage:
+cpu_prof       	284629		<1%
+IDLE           	72589324		95%
+i2s_cap        	34826		<1%
+fsr            	26096		<1%
+telemetry      	56267		<1%
+ble_send       	26552		<1%
+ble_ll_task    	2391231		3%
+esp_timer      	120993		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (80692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (80692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (80992) CPU: [0m
+Task CPU usage:
+cpu_prof       	305405		<1%
+IDLE           	77415240		96%
+fsr            	27820		<1%
+ble_send       	28286		<1%
+telemetry      	59136		<1%
+i2s_cap        	37112		<1%
+ble_ll_task    	2550846		3%
+esp_timer      	126073		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (85692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (85692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (86012) CPU: [0m
+Task CPU usage:
+cpu_prof       	326258		<1%
+IDLE           	82238996		96%
+fsr            	29526		<1%
+ble_send       	29985		<1%
+telemetry      	62039		<1%
+i2s_cap        	39369		<1%
+ble_ll_task    	2712512		3%
+esp_timer      	131233		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (90692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55432 frames/s=0 bytes/s=0[0m
+[0;32mI (90692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (91032) CPU: [0m
+Task CPU usage:
+cpu_prof       	347060		<1%
+IDLE           	87068073		96%
+i2s_cap        	41639		<1%
+fsr            	31246		<1%
+telemetry      	64921		<1%
+ble_send       	31681		<1%
+esp_timer      	136249		<1%
+ble_ll_task    	2869082		3%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (95692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55432 frames/s=0 bytes/s=0[0m
+[0;32mI (95692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (96052) CPU: [0m
+Task CPU usage:
+cpu_prof       	367985		<1%
+IDLE           	91896080		96%
+i2s_cap        	43891		<1%
+fsr            	32956		<1%
+telemetry      	67876		<1%
+ble_send       	33384		<1%
+ble_ll_task    	3026380		3%
+esp_timer      	141366		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (100692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (100692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (101072) CPU: [0m
+Task CPU usage:
+cpu_prof       	388836		<1%
+IDLE           	96721301		96%
+i2s_cap        	46146		<1%
+fsr            	34667		<1%
+telemetry      	70913		<1%
+ble_send       	35082		<1%
+ble_ll_task    	3186544		3%
+esp_timer      	146429		<1%
+ctrl_task      	31		<1%
+nimble_host    	5312		<1%
+
+[0;32mI (105692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55492 frames/s=0 bytes/s=0[0m
+[0;32mI (105692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m
+[0;32mI (106092) CPU: [0m
+Task CPU usage:
+cpu_prof       	407370		<1%
+IDLE           	101548248		96%
+fsr            	36404		<1%
+ble_send       	36809		<1%
+telemetry      	73946		<1%
+i2s_cap        	48430		<1%
+ble_ll_task    	3347110		3%
+esp_timer      	151601		<1%
+nimble_host    	5312		<1%
+ctrl_task      	31		<1%
+
+[0;32mI (110692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55432 frames/s=0 bytes/s=0[0m
+[0;32mI (110692) STACK: i2s_cap: 6396  ble_send: 18652 words free[0m

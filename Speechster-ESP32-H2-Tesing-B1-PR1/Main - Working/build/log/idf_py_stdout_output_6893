@@ -1,0 +1,119 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 921600 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+[0;32mI (105) esp_image: segment 1: paddr=00025a1c vaddr=40800000 sizeESP-ROM:esp32h2-20221101[0m
+Build:Nov  1 2022
+rst:0x15 (USB_UART_HPSYS),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x408098b4
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x408460f0,len:0x1700
+load:0x4083c2d0,len:0x1080
+load:0x4083efd0,len:0x34f4
+entry 0x4083c2e8
+[0;32mI (23) boot: ESP-IDF v5.5.1-dirty 2nd stage bootloader[0m
+[0;32mI (23) boot: compile time Oct 25 2025 19:40:57[0m
+[0;32mI (24) boot: chip revision: v0.1[0m
+[0;32mI (25) boot: efuse block revision: v0.3[0m
+[0;32mI (27) boot.esp32h2: SPI Speed      : 64MHz[0m
+[0;32mI (31) boot.esp32h2: SPI Mode       : DIO[0m
+[0;32mI (35) boot.esp32h2: SPI Flash Size : 2MB[0m
+[0;32mI (38) boot: Enabling RNG early entropy source...[0m
+[0;32mI (43) boot: Partition Table:[0m
+[0;32mI (45) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (52) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (58) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (65) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (72) boot: End of partition table[0m
+[0;32mI (75) esp_image: segment 0: paddr=00010020 vaddr=42090020 size=159f4h ( 88564) map[0m
+[0;32mI (105) esp_image: segment 1: paddr=00025a1c vaddr=40800000 size=025fch (  9724) load[0m
+[0;32mI (109) esp_image: segment 2: paddr=00028020 vaddr=42000020 size=88028h (557096) map[0m
+[0;32mI (251) esp_image: segment 3: paddr=000b0050 vaddr=408025fc size=15660h ( 87648) load[0m
+[0;32mI (283) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (284) boot: Disabling RNG early entropy source...[0m
+[0;32mI (294) cpu_start: Unicore app[0m
+[0;32mI (302) cpu_start: Pro cpu start user code[0m
+[0;32mI (303) cpu_start: cpu freq: 96000000 Hz[0m
+[0;32mI (303) app_init: Application information:[0m
+[0;32mI (304) app_init: Project name:     BT-Test[0m
+[0;32mI (306) app_init: App version:      1da8838-dirty[0m
+[0;32mI (311) app_init: Compile time:     Oct 25 2025 19:39:49[0m
+[0;32mI (316) app_init: ELF file SHA256:  7724af0f2...[0m
+[0;32mI (320) app_init: ESP-IDF:          v5.5.1-dirty[0m
+[0;32mI (324) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (328) efuse_init: Max chip rev:     v1.99 [0m
+[0;32mI (332) efuse_init: Chip rev:         v0.1[0m
+[0;32mI (336) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (342) heap_init: At 4081A710 len 00032C70 (203 KiB): RAM[0m
+[0;32mI (348) heap_init: At 4084D380 len 00002B60 (10 KiB): RAM[0m
+[0;32mI (353) heap_init: At 50000000 len 00000FE8 (3 KiB): RTCRAM[0m
+[0;32mI (359) spi_flash: detected chip: gd[0m
+[0;32mI (361) spi_flash: flash io: dio[0m
+[0;33mW (364) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (377) ADC: legacy driver is deprecated, please migrate to `esp_adc/adc_oneshot.h`[0m
+[0;32mI (384) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (390) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (397) coexist: coex firmware version: b0bcc39[0m
+[0;32mI (402) main_task: Started on CPU0[0m
+[0;32mI (402) main_task: Calling app_main()[0m
+[0;32mI (402) speechster_b1: Speechster B1 Starting Up[0m
+[0;32mI (402) speechster_b1: audio_rb: 1082448680[0m
+[0;32mI (412) speechster_b1: I2S initialized: BCLK=3 WS=14 DIN=10[0m
+[0;32mI (432) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (432) BLE_INIT: ble controller commit:[898f73c][0m
+[0;33mW (442) BLE_INIT: BLE modem sleep is enabled[0m
+[0;32mI (442) BLE_INIT: Bluetooth MAC: 74:4d:bd:65:9f:d4[0m
+[0;32mI (452) phy: phy_version: 323,2, a8ef10c, Aug  1 2025, 17:46:10[0m
+[0;32mI (472) phy: libbtbb version: 4515421, Aug  1 2025, 17:46:22[0m
+[0;32mI (472) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (482) speechster_b1: Advertising started (name=Speechster-B1)[0m
+[0;32mI (682) speechster_b1: i2s_capture_task start[0m
+[0;32mI (682) speechster_b1: fsr_task start (ADC channel 1)[0m
+[0;32mI (682) speechster_b1: ble_sender_task start[0m
+[0;32mI (682) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56400 frames/s=0 bytes/s=0[0m
+[0;32mI (692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (682) speechster_b1: Main started; advertising automatically, UART logs enabled[0m
+[0;32mI (802) main_task: Returned from app_main()[0m
+[0;32mI (1682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (2682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (3682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (4682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (5682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (5692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (5692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (6682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (7682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (8682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (9682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (10682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (10692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (10692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (11682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (12682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (13682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (14682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (15682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (15692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (15692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (16682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (17682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (18682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (19682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (20682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (20692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (20692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (21682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (22682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (23682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (24682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (25682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (25692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (25692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (26682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (27682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (28682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (29682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (30682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (30692) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58472 frames/s=0 bytes/s=0[0m
+[0;32mI (30692) STACK: i2s_cap: 6396  ble_send: 18660 words free[0m
+[0;32mI (31682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (32682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m
+[0;32mI (33682) PROF: CPU Idle: 0.0% (Load: 100.0%)[0m

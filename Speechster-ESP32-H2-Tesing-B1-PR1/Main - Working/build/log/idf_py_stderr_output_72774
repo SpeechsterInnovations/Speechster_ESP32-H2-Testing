@@ -1,0 +1,40 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 921600 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+[0;33m--- esp-idf-monitor 1.8.0 on /dev/ttyACM0 921600[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+[0m--- 0x4207968e: [0;33m__sfvwrite_r[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/riscv32-esp-elf/src/newlib/newlib/libc/stdio/fvwrite.c[0m[0m:[1;31m51[0m
+[0m--- 0x4083c2d0: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/opt/esp-idf/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m38[0m
+[0m--- 0x4083efd0: [0;33mesp_flash_encryption_enabled[0m[0m at [0;32m/opt/esp-idf/components/bootloader_support/src/flash_encrypt.c[0m[0m:[1;31m87[0m
+[0m--- 0x4083c2e8: [0;33mcall_start_cpu0[0m[0m at [0;32m/opt/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m25[0m
+[0;33m--- Stack dump detected[0m
+[0m--- 0x4080f316: [0;33mvListInsert[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m183[0m
+[0m--- 0x40810116: [0;33mvTaskPlaceOnEventList[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c[0m[0m:[1;31m3768[0m
+[0m--- 0x40009432: [0;33msystimer_hal_set_alarm_target[0m[0m in [0;32mROM[0m
+[0m--- 0x40800001: [0;33m_vector_table[0m[0m at [0;32m/opt/esp-idf/components/riscv/vectors_intc.S[0m[0m:[1;31m54[0m
+[0m--- 0x4080f316: [0;33mvListInsert[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m183[0m
+[0m--- 0x40810116: [0;33mvTaskPlaceOnEventList[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c[0m[0m:[1;31m3768[0m
+[0m--- 0x4080e80e: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1897[0m
+[0m--- 0x40800f2e: [0;33mheap_caps_update_per_task_info_free[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_task_info.c[0m[0m:[1;31m405[0m
+[0m--- 0x40801642: [0;33mheap_caps_free[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_caps_base.c[0m[0m:[1;31m86[0m
+[0m--- 0x4080146e: [0;33mtrace_free[0m[0m at [0;32m/opt/esp-idf/components/heap/include/heap_trace.inc[0m[0m:[1;31m176[0m
+[0m--- 0x4080159a: [0;33m__wrap_heap_caps_free[0m[0m at [0;32m/opt/esp-idf/components/heap/include/heap_trace.inc[0m[0m:[1;31m180[0m
+[0m--- 0x40813992: [0;33mfree[0m[0m at [0;32m/opt/esp-idf/components/newlib/src/heap.c[0m[0m:[1;31m35[0m
+[0m--- 0x4205bd02: [0;33mtimer_process_alarm[0m[0m at [0;32m/opt/esp-idf/components/esp_timer/src/esp_timer.c[0m[0m:[1;31m410[0m
+[0m--- 0x4080eafe: [0;33mvPortTaskWrapper[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/portable/riscv/port.c[0m[0m:[1;31m258[0m
+[0m--- 0x4208c220: [0;33mesp_panic_handler[0m[0m at [0;32m/opt/esp-idf/components/esp_system/panic.c[0m[0m:[1;31m461[0m
+[0m--- 0x4083c2d0: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/opt/esp-idf/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m38[0m
+[0m--- 0x4083efd0: [0;33mesp_flash_encryption_enabled[0m[0m at [0;32m/opt/esp-idf/components/bootloader_support/src/flash_encrypt.c[0m[0m:[1;31m87[0m
+[0m--- 0x4083c2e8: [0;33mcall_start_cpu0[0m[0m at [0;32m/opt/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m25[0m
+[0m--- 0x4080f314: [0;33mvListInsert[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m183[0m
+[0m--- 0x40810116: [0;33mvTaskPlaceOnEventList[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c[0m[0m:[1;31m3768[0m
+[0m--- 0x40009432: [0;33msystimer_hal_set_alarm_target[0m[0m in [0;32mROM[0m
+[0m--- 0x40800001: [0;33m_vector_table[0m[0m at [0;32m/opt/esp-idf/components/riscv/vectors_intc.S[0m[0m:[1;31m54[0m
+[0m--- 0x4080f314: [0;33mvListInsert[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m183[0m
+[0m--- 0x40810116: [0;33mvTaskPlaceOnEventList[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c[0m[0m:[1;31m3768[0m
+[0m--- 0x4080e80e: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/opt/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1897[0m
+[0m--- 0x40800f2e: [0;33mheap_caps_update_per_task_info_free[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_task_info.c[0m[0m:[1;31m405[0m
+[0m--- 0x40801642: [0;33mheap_caps_free[0m[0m at [0;32m/opt/esp-idf/components/heap/heap_caps_base.c[0m[0m:[1;31m86[0m
+[0m--- 0x4080146e: [0;33mtrace_free[0m[0m at [0;32m/opt/esp-idf/components/heap/include/heap_trace.inc[0m[0m:[1;31m176[0m
+[0m--- 0x4080159a: [0;33m__wrap_heap_caps_free[0m[0m at [0;32m/opt/esp-idf/components/heap/include/heap_trace.inc[0m[0m:[1;31m180[0m
+[0m--- 0x40813992: [0;33mfree[0m[0m at [0;32m/opt/esp-idf/components/newlib/src/heap.c[0m[0m:[1;31m35[0m
+[0m--- 0x4205bd02: [0;33mtimer_process_alarm[0m[0m at [0;32m/opt/esp-idf/components/esp_timer/src/esp_timer.c[0m[0m:[1;31m410[0m
+[0m

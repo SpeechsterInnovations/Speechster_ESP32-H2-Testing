@@ -1,0 +1,45 @@
+Command: ninja flash
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/__main__.py", line 9, in <module>
+    esptool._main()
+    ~~~~~~~~~~~~~^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/__init__.py", line 1365, in _main
+    main()
+    ~~~~^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/__init__.py", line 815, in main
+    esp = esp or get_default_connected_device(
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        ser_list,
+        ^^^^^^^^^
+    ...<5 lines>...
+        before=args.before,
+        ^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/__init__.py", line 1246, in get_default_connected_device
+    _esp.connect(before, connect_attempts)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/loader.py", line 772, in connect
+    last_error = self._connect_attempt(reset_strategy, mode)
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/loader.py", line 648, in _connect_attempt
+    reset_strategy()  # Reset the chip to bootloader (download mode)
+    ~~~~~~~~~~~~~~^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/esptool/reset.py", line 46, in __call__
+    self.port.open()
+    ~~~~~~~~~~~~~~^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/serial/serialposix.py", line 336, in open
+    self._update_dtr_state()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/lib/python3.13/site-packages/serial/serialposix.py", line 715, in _update_dtr_state
+    fcntl.ioctl(self.fd, TIOCMBIC, TIOCM_DTR_str)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 71] Protocol error
+CMake Error at run_serial_tool.cmake:67 (message):
+  
+  /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python;;/opt/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32h2
+  failed.
+
+
+

@@ -1,0 +1,1470 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 921600 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py'
+[0;32mI (105) esp_image: segment 1: paddr=000259dc vaddr=40800000 sizeESP-ROM:esp32h2-20221101[0m
+Build:Nov  1 2022
+rst:0x15 (USB_UART_HPSYS),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x408098b4
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x408460f0,len:0x1700
+load:0x4083c2d0,len:0x1080
+load:0x4083efd0,len:0x34f4
+entry 0x4083c2e8
+[0;32mI (23) boot: ESP-IDF v5.5.1-dirty 2nd stage bootloader[0m
+[0;32mI (23) boot: compile time Oct 25 2025 19:40:57[0m
+[0;32mI (24) boot: chip revision: v0.1[0m
+[0;32mI (25) boot: efuse block revision: v0.3[0m
+[0;32mI (27) boot.esp32h2: SPI Speed      : 64MHz[0m
+[0;32mI (31) boot.esp32h2: SPI Mode       : DIO[0m
+[0;32mI (35) boot.esp32h2: SPI Flash Size : 2MB[0m
+[0;32mI (38) boot: Enabling RNG early entropy source...[0m
+[0;32mI (43) boot: Partition Table:[0m
+[0;32mI (45) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (52) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (58) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (65) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (72) boot: End of partition table[0m
+[0;32mI (75) esp_image: segment 0: paddr=00010020 vaddr=42088020 size=159b4h ( 88500) map[0m
+[0;32mI (105) esp_image: segment 1: paddr=000259dc vaddr=40800000 size=0263ch (  9788) load[0m
+[0;32mI (109) esp_image: segment 2: paddr=00028020 vaddr=42000020 size=87fb8h (556984) map[0m
+[0;32mI (251) esp_image: segment 3: paddr=000affe0 vaddr=4080263c size=13328h ( 78632) load[0m
+[0;32mI (274) esp_image: segment 4: paddr=000c3310 vaddr=40815970 size=0220ch (  8716) load[0m
+[0;32mI (284) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (285) boot: Disabling RNG early entropy source...[0m
+[0;32mI (295) cpu_start: Unicore app[0m
+[0;32mI (303) cpu_start: Pro cpu start user code[0m
+[0;32mI (304) cpu_start: cpu freq: 96000000 Hz[0m
+[0;32mI (304) app_init: Application information:[0m
+[0;32mI (305) app_init: Project name:     BT-Test[0m
+[0;32mI (307) app_init: App version:      1da8838-dirty[0m
+[0;32mI (312) app_init: Compile time:     Oct 25 2025 19:39:49[0m
+[0;32mI (317) app_init: ELF file SHA256:  245ea7601...[0m
+[0;32mI (321) app_init: ESP-IDF:          v5.5.1-dirty[0m
+[0;32mI (326) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (329) efuse_init: Max chip rev:     v1.99 [0m
+[0;32mI (333) efuse_init: Chip rev:         v0.1[0m
+[0;32mI (337) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (343) heap_init: At 4081A630 len 00032D50 (203 KiB): RAM[0m
+[0;32mI (349) heap_init: At 4084D380 len 00002B60 (10 KiB): RAM[0m
+[0;32mI (354) heap_init: At 50000000 len 00000FE8 (3 KiB): RTCRAM[0m
+[0;32mI (361) spi_flash: detected chip: gd[0m
+[0;32mI (362) spi_flash: flash io: dio[0m
+[0;33mW (365) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (378) ADC: legacy driver is deprecated, please migrate to `esp_adc/adc_oneshot.h`[0m
+[0;32mI (385) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (391) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (398) coexist: coex firmware version: b0bcc39[0m
+[0;32mI (403) main_task: Started on CPU0[0m
+[0;32mI (403) main_task: Calling app_main()[0m
+[0;32mI (403) speechster_b1: Speechster B1 Starting Up[0m
+[0;32mI (403) speechster_b1: audio_rb: 1082448680[0m
+[0;32mI (413) speechster_b1: I2S initialized: BCLK=3 WS=14 DIN=10[0m
+[0;32mI (433) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (433) BLE_INIT: ble controller commit:[898f73c][0m
+[0;33mW (443) BLE_INIT: BLE modem sleep is enabled[0m
+[0;32mI (443) BLE_INIT: Bluetooth MAC: 74:4d:bd:65:9f:d4[0m
+[0;32mI (453) phy: phy_version: 323,2, a8ef10c, Aug  1 2025, 17:46:10[0m
+[0;32mI (463) phy: libbtbb version: 4515421, Aug  1 2025, 17:46:22[0m
+[0;32mI (473) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (483) speechster_b1: Advertising started (name=Speechster-B1)[0m
+[0;32mI (483) speechster_b1: i2s_capture_task start[0m
+[0;32mI (483) speechster_b1: fsr_task start (ADC channel 1)[0m
+[0;32mI (483) speechster_b1: ble_sender_task start[0m
+[0;32mI (493) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56624 frames/s=0 bytes/s=0[0m
+[0;32mI (503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (503) speechster_b1: Main started; advertising automatically, UART logs enabled[0m
+[0;32mI (613) main_task: Returned from app_main()[0m
+[0;32mI (1503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (2503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (3503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (4503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (5503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (5503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (5503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (6503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (7503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (8503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (9503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (10503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (10503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (10503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (11503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (12503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (13503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (14503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (15503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (15503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (15503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (16503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (17503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (18503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (19503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (20503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (20503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (20503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (21503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (22503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (23503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (24503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (25503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (25503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (25503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (26503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (27503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (28503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (29503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (30503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (30503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (30503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (31503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (32503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (33503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (34503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (35503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (35503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (35503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (36503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (37503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (38503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (39503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (40503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (40503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (40503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (41503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (42503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (43503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (44503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (45503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (45503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (45503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (46503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (47503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (48503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (49503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (50503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (50503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (50503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (51503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (52503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (53503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (54503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (55503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (55503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (55503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (56503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (57503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (58503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (59503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (60503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (60503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (60503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (61503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (62503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (63503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (64503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (65503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (65503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (65503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (66503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (67503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (68503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (69503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (70503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58620 frames/s=0 bytes/s=0[0m
+[0;32mI (70503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (70503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (71503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (72503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (73503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (74503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (75503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (75503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (75503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (76503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (77503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (78503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (79503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (80503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (80503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (80503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (81503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (82503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (83503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (84503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (85503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (85503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (85503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (86503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (87503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (88503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (89503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (90503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (90503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (90503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (91503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (92503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (93503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (94503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (95503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (95503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (95503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (96503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (97503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (98503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (99503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (100503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (100503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (100503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (101503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (102503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (103503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (104503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (105503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (105503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (105503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (106503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (107503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (108503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (109503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (110503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (110503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (110503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (111503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (112503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (113503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (114503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (115503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (115503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (115503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (116503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (117503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (118503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (119503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (120503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (120503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (120503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (121503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (122503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (123503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (124503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (125503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (125503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (125503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (126503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (127503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (128503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (129503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (130503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (130503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (130503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (131503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (132503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (133503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (134503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (135503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (135503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (135503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (136503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (137503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (138503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (139503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (140503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (140503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (140503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (141503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (142503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (143503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (144503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (145503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (145503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (145503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (146503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (147503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (148503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (149503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (150503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (150503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (150503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (151503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (152503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (153503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (154503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (155503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (155503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (155503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (156503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (157503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (158503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (159503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (160503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (160503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (160503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (161503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (162503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (163503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (164503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (165503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (165503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (165503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (166503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (167503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (168503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (169503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (170503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (170503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (170503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (171503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (172503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (173503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (174503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (175503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (175503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (175503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (176503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (177503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (178503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (179503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (180503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (180503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (180503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (181503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (182503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (183503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (184503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (185503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (185503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (185503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (186503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (187503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (188503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (189503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (190503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (190503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (190503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (191503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (192503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (193503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (194503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (195503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (195503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (195503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (196503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (197503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (198503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (199503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (200503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (200503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (200503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (201503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (202503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (203503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (204503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (205503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (205503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (205503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (206503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (207503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (208503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (209503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (210503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (210503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (210503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (211503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (212503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (213503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (214503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (215503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (215503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (215503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (216503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (217503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (218503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (219503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (220503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (220503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (220503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (221503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (222503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (223503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (224503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (225503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (225503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (225503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (226503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (227503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (228503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (229503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (230503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (230503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (230503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (231503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (232503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (233503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (234503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (235503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (235503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (235503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (236503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (237503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (238503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (239503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (240503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (240503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (240503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (241503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (242503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (243503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (244503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (245503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (245503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (245503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (246503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (247503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (248503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (249503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (250503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (250503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (250503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (251503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (252503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (253503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (254503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (255503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (255503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (255503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (256503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (257503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (258503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (259503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (260503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (260503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (260503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (261503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (262503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (263503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (264503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (265503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (265503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (265503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (266503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (267503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (268503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (269503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (270503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (270503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (270503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (271503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (272503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (273503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (274503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (275503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (275503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (275503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (276503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (277503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (278503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (279503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (280503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (280503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (280503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (281503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (282503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (283503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (284503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (285503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (285503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (285503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (286503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (287503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (288503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (289503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (290503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (290503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (290503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (291503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (292503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (293503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (294503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (295503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (295503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (295503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (296503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (297503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (298503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (299503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (300503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (300503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (300503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (301503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (302503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (303503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (304503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (305503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (305503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (305503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (306503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (307503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (308503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (309503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (310503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (310503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (310503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (311503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (312503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (313503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (314503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (315503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (315503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (315503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (316503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (317503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (318503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (319503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (320503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (320503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (320503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (321503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (322503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (323503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (324503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (325503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (325503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (325503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (326503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (327503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (328503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (329503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (330503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (330503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (330503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (331503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (332503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (333503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (334503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (335503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (335503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (335503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (336503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (337503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (338503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (339503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (340503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (340503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (340503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (341503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (342503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (343503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (344503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (345503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (345503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (345503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (346503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (347503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (348503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (349503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (350503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (350503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (350503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (351503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (352503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (353503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (354503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (355503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (355503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (355503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (356503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (357503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (358503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (359503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (360503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (360503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (360503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (361503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (362503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (363503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (364503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (365503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (365503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (365503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (366503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (367503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (368503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (369503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (370503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (370503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58620 frames/s=0 bytes/s=0[0m
+[0;32mI (370503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (371503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (372503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (373503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (374503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (375503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (375503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (375503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (376503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (377503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (378503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (379503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (380503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (380503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (380503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (381503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (382503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (383503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (384503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (385503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (385503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (385503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (386503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (387503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (388503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (389503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (390503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58620 frames/s=0 bytes/s=0[0m
+[0;32mI (390503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (390503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (391503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (392503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (393503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (394503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (395503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (395503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (395503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (396503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (397503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (398503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (399503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (400503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58620 frames/s=0 bytes/s=0[0m
+[0;32mI (400503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (400503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (401503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (402503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (403503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (404503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (405503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (405503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (405503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (406503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (407503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (408503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (409503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (410503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=58692 frames/s=0 bytes/s=0[0m
+[0;32mI (410503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (410503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (411503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (411603) speechster_b1: MTU exchange event: conn=0 mtu=256[0m
+[0;32mI (411603) speechster_b1: ble_att_mtu() => 256[0m
+[0;32mI (411603) speechster_b1: Connected (handle 0)[0m
+[0;32mI (411603) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (411613) speechster_b1: ble_gap_update_params rc=0[0m
+[0;32mI (411613) speechster_b1: ble_gap_set_prefered_le_phy rc=0[0m
+[0;32mI (411623) speechster_b1: ble_gap_set_preferred_phys rc=0[0m
+[0;32mI (411823) speechster_b1: Subscribe: conn=0 attr_handle=5 cur_notify=1[0m
+[0;32mI (411823) speechster_b1: Cached stream attr handle: 5[0m
+[0;32mI (412503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (413503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (414503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (415503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (415503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (415503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (416503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (417503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (418503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (419503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (420503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56308 frames/s=0 bytes/s=0[0m
+[0;32mI (420503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (420503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (421503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (422503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (423503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (424503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (425503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (425503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (425503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (426503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (427503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (428503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (429503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (430503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (430503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (430503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (431503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (432503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (433503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (434503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (435503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56308 frames/s=0 bytes/s=0[0m
+[0;32mI (435503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (435503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (436503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (437503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (438503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (439503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (440503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (440503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (440503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (441503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (442503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (443503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (444503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (445503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (445503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (445503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (446503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (447503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (448503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (449503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (450503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (450503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (450503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (451503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (452503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (453503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (454503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (455503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (455503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (455503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (456503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (457503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (458503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (459503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (460503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56308 frames/s=0 bytes/s=0[0m
+[0;32mI (460503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (460503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (461503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (462503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (463503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (464503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (465503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (465503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (465503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (466503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (467503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (468503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (469503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (470503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (470503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (470503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (471503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (472503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (473503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (474503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (475503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56308 frames/s=0 bytes/s=0[0m
+[0;32mI (475503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (475503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (476503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (477503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (478503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (479503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (480503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (480503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (480503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (481503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (482503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (483503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (484503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (485503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=56368 frames/s=0 bytes/s=0[0m
+[0;32mI (485503) STACK: i2s_cap: 6396  ble_send: 18648 words free[0m
+[0;32mI (485503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (486263) speechster_b1: [CTRL_IN] rx JSON: {"mic":true}[0m
+[0;32mI (486263) speechster_b1: [JSON_PARSE] mic=1[0m
+[0;32mI (486503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (487413) speechster_b1: Frame sliced (18212 → 8192 bytes)[0m
+[0;32mI (487503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (488503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (489503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (490333) speechster_b1: Frame sliced (17972 → 8192 bytes)[0m
+[0;32mI (490503) speechster_b1: [Health] rb_fill=7.5% free=45456 heap=56088 frames/s=0 bytes/s=3710[0m
+[0;32mI (490503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (490503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (491503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (492503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (493233) speechster_b1: Frame sliced (18012 → 8192 bytes)[0m
+[0;32mI (493503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (494503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (495273) speechster_b1: [CTRL_IN] rx JSON: {"mic":false}[0m
+[0;32mI (495273) speechster_b1: [JSON_PARSE] mic=0[0m
+[0;32mI (495503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=7534[0m
+[0;32mI (495503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (495503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (496503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (497503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (498503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (499503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (500503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=0[0m
+[0;32mI (500503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (500503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (501503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (502503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (503503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (504503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (505503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55912 frames/s=0 bytes/s=0[0m
+[0;32mI (505503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (505503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (506503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (507503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (508503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (509503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (510503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=0[0m
+[0;32mI (510503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (510503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (511503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (512503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (513503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (514503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (515503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=0[0m
+[0;32mI (515503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (515503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (516503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (517503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (518503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (519503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (520503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=0[0m
+[0;32mI (520503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (520503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (521503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (522503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (523503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (524503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (525503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=55984 frames/s=0 bytes/s=0[0m
+[0;32mI (525503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (525503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (526503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (527503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (528503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (529503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (529753) speechster_b1: Subscribe: conn=0 attr_handle=5 cur_notify=0[0m
+[0;33mW (529763) speechster_b1: Client disconnected (reason=531)[0m
+[0;32mI (529763) speechster_b1: Flushed pending ringbuffer items and reset backoff[0m
+[0;32mI (529963) speechster_b1: Restarting advertising after disconnect...[0m
+[0;32mI (530503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (530503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (530503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (531503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (532503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (533503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (534503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (535503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (535503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (535503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (536503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (537503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (538503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (539503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (540503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (540503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (540503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (541503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (542503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (543503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (544503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (545503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (545503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (545503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (546503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (547503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (548503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (549503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (550503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (550503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (550503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (551503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (552503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (553503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (554503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (555503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (555503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (555503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (556503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (557503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (558503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (559503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (560503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (560503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (560503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (561503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (562503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (563503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (564503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (565503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (565503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (565503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (566503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (567503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (568503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (569503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (570503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (570503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (570503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (571503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (572503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (573503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (574503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (575503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (575503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (575503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (576503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (577503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (578503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (579503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (580503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (580503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (580503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (581503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (582503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (583503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (584503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (585503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (585503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (585503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (586503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (587503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (588503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (589503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (590503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (590503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (590503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (591503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (592503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (593503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (594503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (595503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (595503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (595503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (596503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (597503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (598503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (599503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (600503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (600503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (600503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (601503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (602503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (603503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (604503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (605503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (605503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (605503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (606503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (607503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (608503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (609503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (610503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (610503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (610503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (611503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (612503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (613503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (614503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (615503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (615503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (615503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (616503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (617503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (618503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (619503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (620503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (620503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (620503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (621503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (622503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (623503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (624503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (625503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (625503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (625503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (626503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (627503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (628503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (629503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (630503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (630503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (630503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (631503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (632503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (633503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (634503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (635503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (635503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (635503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (636503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (637503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (638503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (639503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (640503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (640503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (640503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (641503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (642503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (643503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (644503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (645503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (645503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (645503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (646503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (647503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (648503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (649503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (650503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (650503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (650503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (651503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (652503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (653503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (654503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (655503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (655503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (655503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (656503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (657503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (658503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (659503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (660503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (660503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (660503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (661503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (662503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (663503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (664503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (665503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (665503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (665503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (666503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (667503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (668503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (669503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (670503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (670503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (670503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (671503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (672503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (673503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (674503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (675503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (675503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (675503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (676503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (677503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (678503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (679503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (680503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (680503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (680503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (681503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (682503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (683503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (684503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (685503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (685503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (685503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (686503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (687503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (688503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (689503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (690503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (690503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (690503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (691503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (692503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (693503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (694503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (695503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (695503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (695503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (696503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (697503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (698503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (699503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (700503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (700503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (700503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (701503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (702503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (703503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (704503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (705503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (705503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (705503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (706503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (707503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (708503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (709503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (710503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (710503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (710503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (711503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (712503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (713503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (714503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (715503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (715503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (715503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (716503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (717503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (718503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (719503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (720503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (720503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (720503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (721503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (722503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (723503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (724503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (725503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (725503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (725503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (726503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (727503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (728503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (729503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (730503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (730503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (730503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (731503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (732503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (733503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (734503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (735503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (735503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (735503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (736503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (737503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (738503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (739503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (740503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (740503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (740503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (741503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (742503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (743503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (744503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (745503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (745503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (745503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (746503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (747503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (748503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (749503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (750503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (750503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (750503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (751503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (752503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (753503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (754503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (755503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (755503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (755503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (756503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (757503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (758503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (759503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (760503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (760503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (760503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (761503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (762503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (763503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (764503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (765503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (765503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (765503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (766503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (767503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (768503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (769503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (770503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (770503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (770503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (771503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (772503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (773503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (774503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (775503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (775503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (775503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (776503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (777503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (778503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (779503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (780503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (780503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (780503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (781503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (782503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (783503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (784503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (785503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (785503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (785503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (786503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (787503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (788503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (789503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (790503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (790503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (790503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (791503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (792503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (793503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (794503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (795503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (795503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (795503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (796503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (797503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (798503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (799503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (800503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (800503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (800503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (801503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (802503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (803503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (804503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (805503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (805503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (805503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (806503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (807503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (808503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (809503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (810503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (810503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (810503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (811503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (812503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (813503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (814503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (815503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (815503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (815503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (816503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (817503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (818503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (819503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (820503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (820503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (820503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (821503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (822503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (823503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (824503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (825503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (825503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (825503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (826503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (827503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (828503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (829503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (830503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (830503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (830503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (831503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (832503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (833503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (834503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (835503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (835503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (835503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (836503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (837503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (838503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (839503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (840503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (840503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (840503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (841503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (842503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (843503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (844503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (845503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (845503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (845503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (846503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (847503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (848503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (849503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (850503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (850503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (850503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (851503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (852503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (853503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (854503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (855503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (855503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (855503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (856503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (857503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (858503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (859503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (860503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (860503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (860503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (861503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (862503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (863503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (864503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (865503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (865503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (865503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (866503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (867503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (868503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (869503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (870503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (870503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (870503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (871503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (872503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (873503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (874503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (875503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (875503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (875503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (876503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (877503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (878503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (879503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (880503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (880503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (880503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (881503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (882503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (883503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (884503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (885503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (885503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (885503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (886503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (887503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (888503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (889503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (890503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (890503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (890503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (891503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (892503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (893503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (894503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (895503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (895503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (895503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (896503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (897503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (898503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (899503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (900503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (900503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (900503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (901503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (902503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (903503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (904503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (905503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (905503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (905503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (906503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (907503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (908503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (909503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (910503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (910503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (910503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (911503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (912503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (913503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (914503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (915503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (915503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (915503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (916503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (917503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (918503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (919503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (920503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (920503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (920503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (921503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (922503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (923503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (924503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (925503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (925503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (925503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (926503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (927503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (928503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (929503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (930503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (930503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (930503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (931503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (932503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (933503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (934503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (935503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (935503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (935503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (936503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (937503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (938503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (939503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (940503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (940503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (940503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (941503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (942503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (943503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (944503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (945503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (945503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (945503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (946503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (947503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (948503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (949503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (950503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (950503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (950503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (951503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (952503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (953503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (954503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (955503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (955503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (955503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (956503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (957503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (958503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (959503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (960503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (960503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (960503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (961503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (962503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (963503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (964503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (965503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (965503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (965503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (966503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (967503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (968503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (969503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (970503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (970503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (970503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (971503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (972503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (973503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (974503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (975503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (975503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (975503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (976503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (977503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (978503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (979503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (980503) speechster_b1: [Health] rb_fill=0.0% free=49152 heap=59780 frames/s=0 bytes/s=0[0m
+[0;32mI (980503) STACK: i2s_cap: 6396  ble_send: 18552 words free[0m
+[0;32mI (980503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (981503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (982503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m
+[0;32mI (983503) PROF: CPU Idle: 0.0%  (Load: 100.0%)[0m

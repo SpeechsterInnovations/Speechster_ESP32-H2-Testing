@@ -1,0 +1,258 @@
+Command: /home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python /opt/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 921600 --toolchain-prefix riscv32-esp-elf- --target esp32h2 --revision 0 --decode-panic backtrace /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/BT-Test.elf /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-H2-Tesing-B1-PR1/BT-Test/build/bootloader/bootloader.elf -m '/home/reyaansh/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/opt/esp-idf/tools/idf.py'
+[0;32mI (105) esp_image: segment 1: paddr=0002543c vaddr=40800000 sizeESP-ROM:esp32h2-20221101[0m
+Build:Nov  1 2022
+rst:0x15 (USB_UART_HPSYS),boot:0x18 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x408097fe
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x408460f0,len:0x1700
+load:0x4083c2d0,len:0x1080
+load:0x4083efd0,len:0x34f4
+entry 0x4083c2e8
+[0;32mI (23) boot: ESP-IDF v5.5.1-dirty 2nd stage bootloader[0m
+[0;32mI (23) boot: compile time Oct 23 2025 15:36:27[0m
+[0;32mI (24) boot: chip revision: v0.1[0m
+[0;32mI (25) boot: efuse block revision: v0.3[0m
+[0;32mI (27) boot.esp32h2: SPI Speed      : 64MHz[0m
+[0;32mI (31) boot.esp32h2: SPI Mode       : DIO[0m
+[0;32mI (35) boot.esp32h2: SPI Flash Size : 2MB[0m
+[0;32mI (39) boot: Enabling RNG early entropy source...[0m
+[0;32mI (43) boot: Partition Table:[0m
+[0;32mI (46) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (52) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (58) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (65) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (72) boot: End of partition table[0m
+[0;32mI (75) esp_image: segment 0: paddr=00010020 vaddr=42088020 size=15414h ( 87060) map[0m
+[0;32mI (105) esp_image: segment 1: paddr=0002543c vaddr=40800000 size=02bdch ( 11228) load[0m
+[0;32mI (109) esp_image: segment 2: paddr=00028020 vaddr=42000020 size=86dfch (552444) map[0m
+[0;32mI (250) esp_image: segment 3: paddr=000aee24 vaddr=40802bdc size=12aech ( 76524) load[0m
+[0;32mI (273) esp_image: segment 4: paddr=000c1918 vaddr=408156d0 size=021e8h (  8680) load[0m
+[0;32mI (283) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (283) boot: Disabling RNG early entropy source...[0m
+[0;32mI (293) cpu_start: Unicore app[0m
+[0;32mI (302) cpu_start: Pro cpu start user code[0m
+[0;32mI (302) cpu_start: cpu freq: 96000000 Hz[0m
+[0;32mI (303) app_init: Application information:[0m
+[0;32mI (303) app_init: Project name:     BT-Test[0m
+[0;32mI (306) app_init: App version:      e9e5e66-dirty[0m
+[0;32mI (310) app_init: Compile time:     Oct 23 2025 15:35:13[0m
+[0;32mI (315) app_init: ELF file SHA256:  e77f3b917...[0m
+[0;32mI (320) app_init: ESP-IDF:          v5.5.1-dirty[0m
+[0;32mI (324) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (328) efuse_init: Max chip rev:     v1.99 [0m
+[0;32mI (332) efuse_init: Chip rev:         v0.1[0m
+[0;32mI (336) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (342) heap_init: At 4081A230 len 00033150 (204 KiB): RAM[0m
+[0;32mI (347) heap_init: At 4084D380 len 00002B60 (10 KiB): RAM[0m
+[0;32mI (352) heap_init: At 50000000 len 00000FE8 (3 KiB): RTCRAM[0m
+[0;32mI (359) spi_flash: detected chip: gd[0m
+[0;32mI (361) spi_flash: flash io: dio[0m
+[0;33mW (364) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (376) ADC: legacy driver is deprecated, please migrate to `esp_adc/adc_oneshot.h`[0m
+[0;32mI (384) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (390) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (396) coexist: coex firmware version: b0bcc39[0m
+[0;32mI (401) main_task: Started on CPU0[0m
+[0;32mI (401) main_task: Calling app_main()[0m
+[0;32mI (401) speechster_b1: Speechster B1 Starting Up[0m
+[0;32mI (411) speechster_b1: audio_rb: 1082448596[0m
+[0;32mI (411) speechster_b1: I2S initialized: BCLK=3 WS=14 DIN=10[0m
+[0;32mI (431) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (431) BLE_INIT: ble controller commit:[898f73c][0m
+[0;33mW (441) BLE_INIT: BLE modem sleep is enabled[0m
+[0;32mI (441) BLE_INIT: Bluetooth MAC: 74:4d:bd:65:9f:d4[0m
+[0;32mI (451) phy: phy_version: 323,2, a8ef10c, Aug  1 2025, 17:46:10[0m
+[0;32mI (461) phy: libbtbb version: 4515421, Aug  1 2025, 17:46:22[0m
+[0;32mI (471) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (481) speechster_b1: Advertising started (name=Speechster-B1)[0m
+[0;32mI (481) speechster_b1: i2s_capture_task start[0m
+[0;32mI (481) speechster_b1: fsr_task start (ADC channel 1)[0m
+[0;32mI (481) speechster_b1: ble_sender_task start[0m
+[0;32mI (491) speechster_b1: Main started; advertising automatically, UART logs enabled[0m
+[0;32mI (491) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (591) main_task: Returned from app_main()[0m
+[0;32mI (5501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (10501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (15501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (20501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (25501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (30501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (35501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (40501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (41491) speechster_b1: MTU exchange event: conn=0 mtu=256[0m
+[0;32mI (41491) speechster_b1: ble_att_mtu() => 256[0m
+[0;32mI (41491) speechster_b1: Connected (handle 0)[0m
+[0;32mI (41501) speechster_b1: ble_att_set_preferred_mtu rc=0[0m
+[0;32mI (41501) speechster_b1: ble_gap_update_params rc=0[0m
+[0;32mI (41511) speechster_b1: ble_gap_set_prefered_le_phy rc=0[0m
+[0;32mI (41511) speechster_b1: ble_gap_set_preferred_phys rc=0[0m
+[0;32mI (41741) speechster_b1: Subscribe: conn=0 attr_handle=5 cur_notify=1[0m
+[0;32mI (41741) speechster_b1: Cached stream attr handle: 5[0m
+[0;32mI (45501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (50501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (55501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (60501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (65501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (70501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (75501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (80501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (85501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (87271) speechster_b1: [CTRL_IN] rx JSON: {"mic":true}[0m
+[0;32mI (87271) speechster_b1: [JSON_PARSE] mic=1[0m
+[0;32mI (88401) speechster_b1: Frame sliced (18052 → 8192 bytes)[0m
+[0;32mI (89491) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (90501) speechster_b1: [Health] rb_fill=0.3% free=48984 waiting=168[0m
+[0;32mI (90581) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (91671) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (92761) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (93851) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (94941) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (95501) speechster_b1: [Health] rb_fill=20.2% free=39240 waiting=9408[0m
+[0;32mI (96031) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (97121) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (98211) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (99301) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (99421) speechster_b1: [CTRL_IN] rx JSON: {"mic":false}[0m
+[0;32mI (99421) speechster_b1: [JSON_PARSE] mic=0[0m
+[0;33mW (99881) speechster_b1: mbuf exhausted while sending seq=20 pos=5800 — abort aggregate, backing off 20ms[0m
+[0;32mI (100501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (105501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (110501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (115501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (120501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (125501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (130501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (135501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (140501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (145501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (150501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (155501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (160501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (165501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (170501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (175501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (180501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (185501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (190501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (195501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (200501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (205501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (210501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (215501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (220501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (225501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (230501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (235501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (240501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (245501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (250501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (255501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (260501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (265501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (270501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (275501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (280501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (285501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (290501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (295501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (300501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (305501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (310501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (315501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (320501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (325501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (330501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (335501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (340501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (345501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (350501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (355501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (360501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (365501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (370501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (375501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (380501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (385501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (390501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (395501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (400501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (405501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (410501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (415501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (420501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (425501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (430501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (435501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (440501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (445501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (450501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (455501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (460501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (465501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (470501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (475501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (480501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (485501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (490501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (495501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (500501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (505501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (510501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (515501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (520501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (525501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (530501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (532121) speechster_b1: [CTRL_IN] rx JSON: {"mic":true}[0m
+[0;32mI (532121) speechster_b1: [JSON_PARSE] mic=1[0m
+[0;32mI (533271) speechster_b1: Frame sliced (18356 → 8192 bytes)[0m
+[0;32mI (534361) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (535451) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (535501) speechster_b1: [Health] rb_fill=2.7% free=47808 waiting=840[0m
+[0;32mI (536541) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (537631) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (538721) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (539811) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (540501) speechster_b1: [Health] rb_fill=24.6% free=37056 waiting=11592[0m
+[0;32mI (540901) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (541991) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;32mI (543081) speechster_b1: Frame sliced (18252 → 8192 bytes)[0m
+[0;33mW (543801) speechster_b1: Notify failed rc=6 (take=200 pos=7400/8192) — backoff 20ms[0m
+[0;33mW (543861) speechster_b1: Notify failed rc=6 (take=200 pos=7800/8192) — backoff 20ms[0m
+[0;33mW (543921) speechster_b1: Notify failed rc=6 (take=192 pos=8192/8192) — backoff 20ms[0m
+[0;32mI (544171) speechster_b1: Frame sliced (18268 → 8192 bytes)[0m
+[0;33mW (544551) speechster_b1: Notify failed rc=6 (take=200 pos=4000/8192) — backoff 20ms[0m
+[0;33mW (544611) speechster_b1: Notify failed rc=6 (take=200 pos=4400/8192) — backoff 20ms[0m
+[0;33mW (544671) speechster_b1: Notify failed rc=6 (take=200 pos=4800/8192) — backoff 20ms[0m
+[0;33mW (544731) speechster_b1: Notify failed rc=6 (take=200 pos=5200/8192) — backoff 20ms[0m
+[0;33mW (544771) speechster_b1: Notify failed rc=6 (take=200 pos=5400/8192) — backoff 20ms[0m
+[0;33mW (544811) speechster_b1: Notify failed rc=6 (take=200 pos=5600/8192) — backoff 20ms[0m
+[0;33mW (544831) speechster_b1: Notify failed rc=6 (take=200 pos=5600/8192) — backoff 40ms[0m
+[0;33mW (544971) speechster_b1: Notify failed rc=6 (take=200 pos=6600/8192) — backoff 20ms[0m
+[0;33mW (545071) speechster_b1: Notify failed rc=6 (take=200 pos=7400/8192) — backoff 20ms[0m
+[0;33mW (545111) speechster_b1: Notify failed rc=6 (take=200 pos=7600/8192) — backoff 20ms[0m
+[0;33mW (545191) speechster_b1: Notify failed rc=6 (take=192 pos=8192/8192) — backoff 20ms[0m
+[0;32mI (545351) speechster_b1: Frame sliced (18316 → 8192 bytes)[0m
+[0;32mI (545451) speechster_b1: [CTRL_IN] rx JSON: {"mic":false}[0m
+[0;32mI (545451) speechster_b1: [JSON_PARSE] mic=0[0m
+[0;33mW (545451) speechster_b1: Notify failed rc=6 (take=200 pos=1200/8192) — backoff 20ms[0m
+[0;32mI (545501) speechster_b1: [Health] rb_fill=6.8% free=45792 waiting=1848[0m
+[0;33mW (545571) speechster_b1: Notify failed rc=6 (take=200 pos=2200/8192) — backoff 20ms[0m
+[0;33mW (545631) speechster_b1: Notify failed rc=6 (take=200 pos=2600/8192) — backoff 20ms[0m
+[0;33mW (545671) speechster_b1: Notify failed rc=6 (take=200 pos=2800/8192) — backoff 20ms[0m
+[0;33mW (545771) speechster_b1: Notify failed rc=6 (take=200 pos=3600/8192) — backoff 20ms[0m
+[0;33mW (545811) speechster_b1: Notify failed rc=6 (take=200 pos=3800/8192) — backoff 20ms[0m
+[0;33mW (545891) speechster_b1: Notify failed rc=6 (take=200 pos=4400/8192) — backoff 20ms[0m
+[0;33mW (545971) speechster_b1: Notify failed rc=6 (take=200 pos=5000/8192) — backoff 20ms[0m
+[0;33mW (546011) speechster_b1: Notify failed rc=6 (take=200 pos=5200/8192) — backoff 20ms[0m
+[0;33mW (546071) speechster_b1: Notify failed rc=6 (take=200 pos=5600/8192) — backoff 20ms[0m
+[0;33mW (546171) speechster_b1: Notify failed rc=6 (take=200 pos=6400/8192) — backoff 20ms[0m
+[0;33mW (546211) speechster_b1: Notify failed rc=6 (take=200 pos=6600/8192) — backoff 20ms[0m
+[0;33mW (546311) speechster_b1: Notify failed rc=6 (take=200 pos=7400/8192) — backoff 20ms[0m
+[0;33mW (546391) speechster_b1: Notify failed rc=6 (take=200 pos=8000/8192) — backoff 20ms[0m
+[0;32mI (546931) speechster_b1: [CTRL_IN] rx JSON: {"mic":false}[0m
+[0;32mI (546931) speechster_b1: [JSON_PARSE] mic=0[0m
+[0;32mI (550501) speechster_b1: [Health] rb_fill=0.0% free=49152 waiting=0[0m
+[0;32mI (551251) speechster_b1: Subscribe: conn=0 attr_handle=5 cur_notify=0[0m
+[0;33mW (551251) speechster_b1: Client disconnected (reason=531)[0m
+[0;32mI (551451) speechster_b1: Restarting advertising after disconnect...[0m
