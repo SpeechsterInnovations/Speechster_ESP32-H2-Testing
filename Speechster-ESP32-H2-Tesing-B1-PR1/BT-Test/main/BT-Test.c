@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// Speechster-B1 BLE Audio Streamer — v1.0 STABLE
+// Speechster-B1 BLE Audio Streamer — v0.9 UNSTABLE
 // Oct-2025 build (ESP-IDF 5.5.1)
 // Safe aggregation, adaptive BLE pacing, heap-based buffers
 // ─────────────────────────────────────────────
