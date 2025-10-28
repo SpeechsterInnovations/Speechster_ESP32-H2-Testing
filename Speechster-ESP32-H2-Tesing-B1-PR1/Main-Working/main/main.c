@@ -33,6 +33,7 @@
 #include <stdatomic.h>
 #include "esp_task_wdt.h"
 #include "esp_heap_caps.h"
+#include "esp_intr_alloc.h"
 
 /* --- Suppress deprecation warnings for legacy driver headers (keeps code compatible with current toolchain)
        This avoids the noisy compiler warnings you saw while retaining the well-tested APIs you already used.
@@ -77,15 +78,15 @@ static const char *TAG = "speechster_b1";
 
 /* ---------- Defaults & config ---------- */
 #define UART_BAUD_RATE       115200
-#define AUDIO_SAMPLE_RATE    48000
-#define AUDIO_FRAME_MS       20
+#define AUDIO_SAMPLE_RATE    16000
+#define AUDIO_FRAME_MS       10
 #define AUDIO_FRAME_SAMPLES   ((AUDIO_SAMPLE_RATE / 1000) * AUDIO_FRAME_MS)  // 960 at 48kHz
 #define AUDIO_BYTES_PER_SAMPLE 2
 #define AUDIO_READ_BYTES     (AUDIO_FRAME_SAMPLES * AUDIO_BYTES_PER_SAMPLE)
 #define AUDIO_RINGBUF_SIZE   (48 * 1024)
 #define STREAM_SLICE_MAX   (8 * 1024) // Smaller slice size reduces total number of chunks per logical frame
 #define I2S_BUF_SIZE 1024
-#define AGGREGATE_BYTES  (4 * 1024)
+#define AGGREGATE_BYTES  (15 * 320)
 #define LOG_CTRL(fmt, ...) ESP_LOGI(TAG, "[CTRL_IN] " fmt, ##__VA_ARGS__)
 #define LOG_JSON_PARSE(fmt, ...) ESP_LOGI(TAG, "[JSON_PARSE] " fmt, ##__VA_ARGS__)
 // #define LOG_STREAM(fmt, ...) ESP_LOGI(TAG, "[STREAM_OUT] " fmt, ##__VA_ARGS__)
@@ -93,7 +94,7 @@ static const char *TAG = "speechster_b1";
 static heap_trace_record_t trace_record[HEAP_TRACE_RECORDS];
 static i2s_chan_handle_t rx_chan = NULL; 
 static uint32_t rb_overflow_count = 0;
-static uint32_t ble_delay_ms = 15;
+static uint32_t ble_delay_ms = 10;
 
 #define I2S_PORT_NUM         I2S_NUM_0
 #define I2S_BCK_IO           3
@@ -148,6 +149,7 @@ static uint32_t seq_counter = 0;
 static uint8_t *agg_buf = NULL;
 static volatile uint64_t idle_ticks = 0;
 static uint64_t last_total_ticks = 0;
+static SemaphoreHandle_t ringbuf_mutex = NULL; // Protects ringbuffer access without disabling interrupts
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
@@ -192,15 +194,15 @@ static void i2s_init_inmp441(void) {
     i2s_chan_config_t chan_cfg = {
         .id = I2S_PORT_NUM,
         .role = I2S_ROLE_MASTER,
-        .dma_desc_num = 4,
-        .dma_frame_num = 32,
+        .dma_desc_num = 8,
+        .dma_frame_num = 512,
         .auto_clear = true,
     };
 
     ESP_ERROR_CHECK(i2s_new_channel(&chan_cfg, NULL, &rx_chan));
 
     i2s_std_config_t std_cfg = {
-        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(48000),
+        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(16000),
         .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO),
         .gpio_cfg = {
             .mclk = I2S_GPIO_UNUSED,
@@ -243,25 +245,40 @@ void mic_test_task(void *param) {
 }
 
 // Global or static lock (safe to share between both funcs)
-static portMUX_TYPE ringbuf_mux = portMUX_INITIALIZER_UNLOCKED;
+//static portMUX_TYPE ringbuf_mux = portMUX_INITIALIZER_UNLOCKED;
 
 static void *ringbuf_receive_safe(RingbufHandle_t rb, size_t *item_size, TickType_t ticks_to_wait) {
-    void *item;
-    taskENTER_CRITICAL(&ringbuf_mux);
-    item = xRingbufferReceive(rb, item_size, 0);
-    taskEXIT_CRITICAL(&ringbuf_mux);
-    if (!item)
-        item = xRingbufferReceive(rb, item_size, ticks_to_wait);
+    void *item = NULL;
+
+    // take mutex (non-blocking fast path)
+    if (xSemaphoreTake(ringbuf_mutex, pdMS_TO_TICKS(0)) == pdTRUE) {
+        item = xRingbufferReceive(rb, item_size, 0); // try immediate
+        xSemaphoreGive(ringbuf_mutex);
+
+        if (item) return item;
+    }
+
+    // slow path: wait with mutex taken
+    if (xSemaphoreTake(ringbuf_mutex, ticks_to_wait) == pdTRUE) {
+        item = xRingbufferReceive(rb, item_size, 0);
+        xSemaphoreGive(ringbuf_mutex);
+    }
     return item;
 }
 
 static BaseType_t ringbuf_send_safe(RingbufHandle_t rb, const void *item, size_t size, TickType_t ticks_to_wait) {
-    BaseType_t rc;
-    taskENTER_CRITICAL(&ringbuf_mux);
-    rc = xRingbufferSend(rb, item, size, 0);
-    taskEXIT_CRITICAL(&ringbuf_mux);
-    if (rc != pdTRUE)
+    BaseType_t rc = pdFALSE;
+
+    if (xSemaphoreTake(ringbuf_mutex, pdMS_TO_TICKS(0)) == pdTRUE) {
+        rc = xRingbufferSend(rb, item, size, 0);
+        xSemaphoreGive(ringbuf_mutex);
+        if (rc == pdTRUE) return rc;
+    }
+
+    if (xSemaphoreTake(ringbuf_mutex, ticks_to_wait) == pdTRUE) {
         rc = xRingbufferSend(rb, item, size, ticks_to_wait);
+        xSemaphoreGive(ringbuf_mutex);
+    }
     return rc;
 }
 
@@ -293,140 +310,112 @@ static void stop_mic_streaming(void) {
 static uint8_t audio_frame_buf[MAX_FRAME_SIZE]; // pre-allocated buffer for PCM frames
 
 /* ---------- I2S capture task (heap-safe) ---------- */
-static void i2s_capture_task(void *arg) {
-
-    // Subscribe this task to Task WDT (safe: adds current task)
+static void i2s_capture_task(void *arg)
+{
     esp_task_wdt_add(NULL);
+    ESP_LOGI(TAG, "i2s_capture_task start (real-time mode)");
 
-    // Now capturing at 48 kHz, but downsampling to 16 kHz PCM16 before BLE send.
-    // Effective BLE audio bandwidth ~32 kB/s (≈16 kHz mono).
-
-    vTaskDelay(pdMS_TO_TICKS(5));
-    taskYIELD();
-
-    ESP_LOGI(TAG, "i2s_capture_task start");
-
-    const uint32_t frame_ms = 5;  // capture 5 ms slices instead of 20 ms
-    const size_t frame_samples = (AUDIO_SAMPLE_RATE / 1000) * frame_ms;
+    const uint32_t frame_ms = 10; // 10 ms per read (real-time tuned)
+    const size_t frame_samples = (AUDIO_SAMPLE_RATE / 1000) * frame_ms; // 160 samples @16kHz
+    const size_t bytes_per_read = frame_samples * sizeof(int32_t);
     const size_t pcm_bytes = frame_samples * sizeof(int16_t);
-    const size_t frame_sz = 8 + pcm_bytes;
+    const TickType_t i2s_read_timeout = pdMS_TO_TICKS(8);
+    const TickType_t push_timeout = pdMS_TO_TICKS(5);
 
-    // heap-allocate buffers to avoid stack overflow in FreeRTOS tasks
-    int32_t *i2s_buf = (int32_t*) pvPortMalloc(frame_samples * sizeof(int32_t));
-    int16_t *pcm_down = (int16_t*) pvPortMalloc((frame_samples / 3 + 4) * sizeof(int16_t));
+    int32_t *i2s_buf = (int32_t *)pvPortMalloc(bytes_per_read);
+    int16_t *pcm_down = (int16_t *)pvPortMalloc(pcm_bytes);
     if (!i2s_buf || !pcm_down) {
-        ESP_LOGE(TAG, "i2s_capture_task: buffer alloc failed");
-        if (i2s_buf) vPortFree(i2s_buf);
-        if (pcm_down) vPortFree(pcm_down);
+        ESP_LOGE(TAG, "Failed to alloc I2S buffers");
         vTaskDelete(NULL);
         return;
     }
 
     while (1) {
-
         esp_task_wdt_reset();
-        
-        if (audio_rb == NULL) {
-            ESP_LOGW(TAG, "audio_rb not ready yet");
-            vTaskDelay(pdMS_TO_TICKS(50));
-            continue;
-        }
+        taskYIELD();
 
         if (!atomic_load(&mic_active)) {
-            vTaskDelay(pdMS_TO_TICKS(50));
+            vTaskDelay(pdMS_TO_TICKS(20));
             continue;
         }
-
-        // Backoff dynamically if ringbuffer nearly full
-        size_t free_bytes = xRingbufferGetCurFreeSize(audio_rb);
-        float fill_ratio = 1.0f - ((float)free_bytes / (float)AUDIO_RINGBUF_SIZE);
-        if (fill_ratio > 0.85f) {
-            vTaskDelay(pdMS_TO_TICKS(50)); // pause 50 ms to let BLE drain
-            taskYIELD();
-        }
-
 
         size_t bytes_read = 0;
-        esp_err_t ret = i2s_channel_read(rx_chan, i2s_buf,
-                                         frame_samples * sizeof(int32_t),
-                                         &bytes_read, portMAX_DELAY);
+        esp_err_t ret = i2s_channel_read(rx_chan, i2s_buf, bytes_per_read, &bytes_read, i2s_read_timeout);
+        esp_task_wdt_reset();
+
         if (ret != ESP_OK || bytes_read == 0) {
-            ESP_LOGW(TAG, "I2S read failed: %d", ret);
-            vTaskDelay(pdMS_TO_TICKS(5));
+            vTaskDelay(pdMS_TO_TICKS(2));
             continue;
         }
 
-        size_t samples_read = bytes_read / sizeof(int32_t);
+        size_t samples = bytes_read / sizeof(int32_t);
+        if (samples > frame_samples) samples = frame_samples;
 
-        if (free_bytes < AUDIO_READ_BYTES * 2) {
-            vTaskDelay(pdMS_TO_TICKS(ble_delay_ms)); // brief pause if buffer nearly full
-            taskYIELD();
-            continue;
-        }
+        for (size_t i = 0; i < samples; i++)
+            pcm_down[i] = (int16_t)(i2s_buf[i] >> 8);
 
-        // Downsample 48 kHz → 16 kHz by simple decimation (every 3rd sample).
-        // INMP441 has an internal low-pass filter, so no FIR filter needed here.
-        size_t j = 0;
-        for (size_t i = 0; i + 2 < samples_read; i += 3) {
-            int32_t s = (i2s_buf[i] >> 8);  // take one out of every 3 samples
-            pcm_down[j++] = (int16_t)s;
-        }
-        size_t down_samples = j;
-        size_t down_bytes = down_samples * sizeof(int16_t);
+        size_t frame_len = 8 + (samples * sizeof(int16_t));
+        if (frame_len > MAX_FRAME_SIZE) frame_len = MAX_FRAME_SIZE;
 
-        uint8_t flags = AUDIO_FLAG_PCM;
         uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+        uint16_t seq = (uint16_t)__atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+        pack_header(audio_frame_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
+        memcpy(audio_frame_buf + 8, pcm_down, frame_len - 8);
 
-        pack_header(audio_frame_buf, 0x01, flags, 0, ts);  // seq=0 → placeholder
-        memcpy(audio_frame_buf + 8, pcm_down, down_bytes);
-
-        if (xRingbufferSend(audio_rb, audio_frame_buf, 8 + down_bytes, pdMS_TO_TICKS(20)) != pdTRUE) {
+        if (ringbuf_send_safe(audio_rb, audio_frame_buf, frame_len, push_timeout) != pdTRUE) {
             rb_overflow_count++;
+            ESP_LOGW(TAG, "audio_rb overflow (seq=%u)", seq);
         }
 
-        if (free_bytes < AUDIO_READ_BYTES * 4) {
-            // back off capture when BLE can't drain fast enough
-            vTaskDelay(pdMS_TO_TICKS(MAX(ble_delay_ms, ble_backoff_ms)));
-        }
-
-        // Optional debug — verify frames are capped
-        // ESP_LOGI(TAG, "Captured frame: %zu bytes (capped=%zu)", pcm_bytes, capped_bytes);
-
-        static uint32_t last_wdt = 0;
-        uint32_t now = esp_log_timestamp();
-        if (now - last_wdt > 2000) { // feed every 2s
-            last_wdt = now;
-        }
-
-        // Allow scheduler and idle task to run between captures
-        vTaskDelay(pdMS_TO_TICKS(frame_ms * 2 + 5));
+        esp_task_wdt_reset();
+        vTaskDelay(pdMS_TO_TICKS(1)); // small breathing delay
     }
 
-    // (not reached in normal operation)
     vPortFree(i2s_buf);
     vPortFree(pcm_down);
     vTaskDelete(NULL);
 }
 
-/* ---------- FSR ADC polling ---------- */
-static void fsr_task(void *arg) {
+/* ---------- FSR ADC polling (watchdog-safe) ---------- */
+static void fsr_task(void *arg)
+{
+    esp_task_wdt_add(NULL);
     ESP_LOGI(TAG, "fsr_task start (ADC channel %d)", FSR_ADC_CHANNEL);
+
+    static uint8_t fsr_frame[12];
+    uint8_t payload[2];
+
     while (1) {
+        esp_task_wdt_reset();
+
         if (!fsr_enabled) {
-            vTaskDelay(pdMS_TO_TICKS(50));
+            vTaskDelay(pdMS_TO_TICKS(100));
             continue;
         }
+
+        // Read ADC (feed WDT before/after)
+        esp_task_wdt_reset();
         int raw = adc1_get_raw(FSR_ADC_CHANNEL);
-        uint8_t payload[2];
-        payload[0] = raw & 0xff;
-        payload[1] = (raw >> 8) & 0xff;
-        size_t frame_sz = 8 + sizeof(payload);
-        static uint8_t fsr_frame[12];
+        esp_task_wdt_reset();
+
+        payload[0] = raw & 0xFF;
+        payload[1] = (raw >> 8) & 0xFF;
+
+        // Build frame
         uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
         pack_header(fsr_frame, 0x02, 0x00, 0, ts);
         memcpy(fsr_frame + 8, payload, sizeof(payload));
-        xRingbufferSend(audio_rb, fsr_frame, 8 + sizeof(payload), pdMS_TO_TICKS(50));
-        vTaskDelay(pdMS_TO_TICKS(fsr_interval_ms));
+
+        // Try to send with a very short timeout; skip if full
+        BaseType_t ok = xRingbufferSend(audio_rb, fsr_frame, sizeof(fsr_frame), pdMS_TO_TICKS(5));
+        if (ok != pdTRUE) {
+            ESP_LOGW(TAG, "FSR ringbuffer full — skipping frame");
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+
+        // Feed WDT and yield
+        esp_task_wdt_reset();
+        vTaskDelay(pdMS_TO_TICKS(fsr_interval_ms));  // default 50ms
     }
 }
 
@@ -444,7 +433,13 @@ static void control_task(void *arg)
 
                 cJSON *jmic = cJSON_GetObjectItem(root, "mic");
                 if (jmic && cJSON_IsBool(jmic)) {
-                    if (cJSON_IsTrue(jmic)) start_mic_streaming(); else stop_mic_streaming();
+                    if (cJSON_IsTrue(jmic)){
+                        vTaskDelay(pdMS_TO_TICKS(300));
+                        start_mic_streaming();
+                        vTaskDelay(pdMS_TO_TICKS(10)); // let scheduler breathe before heavy I2S reads start
+                    } else {
+                        stop_mic_streaming();
+                    }
                     LOG_JSON_PARSE("mic=%d", (int)atomic_load(&mic_active));
                 }
 
@@ -497,354 +492,106 @@ static int gatt_control_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     return 0;
 }
 
-
-// -----------------------------------------------------------------------------
-//  send_chunked_notify()  --  Adaptive BLE chunked sender with pacing auto-tune
-// -----------------------------------------------------------------------------
-static void send_chunked_notify(uint16_t conn_handle,
-                                uint16_t attr_handle,
-                                const uint8_t *frame,
-                                size_t frame_len)
-{
-    if (!atomic_load(&bt_conn) || attr_handle == 0) {
-        // Defensive feed: ensure WDT won't fire from callers that trust this
-        esp_task_wdt_reset();
-        ESP_LOGW(TAG, "[SEND_CHUNKED_NOTIFY]: no active BLE client (conn=%d, attr=%d)",
-                 conn_handle, attr_handle);
-        return;
-    }
-
-    static uint32_t adaptive_delay_ms = 30;  // start slightly slower than before
-    const uint32_t delay_min = 10;
-    const uint32_t delay_max = 200;
-
-    /* Determine max payload from MTU (cautious cap) */
-    uint16_t cur_mtu = ble_att_mtu(conn_handle);
-    size_t payload_max = 96; // conservative default to reduce mbuf pressure
-    if (cur_mtu > 3) {
-        size_t candidate = (size_t)cur_mtu - 3;
-        if (candidate > 120) candidate = 120;   // cap smaller to reduce chunk count
-        payload_max = MIN(candidate, payload_max);
-    }
-    if (payload_max < 48) payload_max = 48;
-
-    /* Safety clamp */
-    if (frame_len > STREAM_SLICE_MAX) {
-        ESP_LOGI(TAG, "Frame sliced (%zu → %d bytes)", frame_len, STREAM_SLICE_MAX);
-        frame_len = STREAM_SLICE_MAX;
-    }
-
-    size_t pos = 0;
-
-    uint32_t backoff_ms = adaptive_delay_ms;
-    const uint32_t backoff_max = 600;
-    const uint32_t backoff_multiplier = 2;
-    uint32_t success_count = 0, fail_count = 0;
-    static int consecutive_failures = 0;
-
-    // Regularly reset WDT while inside this potentially long loop.
-    while (pos < frame_len) {
-        // feed WDT at loop top
-        esp_task_wdt_reset();
-
-        if ((success_count % 32) == 0) {
-            vTaskDelay(pdMS_TO_TICKS(10));  // let timers run
-        }
-
-        size_t remaining = frame_len - pos;
-        size_t take = (remaining > payload_max) ? payload_max : remaining;
-
-        // Build notify buffer (header + payload slice)
-        static uint8_t notify_buf_local[260];
-        memcpy(notify_buf_local, frame, 8);
-        bool is_last = ((pos + take) >= frame_len);
-        if (!is_last) {
-            notify_buf_local[1] |= 0x02;  // continuation flag
-        }
-        memcpy(notify_buf_local + 8, frame + pos, take);
-
-        struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf_local, 8 + take);
-        if (!om) {
-            // mbuf pool exhausted — yield, feed WDT, escalate backoff slightly, then abort this frame
-            ESP_LOGW(TAG, "mbuf exhausted while sending seq=%u pos=%zu — backoff %ums",
-                     (unsigned) ((frame_len >= 8) ? frame[2] | (frame[3]<<8) : 0),
-                     pos, backoff_ms);
-
-            // defensive feed & yield
-            esp_task_wdt_reset();
-            vTaskDelay(pdMS_TO_TICKS(backoff_ms + 20));
-            taskYIELD();
-
-            // increase backoff but cap it
-            backoff_ms = MIN(backoff_ms * backoff_multiplier, backoff_max);
-            // caller will decide what to do next; abort sending rest of this frame
-            return;
-        }
-
-        int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
-
-        // small cooperative pause after each notify so BLE stack + idle can run
-        esp_task_wdt_reset();
-        vTaskDelay(pdMS_TO_TICKS(2));
-        taskYIELD();
-
-        if (rc == 0) {
-            success_count++;
-            consecutive_failures = 0;
-            backoff_ms = adaptive_delay_ms;
-
-            if ((success_count % 64) == 0) {
-                ESP_LOGI(TAG, "Notify OK (rb_free=%zu) mtu=%u payload=%zu delay=%ums",
-                         xRingbufferGetCurFreeSize(audio_rb), cur_mtu, take, adaptive_delay_ms);
-            }
-
-            // Occasionally give a slightly longer pause to let other tasks run
-            if ((success_count & 0x0F) == 0) {
-                esp_task_wdt_reset();
-                vTaskDelay(pdMS_TO_TICKS(3));
-                taskYIELD();
-            }
-
-        } else {
-            fail_count++;
-            consecutive_failures++;
-
-            ESP_LOGW(TAG, "Notify failed rc=%d (take=%zu pos=%zu/%zu) — backoff %ums",
-                     rc, take, pos + take, frame_len, backoff_ms);
-
-            // Feed WDT and give the BLE stack time to recover
-            esp_task_wdt_reset();
-            vTaskDelay(pdMS_TO_TICKS(backoff_ms + 20));
-            taskYIELD();
-
-            // exponential backoff with ceiling
-            backoff_ms = MIN(backoff_ms * backoff_multiplier, backoff_max);
-
-            // If link lost or persistent failures, force disconnect and bail out
-            if (rc == BLE_HS_ENOTCONN || consecutive_failures > 8) {
-                ESP_LOGE(TAG, "BLE link lost (rc=%d) — forcing disconnect", rc);
-                ble_gap_terminate(conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-                g_conn_handle = 0;
-                g_stream_attr_handle = 0;
-                consecutive_failures = 0;
-                return;
-            }
-            // continue trying to send remaining chunks (with backoff)
-            continue;
-        }
-
-        pos += take;
-
-        /* === Auto-tune pacing based on recent ratio === */
-        if ((success_count + fail_count) >= 48) {
-            float success_ratio = (float)success_count / (success_count + fail_count);
-            if (success_ratio < 0.80f && adaptive_delay_ms < delay_max) {
-                adaptive_delay_ms += 3;  // slow down a bit
-            } else if (success_ratio > 0.95f && adaptive_delay_ms > delay_min) {
-                adaptive_delay_ms -= 1;  // speed up slightly
-            }
-            success_count = fail_count = 0;
-            // sync global pacing variable used elsewhere
-            ble_delay_ms = adaptive_delay_ms;
-        }
-
-        // Small cooperative delay tuned by adaptive delay
-        // But never completely starve the idle task: enforce at least 1 ms
-        vTaskDelay(pdMS_TO_TICKS(MAX(1, adaptive_delay_ms)));
-        taskYIELD();
-
-        if ((success_count % 32) == 0) {
-            vTaskDelay(pdMS_TO_TICKS(10));  // let timers run
-        }
-
-    }
-
-    // final WDT feed after finishing
-    esp_task_wdt_reset();
-}
-
-
 /* ---------- Pre-allocated notification buffer ---------- */
 #define MAX_NOTIFY_BUF  260
 static uint8_t notify_buf[MAX_NOTIFY_BUF];
 
 /* ---------- Heap-free BLE sender task (patched footer handling) ---------- */
-static void ble_sender_task(void *arg)
+// returns 0 on success (frame sent), -1 on failure (dropped)
+static int send_chunked_notify(uint16_t conn_handle,
+                               uint16_t attr_handle,
+                               const uint8_t *frame,
+                               size_t frame_len)
 {
-    ESP_LOGI(TAG, "ble_sender_task start");
-    static uint32_t last_wdt = 0;
+    if (!atomic_load(&bt_conn) || attr_handle == 0)
+        return -1;
 
-    // Subscribe this task to Task WDT (safe: adds current task)
-    esp_task_wdt_add(NULL);
-    esp_task_wdt_reset();   // always feed WDT at task level
+    esp_task_wdt_reset();
 
-    uint8_t *cursor = agg_buf + 8;
-    size_t agg_used = 0;
-    uint32_t ts = 0;
-    uint16_t seq = 0;
+    uint16_t mtu = ble_att_mtu(conn_handle);
+    size_t chunk_size = (mtu > 23) ? (mtu - 3) : 20;
+    chunk_size = MIN(chunk_size, 80);
 
-    while (1) {
-        taskYIELD();
+    if (frame_len > STREAM_SLICE_MAX)
+        frame_len = STREAM_SLICE_MAX;
+
+    size_t offset = 0;
+    int consecutive_failures = 0;
+
+    while (offset < frame_len) {
         esp_task_wdt_reset();
 
-        if (!atomic_load(&bt_conn)) {
-            vTaskDelay(pdMS_TO_TICKS(100));
+        size_t remaining = frame_len - offset;
+        size_t take = MIN(chunk_size, remaining);
+
+        uint8_t buf[8 + 100];
+        memcpy(buf, frame, 8);
+        memcpy(buf + 8, frame + offset, take);
+
+        struct os_mbuf *om = ble_hs_mbuf_from_flat(buf, 8 + take);
+        if (!om) {
+            vTaskDelay(pdMS_TO_TICKS(3)); // back off slightly
+            if (++consecutive_failures >= 5)
+                return -1;
             continue;
         }
 
-        if (!atomic_load(&mic_active)) {
-            uint8_t *drop_item;
-            size_t drop_size;
-            while ((drop_item = (uint8_t *)ringbuf_receive_safe(audio_rb, &drop_size, 0))) {
-                vRingbufferReturnItem(audio_rb, drop_item);
-            }
-            agg_used = 0;
-            cursor = agg_buf + 8;
-            vTaskDelay(pdMS_TO_TICKS(200));
+        int rc = ble_gatts_notify_custom(conn_handle, attr_handle, om);
+        if (rc != 0) {
+            os_mbuf_free_chain(om);
+            vTaskDelay(pdMS_TO_TICKS(5));
+            if (++consecutive_failures >= 5)
+                return -1;
             continue;
         }
 
-        uint8_t *item = NULL;
+        offset += take;
+        consecutive_failures = 0;
+
+        // pacing: small delay between chunks
+        vTaskDelay(pdMS_TO_TICKS(2));
+    }
+
+    return 0;
+}
+
+static void ble_sender_task(void *arg)
+{
+    esp_task_wdt_add(NULL);
+    ESP_LOGI(TAG, "ble_sender_task start");
+
+    TickType_t last_wake = xTaskGetTickCount();
+
+    while (1) {
+        esp_task_wdt_reset();
+
+        if (!atomic_load(&bt_conn) || g_stream_attr_handle == 0 || !atomic_load(&streaming)) {
+            vTaskDelay(pdMS_TO_TICKS(50));
+            continue;
+        }
+
         size_t item_size = 0;
+        uint8_t *frame = (uint8_t *)xRingbufferReceiveUpTo(audio_rb, &item_size, pdMS_TO_TICKS(10), 512);
 
-        /* --- Fake mode --- */
-        if (fake_mode && g_stream_attr_handle > 0 && atomic_load(&bt_conn)) {
-            uint8_t fake_payload[4] = {0x11,0x22,0x33,0x44};
-            uint8_t fake_frame[8 + sizeof(fake_payload)];
-            uint32_t fts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-            uint16_t fseq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-            pack_header(fake_frame, 0x01, 0x00, fseq, fts);
-            memcpy(fake_frame + 8, fake_payload, sizeof(fake_payload));
-            send_chunked_notify(g_conn_handle, g_stream_attr_handle, fake_frame, sizeof(fake_frame));
-            vTaskDelay(pdMS_TO_TICKS(40));
-            taskYIELD();
-            if (ble_backoff_ms > 5) ble_backoff_ms = MAX(5, ble_backoff_ms - 10);
-            frames_sent++;
-            total_bytes_sent += sizeof(fake_frame);
-            vTaskDelay(pdMS_TO_TICKS(10));
+        if (!frame) {
+            vTaskDelay(pdMS_TO_TICKS(2));
             continue;
         }
 
-        item = (uint8_t *)ringbuf_receive_safe(audio_rb, &item_size, pdMS_TO_TICKS(50));
+        int rc = send_chunked_notify(g_conn_handle, g_stream_attr_handle, frame, item_size);
+        vRingbufferReturnItem(audio_rb, frame);
 
-        if (item && item_size >= 8) {
-            if (agg_used == 0) {
-                ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-                seq = __atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-                cursor = agg_buf + 8;
-                agg_used = 0;
-            }
-
-            size_t payload_len = item_size - 8;
-
-            if ((esp_log_timestamp() - last_wdt) > 1000) {
-                esp_task_wdt_reset();
-                last_wdt = esp_log_timestamp();
-            }
-
-
-            if (agg_used + payload_len > AGGREGATE_BYTES) {
-                /* --- finalize current aggregate: write footer explicitly (no memcpy) --- */
-                uint16_t footer_seq = seq;
-                uint16_t footer_crc = calc_checksum16(agg_buf + 8, agg_used);
-                uint8_t *footer_ptr = agg_buf + 8 + agg_used;
-                footer_ptr[0] = (uint8_t)(footer_seq & 0xFF);
-                footer_ptr[1] = (uint8_t)((footer_seq >> 8) & 0xFF);
-                footer_ptr[2] = (uint8_t)(footer_crc & 0xFF);
-                footer_ptr[3] = (uint8_t)((footer_crc >> 8) & 0xFF);
-
-                if (consecutive_ble_failures > 0) {
-                    vTaskDelay(pdMS_TO_TICKS(ble_backoff_ms));
-                    consecutive_ble_failures = 0;
-                }
-
-                size_t total_len = 8 + agg_used + 4;
-                pack_header(agg_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
-                // Ensure footer bytes are fully committed to memory before BLE DMA reads
-                esp_cache_writeback_all();
-                vTaskDelay(pdMS_TO_TICKS(1));  // small yield for cache sync
-                send_chunked_notify(g_conn_handle, g_stream_attr_handle, agg_buf, total_len);
-                vTaskDelay(pdMS_TO_TICKS(40));
-                taskYIELD();
-
-                if (ble_backoff_ms > 5) ble_backoff_ms = MAX(5, ble_backoff_ms - 10);
-                frames_sent++;
-                total_bytes_sent += total_len;
-
-                /* Reset aggregation immediately and clear area to avoid stale bytes */
-                agg_used = 0;
-                cursor = agg_buf + 8;
-
-                /* start a fresh aggregate for new items */
-                ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-                seq++;
-            }
-
-            /* If there is space, append this item to the aggregate */
-            if (agg_used + payload_len <= AGGREGATE_BYTES) {
-                memcpy(cursor, item + 8, payload_len);
-                cursor += payload_len;
-                agg_used += payload_len;
-            }
-
-            vRingbufferReturnItem(audio_rb, item);
-
-            /* Small pause after processing each audio frame to let scheduler breathe */
-            vTaskDelay(pdMS_TO_TICKS(1));
-            taskYIELD();
-
-        } else {
-            /* No item received: flush any partial aggregate if present */
-            if (agg_used > 0 && g_stream_attr_handle > 0 && atomic_load(&bt_conn)) {
-                uint16_t footer_seq = seq;
-                uint16_t footer_crc = calc_checksum16(agg_buf + 8, agg_used);
-                uint8_t *footer_ptr = agg_buf + 8 + agg_used;
-                footer_ptr[0] = (uint8_t)(footer_seq & 0xFF);
-                footer_ptr[1] = (uint8_t)((footer_seq >> 8) & 0xFF);
-                footer_ptr[2] = (uint8_t)(footer_crc & 0xFF);
-                footer_ptr[3] = (uint8_t)((footer_crc >> 8) & 0xFF);
-
-                size_t total_len = 8 + agg_used + 4;
-                pack_header(agg_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
-                // Ensure footer bytes are fully committed to memory before BLE DMA reads
-                esp_cache_writeback_all();
-                vTaskDelay(pdMS_TO_TICKS(1));  // small yield for cache sync
-                send_chunked_notify(g_conn_handle, g_stream_attr_handle, agg_buf, total_len);
-                vTaskDelay(pdMS_TO_TICKS(MAX(ble_delay_ms, 20)));  // Let RTOS breathe between notifications
-
-                if (ble_backoff_ms > 5) ble_backoff_ms = MAX(5, ble_backoff_ms - 10);
-                frames_sent++;
-                total_bytes_sent += total_len;
-
-                /* Reset aggregation after flush */
-                agg_used = 0;
-                cursor = agg_buf + 8;
-            }
-
-            vTaskDelay(pdMS_TO_TICKS(ble_delay_ms));
+        if (rc != 0) {
+            ESP_LOGW(TAG, "Frame dropped after send failure (size=%zu)", item_size);
+            vTaskDelay(pdMS_TO_TICKS(10));  // backoff before next frame
+            continue;
         }
 
-        uint32_t now = esp_log_timestamp();
-        if (now - last_wdt > 2000) {
-            last_wdt = now;
-        }
-
-        UBaseType_t watermark = uxTaskGetStackHighWaterMark(NULL);
-        if (watermark < 512) {
-            ESP_LOGW(TAG, "[STACK] ble_sender low watermark: %u words", watermark);
-        }
-
-        // Gentle pause to let RTOS tick and idle task run
-        vTaskDelay(pdMS_TO_TICKS(MAX(ble_delay_ms + 3, ble_backoff_ms + 3)));
-
-        // ensure other system tasks get CPU slice
-        taskYIELD();
-
-        if ((esp_log_timestamp() % 500) < 5) {
-            vTaskDelay(pdMS_TO_TICKS(5));  // every ~500 ms, give idle a slice
-        }
+        // pacing between frames (~8 ms)
+        vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(8));
     }
 }
+
 
 static int gatt_notify_only_cb(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
@@ -1148,9 +895,26 @@ void dump_all_timers(void)
     printf("===========================\n\n");
 }
 
+static void i2s_test_task(void *arg) {
+    esp_task_wdt_add(NULL);
+    int32_t buf[256];
+    size_t bytes_read;
+    while (1) {
+        esp_err_t ret = i2s_channel_read(rx_chan, buf, sizeof(buf), &bytes_read, pdMS_TO_TICKS(100));
+        esp_task_wdt_reset();
+        if (ret == ESP_OK && bytes_read > 0) {
+            ESP_LOGI(TAG, "I2S OK: read %u bytes", bytes_read);
+        } else {
+            ESP_LOGW(TAG, "I2S timeout or fail ret=%d", ret);
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
 /* ---------- app_main ---------- */
 void app_main(void) {
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
+    //esp_log_level_set("*", ESP_LOG_NONE);
     ESP_LOGI(TAG, "Speechster B1 Starting Up");
 
     state_lock = xSemaphoreCreateMutex();
@@ -1160,6 +924,12 @@ void app_main(void) {
         return;
     } else {
         ESP_LOGI(TAG, "audio_rb: %d", audio_rb);
+    }
+
+    ringbuf_mutex = xSemaphoreCreateMutex();
+    if (!ringbuf_mutex) {
+        ESP_LOGE(TAG, "Failed to create ringbuf_mutex");
+        return;
     }
 
     // ADC (legacy call) - acceptable here.
@@ -1188,11 +958,17 @@ void app_main(void) {
 
     vTaskDelay(pdMS_TO_TICKS(200));  // let system timers, NimBLE, heap settle
 
+    ESP_LOGI(TAG, "rx_chan ptr=%p", rx_chan);
+    if (rx_chan == NULL) {
+        ESP_LOGE(TAG, "I2S channel invalid!");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
     // Start Tasks
-    xTaskCreate(i2s_capture_task, "i2s_cap", 8*1024, NULL, 6, NULL);
-    xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 5, NULL);
-    xTaskCreate(ble_sender_task, "ble_send", 20*1024, NULL, 2, NULL);
-    xTaskCreate(heap_watchdog_task, "heapwatch", 4096, NULL, 1, NULL);
+    xTaskCreate(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL);
+    xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 3, NULL);
+    xTaskCreate(ble_sender_task, "ble_send", 24*1024, NULL, 5, NULL);
+    //xTaskCreate(heap_watchdog_task, "heapwatch", 4096, NULL, 1, NULL);
 
     //xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
     // xTaskCreate(telemetry_task, "telemetry", 4096, NULL, 1, NULL);
@@ -1201,11 +977,9 @@ void app_main(void) {
         telemetry_task, "telemetry", 4096, NULL, 1, NULL, 0
     );
 
-    xTaskCreate(cpu_profiler_task, "cpu_prof", 6144, NULL, 1, NULL);
+    // xTaskCreate(cpu_profiler_task, "cpu_prof", 6144, NULL, 1, NULL);
 
     ESP_LOGI(TAG, "Main started; advertising automatically, UART logs enabled");
-
-    dump_all_timers();
 
     vTaskDelay(pdMS_TO_TICKS(100));  // let tasks start
 }

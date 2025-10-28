@@ -181,7 +181,7 @@ async function connectDevice(peripheral) {
               // Trim footer if it looks valid
               fullPayload = payloadData;
             } if (fullPayload.length < 4096) {
-              console.log(`ℹ️ Skipping CRC check (partial flush, len=${fullPayload.length})`);
+              //console.log(`ℹ️ Skipping CRC check (partial flush, len=${fullPayload.length})`);
             } else {
               console.warn('⚠️ Frame too small for footer validation');
             }
@@ -224,7 +224,7 @@ async function connectDevice(peripheral) {
       }
 
       if (controlChar) {
-        console.log('\n🎛️ Ready! Type JSON control commands (e.g. {"mic":true}):');
+        console.log('\nReady! Type JSON control commands (e.g. {"mic":true}):');
         rl.prompt();
 
         rl.on('line', (line) => {
