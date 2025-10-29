@@ -144,7 +144,7 @@ static uint16_t calc_checksum16(const uint8_t *data, size_t len) {
 
 /* Runtime State */
 static const uint8_t AUDIO_FLAG_PCM = 0x00;
-static volatile bool fsr_enabled = false;
+static volatile bool pSensor_enabled = false;
 static uint32_t seq_counter = 0;
 static uint8_t *agg_buf = NULL;
 static volatile uint64_t idle_ticks = 0;
@@ -377,18 +377,18 @@ static void i2s_capture_task(void *arg)
 }
 
 /* ---------- FSR ADC polling (watchdog-safe) ---------- */
-static void fsr_task(void *arg)
+static void pSensor_task(void *arg)
 {
     esp_task_wdt_add(NULL);
-    ESP_LOGI(TAG, "fsr_task start (ADC channel %d)", FSR_ADC_CHANNEL);
+    ESP_LOGI(TAG, "pSensor_task start (ADC channel %d)", FSR_ADC_CHANNEL);
 
-    static uint8_t fsr_frame[12];
+    static uint8_t pSensor_frame[12];
     uint8_t payload[2];
 
     while (1) {
         esp_task_wdt_reset();
 
-        if (!fsr_enabled) {
+        if (!pSensor_enabled) {
             vTaskDelay(pdMS_TO_TICKS(100));
             continue;
         }
@@ -403,13 +403,13 @@ static void fsr_task(void *arg)
 
         // Build frame
         uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-        pack_header(fsr_frame, 0x02, 0x00, 0, ts);
-        memcpy(fsr_frame + 8, payload, sizeof(payload));
+        pack_header(pSensor_frame, 0x02, 0x00, 0, ts);
+        memcpy(pSensor_frame + 8, payload, sizeof(payload));
 
         // Try to send with a very short timeout; skip if full
-        BaseType_t ok = xRingbufferSend(audio_rb, fsr_frame, sizeof(fsr_frame), pdMS_TO_TICKS(5));
+        BaseType_t ok = xRingbufferSend(audio_rb, pSensor_frame, sizeof(pSensor_frame), pdMS_TO_TICKS(5));
         if (ok != pdTRUE) {
-            ESP_LOGW(TAG, "FSR ringbuffer full — skipping frame");
+            ESP_LOGW(TAG, "pSensor ringbuffer full — skipping frame");
             vTaskDelay(pdMS_TO_TICKS(10));
         }
 
@@ -443,10 +443,10 @@ static void control_task(void *arg)
                     LOG_JSON_PARSE("mic=%d", (int)atomic_load(&mic_active));
                 }
 
-                cJSON *jfsr = cJSON_GetObjectItem(root, "fsr");
-                if (jfsr && cJSON_IsBool(jfsr)) {
-                    fsr_enabled = cJSON_IsTrue(jfsr);
-                    LOG_JSON_PARSE("fsr=%d", fsr_enabled);
+                cJSON *jpSensor = cJSON_GetObjectItem(root, "pSensor");
+                if (jpSensor && cJSON_IsBool(jpSensor)) {
+                    pSensor_enabled = cJSON_IsTrue(jpSensor);
+                    LOG_JSON_PARSE("pSensor=%d", pSensor_enabled);
                 }
 
                 cJSON *jdelay = cJSON_GetObjectItem(root, "ble_delay_ms");
@@ -966,7 +966,7 @@ void app_main(void) {
 
     // Start Tasks
     xTaskCreate(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL);
-    xTaskCreate(fsr_task, "fsr", 4*1024, NULL, 3, NULL);
+    xTaskCreate(pSensor_task, "pSensor", 4*1024, NULL, 3, NULL);
     xTaskCreate(ble_sender_task, "ble_send", 24*1024, NULL, 5, NULL);
     //xTaskCreate(heap_watchdog_task, "heapwatch", 4096, NULL, 1, NULL);
 
