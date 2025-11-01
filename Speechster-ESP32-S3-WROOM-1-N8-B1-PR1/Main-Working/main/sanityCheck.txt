@@ -1,0 +1,150 @@
+🧩 1. Pre-Flash Sanity
+
+Before flashing:
+
+Confirm USB-UART connection shows up (run dmesg | grep tty).
+
+Verify idf.py -p /dev/ttyACMx erase_flash succeeds.
+
+Plug board via native USB (ESP32-S3’s USB-C), not through UART-TTL adapter — it supports native flashing.
+
+⚡ 2. Flash + Monitor
+
+Flash with:
+
+idf.py -p /dev/ttyACM0 flash monitor
+
+
+Expected log sequence:
+
+Phase	Expected Log	Meaning
+Bootloader	boot: ESP-IDF v5.5.1	Bootloader loaded
+App start	Speechster B1 Starting Up	App entry confirmed
+I2S init	I2S initialized: BCLK=14 WS=15 DIN=16	Pin config OK
+BLE	Advertising started (name=Speechster-B1)	BLE stack OK
+NVS	No saved Wi-Fi credentials	First-boot expected
+Telemetry	heap=xxxxx free_min=xxxxx tasks=xx bt=0 ws=0	System healthy
+
+✅ If all appear in that order — hardware, firmware, and IDF boot flow are perfect.
+
+📡 3. BLE Bring-Up
+
+On your browser/device, connect via Web Bluetooth (the Speechster website or BLE test tool).
+
+You should see an advertisement named:
+
+Speechster-B1
+UUID: 0xFEED
+
+
+Once connected, send a simple test JSON:
+
+{"ssid":"TestNet","pass":"12345678","host_ip":"192.168.1.50","host_port":"8080"}
+
+
+In the console, expect:
+
+[BLE_CFG] Parsed BLE JSON: SSID=TestNet, IP=192.168.1.50:8080
+[BLE_ACK] Sent BLE ACK: {"status":"OK","msg":"WiFi credentials saved"}
+
+
+✅ If that appears, BLE write + notify → working perfectly.
+
+🌐 4. Wi-Fi Bring-Up
+
+Immediately after BLE provisioning, you should see:
+
+I (XXXX) WiFi: Connecting to SSID: TestNet
+I (XXXX) WiFiSend: Connected to Wi-Fi
+
+
+Then:
+
+I (XXXX) WS: Connected to WebSocket server
+
+
+If your host is offline, you’ll still get:
+
+[WS] Disconnected from WebSocket server
+
+
+✅ That’s fine — it just means your backend isn’t listening yet.
+
+🎙️ 5. Microphone (INMP441)
+
+Once Wi-Fi + WS are up, I2S capture starts automatically:
+
+i2s_capture_task start (Wi-Fi-only streaming mode)
+
+
+Optionally, you can run the test task instead:
+
+xTaskCreate(mic_test_task, "mic_test", 4096, NULL, 5, NULL);
+
+
+Expected log:
+
+Mic avg raw: 120
+Mic avg raw: 118
+...
+
+
+✅ If you see changing values — mic + I2S wiring are correct.
+(If zeros or -1 — check BCLK, WS, DIN pins or INMP441 VCC/GND.)
+
+🧠 6. Telemetry
+
+Every 10 seconds:
+
+Telemetry: heap=242012 free_min=225860 tasks=14 bt=1 ws=1
+
+
+✅ Healthy: heap > 200000, no task leaks, bt=1 (connected), ws=1 (connected).
+
+🔁 7. OTA Test (Optional)
+
+When your test server supports OTA:
+
+Send BLE or WebSocket command:
+
+{"cmd":"OTA_UPDATE"}
+
+
+Expect:
+
+[OTA] Starting OTA update from: http://0.0.0.0:8080/ota/latest.bin
+[OTA] OTA succeeded! Rebooting...
+
+🧯 8. Common Quick Fixes
+Issue	Likely Cause	Fix
+BLE not advertising	NimBLE init failed	Power cycle after first flash
+Wi-Fi fails	Incorrect SSID/pass	Re-send creds via BLE
+I2S read fail	Wrong pins	Swap BCLK/WS lines
+OTA stuck	Server path invalid	Check OTA_URL formatting
+Heap < 150 KB	Too many tasks pinned	Reduce telemetry/log levels
+🧩 9. Confirm NVS Persistence
+
+After successful Wi-Fi connect, reboot once (Ctrl+T Ctrl+R in monitor).
+You should see:
+
+[WiFiNVS] Loaded Wi-Fi and Server Info:
+SSID=TestNet IP=192.168.1.50:8080
+
+
+✅ Confirms that NVS saved and auto-restored correctly.
+
+✅ 10. Final Expected 1-Minute Log Snapshot
+I (0000) speechster_b1: Speechster B1 Starting Up
+I (0110) speechster_b1: I2S initialized: BCLK=14 WS=15 DIN=16
+I (0240) NimBLE: Advertising started (name=Speechster-B1)
+I (0890) WiFiNVS: No saved Wi-Fi credentials
+I (1030) BLE_CFG: Parsed BLE JSON: SSID=TestNet, IP=192.168.1.50:8080
+I (1050) BLE_ACK: Sent BLE ACK: {"status":"OK","msg":"WiFi credentials saved"}
+I (2070) WiFi: Connecting to SSID: TestNet
+I (2650) WiFiSend: Connected to Wi-Fi
+I (2700) WS: Connected to WebSocket server
+I (2750) speechster_b1: i2s_capture_task start (Wi-Fi-only streaming mode)
+I (12750) Telemetry: heap=238000 free_min=224800 tasks=14 bt=1 ws=1
+
+
+That’s your “it’s alive” moment 🎉

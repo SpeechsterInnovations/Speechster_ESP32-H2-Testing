@@ -443,11 +443,8 @@ static void control_task(void *arg)
                     LOG_JSON_PARSE("mic=%d", (int)atomic_load(&mic_active));
                 }
 
-                cJSON *jpSensor = cJSON_GetObjectItem(root, "pSensor");
-                if (jpSensor && cJSON_IsBool(jpSensor)) {
-                    pSensor_enabled = cJSON_IsTrue(jpSensor);
-                    LOG_JSON_PARSE("pSensor=%d", pSensor_enabled);
-                }
+                cJSON *pSensor = cJSON_GetObjectItem(root, "pSensor");
+                LOG_JSON_PARSE("pSensor=%d", pSensor);
 
                 cJSON *jdelay = cJSON_GetObjectItem(root, "ble_delay_ms");
                 if (jdelay && cJSON_IsNumber(jdelay)) {
@@ -911,6 +908,26 @@ static void i2s_test_task(void *arg) {
     }
 }
 
+void dump_gatt_table(void)
+{
+    const struct ble_gatt_svc_def *svc = gatt_svr_svcs;
+
+    while (svc && svc->type != 0) {
+        char svc_uuid_str[BLE_UUID_STR_LEN];
+        ble_uuid_to_str(svc->uuid, svc_uuid_str);
+        ESP_LOGI("GATT", "Service: %s", svc_uuid_str);
+
+        const struct ble_gatt_chr_def *chr = svc->characteristics;
+        while (chr && chr->uuid != NULL) {
+            char chr_uuid_str[BLE_UUID_STR_LEN];
+            ble_uuid_to_str(chr->uuid, chr_uuid_str);
+            ESP_LOGI("GATT", "  Characteristic: %s", chr_uuid_str);
+            chr++;
+        }
+        svc++;
+    }
+}
+
 /* ---------- app_main ---------- */
 void app_main(void) {
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
@@ -951,6 +968,7 @@ void app_main(void) {
 
     // NimBLE
     init_nimble();
+    dump_gatt_table();
 
     static uint8_t agg_buf_static[8 + AGGREGATE_BYTES + 4];
     agg_buf = agg_buf_static;
