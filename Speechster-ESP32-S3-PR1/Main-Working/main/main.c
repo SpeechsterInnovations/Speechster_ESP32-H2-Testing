@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// Speechster-B1 BLE Audio Streamer — v1 STABLE --- Added WiFi Audio Streaming
+// Speechster-B1 BLE Audio Streamer — v1.1 STABLE --- Added PM and Thermal PM
 // Nov-2025 build (ESP-IDF v6.1.0)
 // Safe aggregation, adaptive BLE pacing, heap-based buffers
 // Built for ESP32-S3-DevKitC-1-N8R2 ESP32-S3 WiFi Bluetooth-Compatible BLE 5.0 Mesh Development Board
@@ -65,7 +65,9 @@
 #include "esp_https_ota.h"
 #include "esp_http_client.h"
 
+// PM
 #include "driver/temperature_sensor.h"   // on-chip temp sensor (ESP32-S3)
+#include "esp_sleep.h"
 
 #ifdef CONFIG_PM_ENABLE
 #include "esp_pm.h"
@@ -172,7 +174,6 @@ static volatile bool pSensor_enabled = false;
 static uint32_t seq_counter = 0;
 static uint8_t *agg_buf = NULL;
 static volatile uint64_t idle_ticks = 0;
-static uint64_t last_total_ticks = 0;
 static SemaphoreHandle_t ringbuf_mutex = NULL; // Protects ringbuffer access without disabling interrupts
 
 /* ------------------- WiFi Config ------------------- */
@@ -239,6 +240,7 @@ static bool start_mic_streaming(void);
 static void stop_mic_streaming(void);
 void perform_ota_update(void *pvParameters);
 static void ble_send_json_response(const char *json_str);
+static float read_temperature_c(void);
 
 // ======== Concurrency Flags ========
 static atomic_bool mic_active = ATOMIC_VAR_INIT(false);
@@ -839,7 +841,9 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
                 int upd_rc = ble_gap_update_params(g_conn_handle, &params);
                 ESP_LOGI(TAG, "ble_gap_update_params rc=%d (30-37ms, latency=4)", upd_rc);
 
-                ESP_LOGI(TAG, "ble_gap_set_preferred_phys rc=%d", phy_rc);
+                int phy_rc = ble_gap_set_prefered_le_phy(g_conn_handle, BLE_HCI_LE_PHY_1M, BLE_HCI_LE_PHY_1M, 0);
+
+                ESP_LOGI(TAG, "ble_gap_set_prefered_le_phy rc=%d", phy_rc);
                 atomic_store(&bt_conn, true);
 
             } else {
@@ -1358,6 +1362,7 @@ static void telemetry_push_task(void *arg) {
         float temp = read_temperature_c();
         if (temp < -500.0f) temp = 0.0f; // guard if sensor unavailable
 
+        char json[256];
         snprintf(json, sizeof(json),
                 "{\"device_id\":\"Speechster_B1\",\"heap\":%u,\"frames_sent\":%" PRIu32 ",\"temp\":%.2f}",
                 (unsigned)esp_get_free_heap_size(), frames_sent, temp);
@@ -1381,7 +1386,7 @@ static void telemetry_push_task(void *arg) {
 /* init on-chip temperature sensor (ESP32-S3) */
 static void init_temp_sensor(void)
 {
-    temperature_sensor_config_t cfg = TEMPERATURE_SENSOR_CONFIG_DEFAULT();
+    temperature_sensor_config_t cfg = TEMPERATURE_SENSOR_CONFIG_DEFAULT(10, 50);
     // Set reasonable sample cycles if API requires (default macro used above)
     esp_err_t rc = temperature_sensor_install(&cfg, &temp_sensor_handle);
     if (rc != ESP_OK) {
@@ -1512,9 +1517,9 @@ static void die_temperature_task(void *arg)
 static void setup_power_management(void)
 {
 #ifdef CONFIG_PM_ENABLE
-    // On S3 the esp_pm_config_esp32s3_t struct is available; falling back to esp_pm_config_t works on many IDF versions.
+    // On S3 the esp_pm_config_t struct is available; falling back to esp_pm_config_t works on many IDF versions.
     // We'll use esp_pm_config_t as in your existing code but set light sleep enabled.
-    esp_pm_config_esp32s3_t pmcfg = {
+    esp_pm_config_t pmcfg = {
         .max_freq_mhz = SPEECHSTER_PM_MAX_MHZ,
         .min_freq_mhz = SPEECHSTER_PM_MIN_MHZ,
         .light_sleep_enable = true
