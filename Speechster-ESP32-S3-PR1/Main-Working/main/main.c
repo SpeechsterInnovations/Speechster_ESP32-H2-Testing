@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────
 // Speechster-B1 BLE Audio Streamer — v1 STABLE --- Added WiFi Audio Streaming
-// Oct-2025 build (ESP-IDF v6.1.0)
+// Nov-2025 build (ESP-IDF v6.1.0)
 // Safe aggregation, adaptive BLE pacing, heap-based buffers
 // Built for ESP32-S3-DevKitC-1-N8R2 ESP32-S3 WiFi Bluetooth-Compatible BLE 5.0 Mesh Development Board
 // ─────────────────────────────────────────────
@@ -65,6 +65,8 @@
 #include "esp_https_ota.h"
 #include "esp_http_client.h"
 
+#include "driver/temperature_sensor.h"   // on-chip temp sensor (ESP32-S3)
+
 #ifdef CONFIG_PM_ENABLE
 #include "esp_pm.h"
 #endif
@@ -108,6 +110,21 @@ static int16_t *pcm_dma_buf = NULL;
 static adc_continuous_handle_t adc_handle = NULL;
 static QueueHandle_t adc_evt_queue = NULL;
 static bool adc_running = false;
+
+static temperature_sensor_handle_t temp_sensor_handle = NULL;
+static float current_temp_c = 0.0f;
+
+/* PM config (tunable) */
+#ifndef SPEECHSTER_PM_MAX_MHZ
+#define SPEECHSTER_PM_MAX_MHZ 160
+#endif
+#ifndef SPEECHSTER_PM_MIN_MHZ
+#define SPEECHSTER_PM_MIN_MHZ 80
+#endif
+
+/* Thermal thresholds (adjust to your enclosure / testing) */
+#define THERMAL_WARN_C   65.0f   // throttling threshold
+#define THERMAL_CRIT_C   75.0f   // emergency stop threshold
 
 // FSR Stuff
 #define ADC_UNIT            ADC_UNIT_1
@@ -811,29 +828,17 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
             if (event->connect.status == 0) {
                 g_conn_handle = event->connect.conn_handle;
                 ESP_LOGI(TAG, "Connected (handle %d)", g_conn_handle);
-
-                // Set preferred MTU
-                int mtu_rc = ble_att_set_preferred_mtu(517);
-                ESP_LOGI(TAG, "ble_att_set_preferred_mtu rc=%d", mtu_rc);
-
-                // Request short connection interval: 7.5 ms
+                
+                // Request slightly longer connection interval to reduce radio duty-cycle (saves power/heat)
                 struct ble_gap_upd_params params = {
-                    .itvl_min = 6,   // 6 * 1.25 ms = 7.5 ms
-                    .itvl_max = 6,
-                    .latency  = 0,
-                    .supervision_timeout = 400, // 400 * 10 ms = 4 s
+                    .itvl_min = 24,   // 24 * 1.25 ms = 30 ms
+                    .itvl_max = 30,   // 30 * 1.25 ms = 37.5 ms
+                    .latency  = 4,    // allow some event skipping
+                    .supervision_timeout = 400, // 4 s
                 };
                 int upd_rc = ble_gap_update_params(g_conn_handle, &params);
-                ESP_LOGI(TAG, "ble_gap_update_params rc=%d", upd_rc);
+                ESP_LOGI(TAG, "ble_gap_update_params rc=%d (30-37ms, latency=4)", upd_rc);
 
-                // Request 2 Mbps PHY (NimBLE v5.x)
-                int phy_rc = ble_gap_set_prefered_le_phy(
-                    g_conn_handle,
-                    BLE_HCI_LE_PHY_2M_PREF_MASK,
-                    BLE_HCI_LE_PHY_2M_PREF_MASK,
-                    0
-                );
-                ESP_LOGI(TAG, "ble_gap_set_prefered_le_phy rc=%d", phy_rc);
                 ESP_LOGI(TAG, "ble_gap_set_preferred_phys rc=%d", phy_rc);
                 atomic_store(&bt_conn, true);
 
@@ -1201,6 +1206,11 @@ void wifi_init_sta(const char *ssid, const char *pass) {
     esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
     esp_wifi_start();
 
+    // Limit WiFi TX power by default to reduce heat and range (quarter-dBm units)
+    esp_err_t rc = esp_wifi_set_max_tx_power(32); // ~10 dBm
+    if (rc != ESP_OK) ESP_LOGW("WiFiPM", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+
+
     ESP_LOGI("WiFi", "Connecting to SSID:%s", ssid);
 }
 
@@ -1290,13 +1300,6 @@ static void telemetry_task(void *arg)
                     (unsigned)qfill, ws_ctrl_connected);
 
         }
-
-        uint32_t idle_now = idle_ticks;
-        float cpu_load = 1.0f - ((float)(idle_now - last_total_ticks) / idle_now);
-        last_total_ticks = idle_now;
-        ESP_LOGI(TAG, "CPU load ≈ %.2f%%", cpu_load * 100.0f);
-
-
         vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
@@ -1351,10 +1354,13 @@ static void telemetry_push_task(void *arg) {
             continue;
         }
 
-        char json[128];
+
+        float temp = read_temperature_c();
+        if (temp < -500.0f) temp = 0.0f; // guard if sensor unavailable
+
         snprintf(json, sizeof(json),
-                "{\"device_id\":\"Speechster_B1\",\"heap\":%u,\"frames_sent\":%" PRIu32 "}",
-                (unsigned)esp_get_free_heap_size(), frames_sent);
+                "{\"device_id\":\"Speechster_B1\",\"heap\":%u,\"frames_sent\":%" PRIu32 ",\"temp\":%.2f}",
+                (unsigned)esp_get_free_heap_size(), frames_sent, temp);
 
         esp_http_client_config_t cfg = {
             .url = TELEMETRY_URL[0] ? TELEMETRY_URL : "http://0.0.0.0:0/esp/telemetry",
@@ -1372,6 +1378,157 @@ static void telemetry_push_task(void *arg) {
     }
 }
 
+/* init on-chip temperature sensor (ESP32-S3) */
+static void init_temp_sensor(void)
+{
+    temperature_sensor_config_t cfg = TEMPERATURE_SENSOR_CONFIG_DEFAULT();
+    // Set reasonable sample cycles if API requires (default macro used above)
+    esp_err_t rc = temperature_sensor_install(&cfg, &temp_sensor_handle);
+    if (rc != ESP_OK) {
+        ESP_LOGW(TAG, "temp_sensor install failed: %s", esp_err_to_name(rc));
+        temp_sensor_handle = NULL;
+        return;
+    }
+    rc = temperature_sensor_enable(temp_sensor_handle);
+    if (rc != ESP_OK) {
+        ESP_LOGW(TAG, "temp_sensor enable failed: %s", esp_err_to_name(rc));
+        temperature_sensor_uninstall(temp_sensor_handle);
+        temp_sensor_handle = NULL;
+        return;
+    }
+    ESP_LOGI(TAG, "Temp sensor available");
+}
+
+/* safe read wrapper, returns -1000 on error */
+static float read_temperature_c(void)
+{
+    if (!temp_sensor_handle) return -1000.0f;
+    esp_err_t rc = temperature_sensor_get_celsius(temp_sensor_handle, &current_temp_c);
+    if (rc != ESP_OK) {
+        ESP_LOGW(TAG, "temp_sensor read error: %s", esp_err_to_name(rc));
+        return -1000.0f;
+    }
+    return current_temp_c;
+}
+
+/* Thermal watchdog — auto-throttle radios and stop audio if needed */
+static void thermal_watchdog_task(void *arg)
+{
+    while (1) {
+        float t = read_temperature_c();
+        if (t > -100.0f) { // valid reading
+            ESP_LOGI("THERMAL", "Internal temp: %.2f °C", t);
+
+            if (t >= THERMAL_CRIT_C) {
+                ESP_LOGE("THERMAL", "CRITICAL TEMP %.2f °C — stopping mic and throttling radios", t);
+                stop_mic_streaming();
+                // Further reduce WiFi TX to minimum (quarter-dBm units): 8 -> ~2 dBm
+                esp_err_t rc = esp_wifi_set_max_tx_power(8);
+                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+            } else if (t >= THERMAL_WARN_C) {
+                ESP_LOGW("THERMAL", "High temp %.2f °C — throttling radios", t);
+                // Lower WiFi TX power moderately (e.g. 32 -> ~8 dBm)
+                esp_err_t rc = esp_wifi_set_max_tx_power(32);
+                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+            } else {
+                // Normal operation: allow configured TX power (~40 -> ~10 dBm)
+                esp_err_t rc = esp_wifi_set_max_tx_power(40);
+                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+            }
+        } else {
+            ESP_LOGD("THERMAL", "Temp read invalid, skipping thermal actions");
+        }
+        vTaskDelay(pdMS_TO_TICKS(5000)); // check every 5 s
+    }
+}
+
+/* ─────────────────────────────────────────────
+ *  DIE TEMPERATURE failsafe
+ *  Final protection layer: BLE-priority emergency alert + full shutdown
+ * ───────────────────────────────────────────── */
+static void die_temperature_task(void *arg)
+{
+    const float DIE_TEMP_C = 75.0f;  // Persistent threshold
+    static uint64_t above_start_ms = 0;
+
+    while (1) {
+        float t = read_temperature_c();
+        if (t > -100.0f) {
+            if (t >= DIE_TEMP_C) {
+                uint64_t now = esp_timer_get_time() / 1000ULL;
+                if (above_start_ms == 0)
+                    above_start_ms = now;
+
+                if ((now - above_start_ms) >= 1000) {  // ≥1s sustained
+                    ESP_LOGE("DIE_TEMP", "🔥 DIE TEMPERATURE REACHED (%.2f °C)", t);
+                    ESP_LOGE("DIE_TEMP", "Shutting down all subsystems...");
+
+                    // 1️⃣ Kill active tasks first
+                    stop_mic_streaming();
+                    adc_stop();
+
+                    // 2️⃣ Compose emergency message
+                    const char *die_msg = "{\"msg\":\"Die Temps Reached\"}";
+
+                    // 3️⃣ BLE first — must reach doctor ASAP
+                    ble_send_json_response(die_msg);
+
+                    // 4️⃣ Then Wi-Fi to backend for logging
+                    if (wifi_connected) {
+                        esp_http_client_config_t cfg = {
+                            .url = TELEMETRY_URL[0] ? TELEMETRY_URL : "http://0.0.0.0:0/esp/telemetry",
+                            .method = HTTP_METHOD_POST,
+                            .timeout_ms = 2000,
+                        };
+                        esp_http_client_handle_t c = esp_http_client_init(&cfg);
+                        esp_http_client_set_header(c, "Content-Type", "application/json");
+                        esp_http_client_set_post_field(c, die_msg, strlen(die_msg));
+                        esp_http_client_perform(c);
+                        esp_http_client_cleanup(c);
+                    }
+
+                    // 5️⃣ Disable everything except radios
+                    esp_wifi_stop();     // optionally stop Wi-Fi
+                    esp_bt_controller_disable(); // optional, leave if BLE alert confirmed
+
+                    // 6️⃣ Log and sleep forever
+                    ESP_LOGE("DIE_TEMP", "System entering deep shutdown to prevent damage.");
+                    vTaskDelay(pdMS_TO_TICKS(100)); // small delay to flush UART
+
+                    // Disable all wake sources to make shutdown permanent until power-cycle
+                    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+                    esp_deep_sleep_start();  // full power-off
+                }
+            } else {
+                above_start_ms = 0;  // reset counter once cooled
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(200)); // poll 5×/s for responsiveness
+    }
+}
+
+
+/* ----------------------- PM: helper to enable dynamic scaling (call once) ----------------------- */
+static void setup_power_management(void)
+{
+#ifdef CONFIG_PM_ENABLE
+    // On S3 the esp_pm_config_esp32s3_t struct is available; falling back to esp_pm_config_t works on many IDF versions.
+    // We'll use esp_pm_config_t as in your existing code but set light sleep enabled.
+    esp_pm_config_esp32s3_t pmcfg = {
+        .max_freq_mhz = SPEECHSTER_PM_MAX_MHZ,
+        .min_freq_mhz = SPEECHSTER_PM_MIN_MHZ,
+        .light_sleep_enable = true
+    };
+    esp_err_t rc = esp_pm_configure(&pmcfg);
+    if (rc != ESP_OK) {
+        ESP_LOGW(TAG, "esp_pm_configure failed: %s", esp_err_to_name(rc));
+    } else {
+        ESP_LOGI(TAG, "PM configured %u-%u MHz, light sleep enabled", SPEECHSTER_PM_MIN_MHZ, SPEECHSTER_PM_MAX_MHZ);
+    }
+#else
+    ESP_LOGW(TAG, "Power management not enabled in sdkconfig");
+#endif
+}
 
 /* ---------- app_main ---------- */
 void app_main(void) {
@@ -1428,6 +1585,13 @@ void app_main(void) {
     };
     esp_pm_configure(&pm_config);
     #endif
+
+    setup_power_management();
+    init_temp_sensor();
+
+    // Start Thermal Watchdog Task before anything else
+    xTaskCreatePinnedToCore(thermal_watchdog_task, "thermal_wd", 4096, NULL, 3, NULL, 1);
+    xTaskCreatePinnedToCore(die_temperature_task, "die_temp", 4096, NULL, 5, NULL, 1);
 
     // Start ctrl_task Early
     xTaskCreatePinnedToCore(control_task, "ctrl_task", 6144, NULL, 5, NULL, 1);
