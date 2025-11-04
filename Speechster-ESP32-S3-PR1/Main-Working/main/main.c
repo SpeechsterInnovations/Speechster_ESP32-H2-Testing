@@ -1535,6 +1535,41 @@ static void setup_power_management(void)
 #endif
 }
 
+static void print_b1_banner() {
+
+        // Hide cursor for cinematic effect
+    printf("\033[?25l");
+
+    // Cyan → White → Magenta gradient using precomputed ANSI 24-bit colors
+    printf("\n");
+    printf("\033[38;2;0;200;255m═══════════════════════════════════════════════════════════════\033[0m\n");
+    
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+    printf("\033[38;2;0;200;255m║\033[0m");
+    vTaskDelay(pdMS_TO_TICKS(50));
+    printf("                        \033[38;2;255;255;255mSPEECHSTER-B1\033[0m");
+    vTaskDelay(pdMS_TO_TICKS(50));
+    printf("                       \033[38;2;255;100;200m║\033[0m\n");
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+    printf("\033[38;2;0;200;255m║\033[0m");
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+    printf("            \033[38;2;255;150;230m“Where overheating meets overengineering.”\033[0m");
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+    printf("       \033[38;2;255;100;200m║\033[0m\n");
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+
+    printf("\033[38;2;255;120;255m═══════════════════════════════════════════════════════════════\033[0m\n\n");
+    vTaskDelay(pdMS_TO_TICKS(50));
+
+    // Restore cursor visibility
+    printf("\033[?25h");
+}
+
 /* ---------- app_main ---------- */
 void app_main(void) {
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
@@ -1634,10 +1669,13 @@ void app_main(void) {
 
     xTaskCreatePinnedToCore(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL, 0);
     xTaskCreatePinnedToCore(pSensor_task, "pSensor", 4*1024, NULL, 3, NULL, 0);
-    xTaskCreatePinnedToCore(telemetry_task, "telemetry", 4*1024, NULL, 3, NULL, 1);
+    // xTaskCreatePinnedToCore(telemetry_task, "telemetry", 4*1024, NULL, 3, NULL, 1);
     xTaskCreatePinnedToCore(telemetry_push_task, "telemetry_push", 4096, NULL, 3, NULL, 1);
 
-    ESP_LOGI(TAG, "Main started; advertising automatically, UART logs enabled");
+    vTaskDelay(pdMS_TO_TICKS(300));
+    printf("\033[2J\033[H");  // clear screen
+    print_b1_banner();
+
     ESP_LOGI(TAG, "Build %s (%s) — IDF %s", __DATE__, __TIME__, esp_get_idf_version());
 
     vTaskDelay(pdMS_TO_TICKS(100));  // let tasks start
