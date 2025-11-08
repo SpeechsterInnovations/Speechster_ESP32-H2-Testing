@@ -1,0 +1,7 @@
+ninja: error: build.ninja:30: loading 'CMakeFiles/rules.ninja': No such file or directory
+include CMakeFiles/rules.ninja
+                              ^ near here
+ninja failed with exit code 1, output of the command is in the /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-S3-PR1/Main-Working/build/log/idf_py_stderr_output_143471 and /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-S3-PR1/Main-Working/build/log/idf_py_stdout_output_143471
+Executing action: all (aliases: build)
+Running ninja in directory /home/reyaansh/Documents/Coding/Github/Speechster_ESP32-H2-Testing/Speechster-ESP32-S3-PR1/Main-Working/build
+Executing "ninja all"...
