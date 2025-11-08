@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// Speechster-B1 BLE Audio Streamer — v1.1 STABLE --- Added PM and Thermal PM
+// Speechster-B1 BLE Audio Streamer — v1.2 STABLE --- Improved Systems and Optimized WiFi
 // Nov-2025 build (ESP-IDF v6.1.0)
 // Safe aggregation, adaptive BLE pacing, heap-based buffers
 // Built for ESP32-S3-DevKitC-1-N8R2 ESP32-S3 WiFi Bluetooth-Compatible BLE 5.0 Mesh Development Board
@@ -59,7 +59,6 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_http_server.h"
-#include "esp_http_client.h"
 #include "freertos/semphr.h"
 #include "esp_websocket_client.h"
 #include "esp_https_ota.h"
@@ -116,6 +115,18 @@ static bool adc_running = false;
 static temperature_sensor_handle_t temp_sensor_handle = NULL;
 static float current_temp_c = 0.0f;
 
+// Put near other globals
+typedef enum {
+    WS_ACTION_NONE = 0,
+    WS_ACTION_STOP_CTRL,
+    WS_ACTION_DESTROY_CTRL,
+    WS_ACTION_STOP_AUDIO,
+    WS_ACTION_DESTROY_AUDIO,
+} ws_action_t;
+
+static QueueHandle_t ws_mgr_q = NULL;
+
+
 /* PM config (tunable) */
 #ifndef SPEECHSTER_PM_MAX_MHZ
 #define SPEECHSTER_PM_MAX_MHZ 160
@@ -157,6 +168,13 @@ static inline void pack_header(uint8_t *buf, uint8_t type, uint8_t flags, uint16
     buf[7] = (ts_ms >> 24) & 0xff;
 }
 
+typedef struct {
+    char ssid[32];
+    char pass[64];
+    char ip[32];
+    char port[16];
+} wifi_creds_t;
+
 /* ---------- 16-bit additive checksum ---------- */
 static __attribute__((unused)) uint16_t calc_checksum16(const uint8_t *data, size_t len) {
     uint32_t sum = 0;
@@ -172,13 +190,19 @@ static __attribute__((unused)) uint16_t calc_checksum16(const uint8_t *data, siz
 static const uint8_t AUDIO_FLAG_PCM = 0x00;
 static volatile bool pSensor_enabled = false;
 static uint32_t seq_counter = 0;
-static uint8_t *agg_buf = NULL;
 static volatile uint64_t idle_ticks = 0;
 static SemaphoreHandle_t ringbuf_mutex = NULL; // Protects ringbuffer access without disabling interrupts
+static atomic_bool wifi_connected = ATOMIC_VAR_INIT(false);
+static atomic_bool ws_ctrl_connected = ATOMIC_VAR_INIT(false);
+static atomic_bool ws_audio_connected = ATOMIC_VAR_INIT(false);
+
+/* Set true once esp_wifi_start() returned ESP_OK (soft indicator) */
+static volatile bool wifi_stack_started = false;
+static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+
 
 /* ------------------- WiFi Config ------------------- */
 static const char *WIFI_TAG = "WiFiSend";
-static bool wifi_connected = false;
 
 // Dynamic server URIs — filled at runtime from BLE credentials or NVS
 static char WS_CTRL_URI[128]  = {0};   // ws://<host>:<port>/ws    (control + telemetry)
@@ -191,9 +215,6 @@ static esp_websocket_client_handle_t ws_client_ctrl  = NULL;
 static esp_websocket_client_handle_t ws_client_audio = NULL;
 
 // Per-client connected flags
-static bool ws_ctrl_connected  = false;
-static bool ws_audio_connected = false;
-
 static esp_http_client_handle_t wifi_http_client = NULL;
 
 // ─────────────────────────────────────────────
@@ -206,6 +227,99 @@ typedef struct {
 } wifi_frame_t;
 
 static QueueHandle_t wifi_send_q = NULL;
+
+static void wifi_init_task(void *pv) {
+
+    ESP_LOGI("WiFiTask", "wifi_init_task() running...");
+
+    wifi_creds_t creds;
+    if (!pv) {
+        vTaskDelete(NULL);
+        return;
+    }
+    // If called with direct creds pointer, use it and free if needed
+    memcpy(&creds, pv, sizeof(creds));
+    // if pv came from heap, free it here (not used in this sample)
+
+    // *** Do the full wifi init here. Robust logging at each step. ***
+    ESP_LOGI("WiFiTask", "Starting wifi_init_sta task for SSID='%s'", creds.ssid);
+
+    esp_err_t err;
+    err = esp_netif_init();
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_netif_init failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE("WiFiTask", "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+
+    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
+    if (!sta_netif) {
+        ESP_LOGE("WiFiTask", "esp_netif_create_default_wifi_sta returned NULL");
+        goto done;
+    }
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    err = esp_wifi_init(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_wifi_init failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+
+    err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_event_handler_register(WIFI_EVENT) failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+    err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL);
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_event_handler_register(IP_EVENT) failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+
+    wifi_config_t wifi_config = {0};
+    strncpy((char *)wifi_config.sta.ssid, creds.ssid, sizeof(wifi_config.sta.ssid)-1);
+    strncpy((char *)wifi_config.sta.password, creds.pass, sizeof(wifi_config.sta.password)-1);
+
+    err = esp_wifi_set_mode(WIFI_MODE_STA);
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_wifi_set_mode failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+    err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_wifi_set_config failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+
+    err = esp_wifi_start();
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_wifi_start failed: %s", esp_err_to_name(err));
+        goto done;
+    }
+    wifi_stack_started = true;
+    ESP_LOGI("WiFiTask", "esp_wifi_start OK; calling esp_wifi_connect()");
+
+    err = esp_wifi_connect();
+    if (err != ESP_OK) {
+        ESP_LOGE("WiFiTask", "esp_wifi_connect failed: %s", esp_err_to_name(err));
+        // continue — event handler will handle disconnects/retries
+    }
+
+done:
+    // free the heap credentials passed in by caller (if any)
+    if (pv) {
+        free(pv);
+    }
+
+    // one-shot task; exit
+    vTaskDelete(NULL);
+
+}
 
 
 #ifndef MIN
@@ -241,6 +355,7 @@ static void stop_mic_streaming(void);
 void perform_ota_update(void *pvParameters);
 static void ble_send_json_response(const char *json_str);
 static float read_temperature_c(void);
+void ble_on_wifi_creds_received(const char *json_str);
 
 // ======== Concurrency Flags ========
 static atomic_bool mic_active = ATOMIC_VAR_INIT(false);
@@ -340,6 +455,41 @@ static void adc_stop(void)
     ESP_LOGI("ADC_CONT", "ADC stopped");
 }
 
+static void dynamic_pm_task(void *arg)
+{
+#ifdef CONFIG_PM_ENABLE
+    const int FAST = SPEECHSTER_PM_MAX_MHZ;
+    const int SLOW = SPEECHSTER_PM_MIN_MHZ;
+    /* Start in low-power idle mode; go FAST when busy */
+    int current = SLOW;
+    
+    while (1) {
+        bool busy = atomic_load(&mic_active) || atomic_load(&streaming) ||
+                    atomic_load(&bt_conn) || atomic_load(&ws_audio_connected);
+
+        int target = busy ? FAST : SLOW;
+        if (target != current) {
+            esp_pm_config_t cfg = {
+                .max_freq_mhz = target,
+                .min_freq_mhz = SLOW,
+                .light_sleep_enable = true
+            };
+            esp_err_t rc = esp_pm_configure(&cfg);
+            if (rc == ESP_OK) {
+                current = target;
+                ESP_LOGI("PM_ADAPT", "CPU freq -> %d MHz (%s mode)",
+                         target, busy ? "active" : "idle");
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(5000));
+    }
+#else
+    vTaskDelete(NULL);
+#endif
+}
+
+
 /* ---------- I2S (INMP441) ---------- */
 static void i2s_init_inmp441(void) {
     i2s_chan_config_t chan_cfg = {
@@ -380,7 +530,7 @@ static void handle_control_json(cJSON *root) {
     // BLE priority: if BLE is connected, ignore WebSocket unless BLE is idle
     if (atomic_load(&bt_conn)) {
         ESP_LOGI(TAG, "BLE connected — BLE commands take priority.");
-    } else if (ws_ctrl_connected) {
+    } else if (atomic_load(&ws_ctrl_connected)) {
         ESP_LOGI(TAG, "No BLE connection — accepting WebSocket command.");
     } else {
         ESP_LOGW(TAG, "No control channel active; ignoring JSON command.");
@@ -388,6 +538,28 @@ static void handle_control_json(cJSON *root) {
     }
 
     xSemaphoreTake(state_lock, portMAX_DELAY);
+
+    // Detect BLE Wi-Fi credentials JSON (ssid+pass+host_ip+host_port)
+    cJSON *j_ssid = cJSON_GetObjectItem(root, "ssid");
+    cJSON *j_pass = cJSON_GetObjectItem(root, "pass");
+    cJSON *j_ip   = cJSON_GetObjectItem(root, "host_ip");
+    cJSON *j_port = cJSON_GetObjectItem(root, "host_port");
+
+    if (j_ssid && j_pass && j_ip && j_port &&
+        cJSON_IsString(j_ssid) && cJSON_IsString(j_pass) &&
+        cJSON_IsString(j_ip) && cJSON_IsString(j_port)) {
+        char *json_str = cJSON_PrintUnformatted(root);
+        if (json_str) {
+            ESP_LOGI("CTRL_JSON", "Detected Wi-Fi creds JSON, forwarding to BLE_CFG handler");
+            xSemaphoreGive(state_lock);         // <-- release before calling out
+            ble_on_wifi_creds_received(json_str);
+            free(json_str);
+        } else {
+            xSemaphoreGive(state_lock);         // ensure we don't keep lock if Print failed
+        }
+        return; // stop further handling
+    }
+
 
     cJSON *jmic = cJSON_GetObjectItem(root, "mic");
     if (jmic && cJSON_IsBool(jmic)) {
@@ -523,7 +695,7 @@ static void i2s_capture_task(void *arg)
         esp_task_wdt_reset();
         vTaskDelay(0);
 
-        if (!atomic_load(&mic_active) || !ws_audio_connected) {
+        if (!atomic_load(&mic_active) || !atomic_load(&ws_audio_connected)) {
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
         }
@@ -974,14 +1146,6 @@ static void nimble_host_task(void *param) {
 static void init_nimble(void) {
     esp_err_t rc;
 
-    // NVS must be inited before BT controller
-    rc = nvs_flash_init();
-    if (rc == ESP_ERR_NVS_NO_FREE_PAGES || rc == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_init());
-    } else {
-        ESP_ERROR_CHECK(rc);
-    }
-
     // Initialize nimble host stack
     nimble_port_init();
 
@@ -1064,7 +1228,6 @@ static bool load_wifi_creds(char *ssid, size_t ssid_len,
     return ok;
 }
 
-
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
@@ -1073,10 +1236,10 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     switch (event_id) {
         case WEBSOCKET_EVENT_CONNECTED:
             if (client == ws_client_ctrl) {
-                ws_ctrl_connected = true;
+                atomic_store(&wifi_connected, true);
                 ESP_LOGI("WS", "Control WS connected (%p)", client);
             } else if (client == ws_client_audio) {
-                ws_audio_connected = true;
+                atomic_store(&ws_audio_connected, true);
                 ESP_LOGI("WS", "Audio WS connected (%p)", client);
             } else {
                 ESP_LOGI("WS", "Unknown WS connected (%p)", client);
@@ -1085,18 +1248,24 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
 
         case WEBSOCKET_EVENT_DISCONNECTED:
             if (client == ws_client_ctrl) {
-                ws_ctrl_connected = false;
+                atomic_store(&wifi_connected, false);
                 ESP_LOGW("WS", "Control WS disconnected");
-                if (ws_client_ctrl) {
-                    esp_websocket_client_destroy(ws_client_ctrl);
-                    ws_client_ctrl = NULL;
-                }
-            } else if (client == ws_client_audio) {
-                ws_audio_connected = false;
+                ws_action_t a = WS_ACTION_DESTROY_CTRL;
+                xQueueSend(ws_mgr_q, &a, 0);
+
+                        } else if (client == ws_client_audio) {
+                atomic_store(&ws_audio_connected, false);
                 ESP_LOGW("WS", "Audio WS disconnected");
-                if (ws_client_audio) {
-                    esp_websocket_client_destroy(ws_client_audio);
-                    ws_client_audio = NULL;
+
+                // Defer destroy to manager task (safe context)
+                if (ws_mgr_q) {
+                    ws_action_t a = WS_ACTION_DESTROY_AUDIO;
+                    if (xQueueSend(ws_mgr_q, &a, 0) != pdTRUE) {
+                        ESP_LOGW("WS", "ws_mgr_q full, will attempt destroy later");
+                    }
+                } else {
+                    // Fallback: if manager not available, mark and try to stop later
+                    ESP_LOGW("WS", "ws_mgr_q not ready — audio client left for cleanup");
                 }
             } else {
                 ESP_LOGW("WS", "Unknown WS disconnected");
@@ -1111,9 +1280,21 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                 if (root) {
                     cJSON *cmd = cJSON_GetObjectItem(root, "command");
                     if (cmd && cJSON_IsObject(cmd)) {
-                        ESP_LOGI("WS", "Received WS command (control socket)");
-                        handle_control_json(cmd);
+                        // Serialize the object to a string (bounded), then send to ctrl_queue
+                        char *json_str = cJSON_PrintUnformatted(cmd);
+                        if (json_str) {
+                            control_msg_t msg = { .len = strlen(json_str), .json = json_str };
+                            if (ctrl_queue && xQueueSend(ctrl_queue, &msg, pdMS_TO_TICKS(10)) == pdTRUE) {
+                                ESP_LOGI("WS", "Enqueued WS control JSON for processing");
+                            } else {
+                                ESP_LOGW("WS", "Control queue full or missing; dropping WS JSON");
+                                free(json_str);
+                            }
+                        } else {
+                            ESP_LOGW("WS", "Failed to stringify WS JSON command");
+                        }
                     }
+
                     cJSON_Delete(root);
                 } else {
                     ESP_LOGW("WS", "Control WS: invalid JSON received");
@@ -1135,17 +1316,62 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
 static void wifi_event_handler(void *arg, esp_event_base_t event_base,
                                int32_t event_id, void *event_data) {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+        // explicit connect on start is okay; event-driven connect is safe
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        wifi_connected = false;
-        ESP_LOGW(WIFI_TAG, "Disconnected, retrying...");
+        wifi_event_sta_disconnected_t *disc = (wifi_event_sta_disconnected_t *)event_data;
+        atomic_store(&wifi_connected, false);
+        ESP_LOGW(WIFI_TAG, "Disconnected (reason=%d), retrying...", disc ? disc->reason : -1);
+        
+        if (disc) {
+            switch (disc->reason) {
+                case WIFI_REASON_AUTH_EXPIRE:
+                case WIFI_REASON_AUTH_FAIL:
+                case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+                    ESP_LOGE(WIFI_TAG, "❌ Authentication failed — wrong password or mismatched security mode.");
+                    break;
+
+                case WIFI_REASON_NO_AP_FOUND:
+                    ESP_LOGE(WIFI_TAG, "🚫 No AP found for SSID '%s' — check name and 2.4GHz availability.", disc ? (char*)disc->ssid : "(unknown)");
+                    break;
+
+                case WIFI_REASON_ASSOC_FAIL:
+                case WIFI_REASON_ASSOC_LEAVE:
+                    ESP_LOGE(WIFI_TAG, "⚠️ Association failed — signal too weak or AP refused connection.");
+                    break;
+
+                case WIFI_REASON_BEACON_TIMEOUT:
+                    ESP_LOGE(WIFI_TAG, "📡 Beacon timeout — lost AP signal (weak link or interference).");
+                    break;
+
+                case WIFI_REASON_HANDSHAKE_TIMEOUT:
+                    ESP_LOGE(WIFI_TAG, "⚠️ WPA handshake timeout — router didn't respond in time.");
+                    break;
+
+                case WIFI_REASON_MIC_FAILURE:
+                    ESP_LOGE(WIFI_TAG, "🔒 WPA MIC failure — corrupted frame or bad encryption key.");
+                    break;
+
+                case WIFI_REASON_AUTH_LEAVE:
+                    ESP_LOGE(WIFI_TAG, "🔄 Deauthenticated by AP — router booted you.");
+                    break;
+
+                default:
+                    ESP_LOGW(WIFI_TAG, "🤔 Unknown Wi-Fi disconnect reason: %d", disc->reason);
+                    break;
+            }
+        } else {
+            ESP_LOGW(WIFI_TAG, "Wi-Fi disconnect: event_data was null");
+        }
+
         if (wifi_http_client) {
             esp_http_client_cleanup(wifi_http_client);
             wifi_http_client = NULL;
         }
+        // Let the watchdog manage backoff/reconnect attempts; still call connect once
         esp_wifi_connect();
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-        wifi_connected = true;
+        atomic_store(&wifi_connected, true);
         ESP_LOGI(WIFI_TAG, "Connected to Wi-Fi");
 
         // Create / start control WS client
@@ -1154,15 +1380,18 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
             .reconnect_timeout_ms = 3000,
             .keep_alive_idle = 10,
             .keep_alive_interval = 10,
-            .keep_alive_count = 3
+            .keep_alive_count = 3,
+            .network_timeout_ms = 10000
         };
         ws_client_ctrl = esp_websocket_client_init(&ctrl_cfg);
         if (ws_client_ctrl) {
             esp_websocket_register_events(ws_client_ctrl, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)ws_client_ctrl);
             esp_websocket_client_start(ws_client_ctrl);
             ESP_LOGI(WIFI_TAG, "Control WS client started (%s)", WS_CTRL_URI);
+            atomic_store(&ws_ctrl_connected, true);
         } else {
             ESP_LOGW(WIFI_TAG, "Failed to init control WS client");
+            atomic_store(&ws_ctrl_connected, false);
         }
 
         // Create / start audio WS client
@@ -1172,50 +1401,181 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
             .keep_alive_idle = 10,
             .keep_alive_interval = 10,
             .keep_alive_count = 3
+            
         };
         ws_client_audio = esp_websocket_client_init(&audio_cfg);
         if (ws_client_audio) {
             esp_websocket_register_events(ws_client_audio, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)ws_client_audio);
             esp_websocket_client_start(ws_client_audio);
             ESP_LOGI(WIFI_TAG, "Audio WS client started (%s)", WS_AUDIO_URI);
+            atomic_store(&ws_audio_connected, true);
         } else {
             ESP_LOGW(WIFI_TAG, "Failed to init audio WS client");
+            atomic_store(&ws_audio_connected, false);
         }
 
         ESP_LOGI(WIFI_TAG, "Starting HTTP server");
         if (!stream_server) {
             start_http_server();
         }
-
     }
 }
 
-void wifi_init_sta(const char *ssid, const char *pass) {
-    if (esp_event_loop_create_default() != ESP_ERR_INVALID_STATE) {
-        // only create if not already present
-        esp_netif_init();
-        esp_netif_create_default_wifi_sta();
-    }
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg);
+static void wifi_watchdog_task(void *arg) {
+    const int SOFT_RESET_AFTER = 10;
+    const int HARD_REBOOT_AFTER  = 60;
+    int wifi_retry = 0;
+    int backoff_ms = 1000;
+    const int BACKOFF_CAP_MS = 15000;
 
-    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
-    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL);
+    ESP_LOGI("WiFiWD", "Wi-Fi watchdog started");
+
+    // Runtime stack usage snapshot (words remain)
+    UBaseType_t high_water = uxTaskGetStackHighWaterMark(NULL);
+    ESP_LOGI("WiFiWD", "wifi_wdt_task stack high-water (words): %u", (unsigned)high_water);
+
+    static uint64_t last_connect_attempt_ms = 0;
+
+    while (1) {
+
+        if (!wifi_stack_started) {
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            continue;
+        }
+
+        bool is_connected = atomic_load(&wifi_connected);
+        if (is_connected) {
+            if (wifi_retry != 0) {
+                ESP_LOGI("WiFiWD", "Wi-Fi recovered after %d retries", wifi_retry);
+            }
+            wifi_retry = 0;
+            backoff_ms = 1000;
+            vTaskDelay(pdMS_TO_TICKS(5000));
+            continue;
+        }
+
+        // Not connected — try to reconnect with backoff
+        wifi_retry++;
+        ESP_LOGW("WiFiWD", "Wi-Fi disconnected (retry %d). backoff=%dms", wifi_retry, backoff_ms);
+
+        // Throttle connect attempts so we don't spam the driver (and avoid deep stack churn)
+        uint64_t now_ms = esp_timer_get_time() / 1000ULL;
+        if (now_ms - last_connect_attempt_ms > 10000) { // at least 10s between attempts
+
+            wifi_mode_t mode;
+            esp_err_t st = esp_wifi_get_mode(&mode);
+            if (st == ESP_ERR_WIFI_NOT_INIT) {
+                ESP_LOGW("WiFiWD", "Wi-Fi driver not initialized yet; delaying watchdog");
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                continue;
+            }
+            esp_err_t rc = esp_wifi_connect();
+            if (rc != ESP_OK) {
+                ESP_LOGW("WiFiWD", "esp_wifi_connect rc=%s", esp_err_to_name(rc));
+            }
+            last_connect_attempt_ms = now_ms;
+        } else {
+            ESP_LOGD("WiFiWD", "Skipping connect attempt (debounced)");
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(backoff_ms));
+
+        backoff_ms = MIN(backoff_ms * 2, BACKOFF_CAP_MS);
+
+        if (wifi_retry == SOFT_RESET_AFTER) {
+            ESP_LOGE("WiFiWD", "Soft-resetting WS clients after %d retries", wifi_retry);
+            // stop/destroy clients without deep-stack locals
+            if (ws_client_audio) {
+                esp_websocket_client_stop(ws_client_audio);
+                esp_websocket_client_destroy(ws_client_audio);
+                ws_client_audio = NULL;
+                atomic_store(&ws_audio_connected, false);
+            }
+            if (ws_client_ctrl) {
+                esp_websocket_client_stop(ws_client_ctrl);
+                esp_websocket_client_destroy(ws_client_ctrl);
+                ws_client_ctrl = NULL;
+                atomic_store(&ws_ctrl_connected, false);
+            }
+            if (stream_server) {
+                httpd_stop(stream_server);
+                stream_server = NULL;
+            }
+
+            esp_err_t stop_rc = esp_wifi_stop();
+            ESP_LOGI("WiFiWD", "esp_wifi_stop rc=%s", esp_err_to_name(stop_rc));
+            vTaskDelay(pdMS_TO_TICKS(200));
+            esp_err_t start_rc = esp_wifi_start();
+            if (start_rc == ESP_OK) {
+                wifi_stack_started = true;
+                ESP_LOGI("WiFiWD", "esp_wifi_start after soft reset OK");
+            } else {
+                ESP_LOGW("WiFiWD", "esp_wifi_start after soft reset rc=%s", esp_err_to_name(start_rc));
+            }
+            backoff_ms = 2000;
+        }
+
+        if (wifi_retry >= HARD_REBOOT_AFTER) {
+            ESP_LOGE("WiFiWD", "Too many Wi-Fi failures (%d). Rebooting as last resort.", wifi_retry);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            esp_wifi_stop();
+            esp_bt_controller_disable();
+            vTaskDelay(pdMS_TO_TICKS(200));
+            esp_restart();
+        }
+
+        // Periodically print stack high-water to tune the size (every N loops)
+        static int loop_cnt = 0;
+        if ((loop_cnt++ & 0x3) == 0) { // every 4 iterations
+            UBaseType_t hw = uxTaskGetStackHighWaterMark(NULL);
+            ESP_LOGD("WiFiWD", "wifi_wdt_task high-water left (words): %u", (unsigned)hw);
+        }
+    }
+}
+
+static void wifi_init_sta(const char *ssid, const char *pass) {
+    ESP_LOGI("WiFi", "Initializing Wi-Fi stack...");
+
+    esp_err_t err;
+
+    // Always init core subsystems — these are idempotent
+    ESP_ERROR_CHECK(esp_netif_init());
+    esp_event_loop_create_default();  // safe even if already exists
+    esp_netif_create_default_wifi_sta();  // always ensure STA interface exists
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+
+    err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler, NULL);
+    err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL);
 
     wifi_config_t wifi_config = {0};
-    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
-    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
+    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
+    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password) - 1);
+    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;  // default safe auth mode
 
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    esp_wifi_start();
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 
-    // Limit WiFi TX power by default to reduce heat and range (quarter-dBm units)
-    esp_err_t rc = esp_wifi_set_max_tx_power(32); // ~10 dBm
-    if (rc != ESP_OK) ESP_LOGW("WiFiPM", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+    esp_err_t start_rc = esp_wifi_start();
+    if (start_rc == ESP_OK) {
+        wifi_stack_started = true;
+        ESP_LOGI("WiFi", "esp_wifi_start OK — awaiting WIFI_EVENT_STA_START to connect");
+        // Do NOT call esp_wifi_connect() here to avoid races with driver initialization.
+        // The wifi_event_handler will perform the actual connect on WIFI_EVENT_STA_START.
+    } else {
+        wifi_stack_started = false;
+        ESP_LOGE("WiFi", "esp_wifi_start failed: %s", esp_err_to_name(start_rc));
+        return;
+    }
 
+    // Cap TX power to prevent overheat / excessive current draw
+    esp_err_t rc = esp_wifi_set_max_tx_power(32);  // ~10 dBm
+    if (rc != ESP_OK)
+        ESP_LOGW("WiFi", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
 
-    ESP_LOGI("WiFi", "Connecting to SSID:%s", ssid);
+    // Spawn watchdog after Wi-Fi confirmed up
+    xTaskCreate(wifi_watchdog_task, "wifi_wdt_task", 8192, NULL, 2, NULL);
 }
 
 // ─────────────────────────────────────────────
@@ -1223,40 +1583,55 @@ void wifi_init_sta(const char *ssid, const char *pass) {
 // ─────────────────────────────────────────────
 void ble_on_wifi_creds_received(const char *json_str) {
     cJSON *root = cJSON_Parse(json_str);
-    if (!root) return;
+    if (!root) {
+        ESP_LOGW("BLE_CFG", "Invalid JSON in BLE payload");
+        return;
+    }
 
     const cJSON *j_ssid = cJSON_GetObjectItem(root, "ssid");
     const cJSON *j_pass = cJSON_GetObjectItem(root, "pass");
     const cJSON *j_ip   = cJSON_GetObjectItem(root, "host_ip");
     const cJSON *j_port = cJSON_GetObjectItem(root, "host_port");
 
-    if (!cJSON_IsString(j_ssid) || !cJSON_IsString(j_pass) ||
-        !cJSON_IsString(j_ip)   || !cJSON_IsString(j_port)) {
+    if (!cJSON_IsString(j_ssid) || !cJSON_IsString(j_pass) || !cJSON_IsString(j_ip) || !cJSON_IsString(j_port)) {
         ESP_LOGE("BLE_CFG", "Invalid BLE JSON received");
         cJSON_Delete(root);
         ble_send_json_response("{\"status\":\"ERR\",\"msg\":\"Invalid JSON\"}");
         return;
     }
 
-    const char *ssid = j_ssid->valuestring;
-    const char *pass = j_pass->valuestring;
-    const char *ip   = j_ip->valuestring;
-    const char *port = j_port->valuestring;
+    wifi_creds_t creds;
+    memset(&creds, 0, sizeof(creds));
+    strncpy(creds.ssid, j_ssid->valuestring, sizeof(creds.ssid)-1);
+    strncpy(creds.pass, j_pass->valuestring, sizeof(creds.pass)-1);
+    strncpy(creds.ip,   j_ip->valuestring,   sizeof(creds.ip)-1);
+    strncpy(creds.port, j_port->valuestring, sizeof(creds.port)-1);
 
-    snprintf(WS_CTRL_URI, sizeof(WS_CTRL_URI), "ws://%s:%s/ws", ip, port);
-    snprintf(WS_AUDIO_URI, sizeof(WS_AUDIO_URI), "ws://%s:%s/data/audio", ip, port);
-    snprintf(OTA_URL, sizeof(OTA_URL), "http://%s:%s/ota/latest.bin", ip, port);
-    snprintf(TELEMETRY_URL, sizeof(TELEMETRY_URL), "http://%s:%s/esp/telemetry", ip, port);
+    // Save to NVS immediately (safe from BLE context)
+    save_wifi_creds(creds.ssid, creds.pass, creds.ip, creds.port);
+
+    ESP_LOGI("BLE_CFG", "Parsed Wi-Fi creds: ssid=%s pass=%s", creds.ssid, creds.pass);
 
 
-    ESP_LOGI("BLE_CFG", "Parsed BLE JSON: SSID=%s, IP=%s:%s", ssid, ip, port);
-    save_wifi_creds(ssid, pass, ip, port);
-
-    // Send BLE ACK immediately
+    // ACK right away
     ble_send_json_response("{\"status\":\"OK\",\"msg\":\"WiFi credentials saved\"}");
 
-    // Proceed with WiFi connection + WebSocket setup
-    wifi_init_sta(ssid, pass);
+    // Spawn wifi_init_task (safe; does heavy work off the BLE host)
+    // Use heap copy or queue; we do a heap allocated copy then create the task.
+    wifi_creds_t *heap_creds = malloc(sizeof(wifi_creds_t));
+    if (heap_creds) {
+        memcpy(heap_creds, &creds, sizeof(wifi_creds_t));
+        BaseType_t rc = xTaskCreate(wifi_init_task, "wifi_init_task", 12288, heap_creds, 3, NULL);
+        ESP_LOGI("BLE_CFG", "wifi_init_task create result: %d", rc);
+        if (rc != pdPASS) {
+            ESP_LOGE("BLE_CFG", "Failed to create wifi_init_task");
+            free(heap_creds);
+        } else {
+            ESP_LOGI("BLE_CFG", "wifi_init_task created successfully");
+        }
+    } else {
+        ESP_LOGE("BLE_CFG", "malloc failed for wifi creds");
+    }
 
     cJSON_Delete(root);
 }
@@ -1281,33 +1656,6 @@ void loadNVSData(void) {
     }
 }
 
-static void telemetry_task(void *arg)
-{
-    while (1) {
-        wifi_ap_record_t info;
-
-        ESP_LOGI(TAG, "Telemetry: heap=%u free_min=%u tasks=%u bt=%d ws=%d",
-                (unsigned)esp_get_free_heap_size(),
-                (unsigned)esp_get_minimum_free_heap_size(),
-                uxTaskGetNumberOfTasks(),
-                atomic_load(&bt_conn),
-                ws_ctrl_connected);
-
-        if (esp_wifi_sta_get_ap_info(&info) == ESP_OK)
-            ESP_LOGI(TAG, "RSSI=%d dBm", info.rssi);
-        
-        if (wifi_send_q) {
-            UBaseType_t qfill = uxQueueMessagesWaiting(wifi_send_q);
-            ESP_LOGI(TAG, "Telemetry: heap=%u free_min=%u queue=%u ws=%d",
-                    (unsigned)esp_get_free_heap_size(),
-                    (unsigned)esp_get_minimum_free_heap_size(),
-                    (unsigned)qfill, ws_ctrl_connected);
-
-        }
-        vTaskDelay(pdMS_TO_TICKS(10000));
-    }
-}
-
 static const char *TAG_OTA = "OTA";
 
 void perform_ota_update(void *pvParameters)
@@ -1326,8 +1674,11 @@ void perform_ota_update(void *pvParameters)
 
     esp_err_t ret = esp_https_ota(&ota_cfg);
     if (ret == ESP_OK) {
-        ESP_LOGI(TAG_OTA, "Rebooting in 2s...");
+        ESP_LOGI(TAG_OTA, "OTA complete, shutting down safely in 2s...");
         vTaskDelay(pdMS_TO_TICKS(2000));
+        esp_wifi_stop();
+        esp_bt_controller_disable();
+        vTaskDelay(pdMS_TO_TICKS(200));
         esp_restart();
     } else {
         ESP_LOGE(TAG_OTA, "OTA failed: %s", esp_err_to_name(ret));
@@ -1336,24 +1687,9 @@ void perform_ota_update(void *pvParameters)
     vTaskDelete(NULL); 
 }
 
-static void wifi_watchdog_task(void *arg) {
-    while (1) {
-        static int wifi_retry = 0;
-        if (!wifi_connected) {
-            wifi_retry++;
-            if (wifi_retry > 5) {
-                ESP_LOGE("WiFiWD", "Too many retries — rebooting");
-                esp_restart();
-            }
-            esp_wifi_connect();
-        }
-        vTaskDelay(pdMS_TO_TICKS(5000));
-    }
-}
-
 static void telemetry_push_task(void *arg) {
     while (1) {
-        if (!wifi_connected) {
+        if (!atomic_load(&wifi_connected)) {
             vTaskDelay(pdMS_TO_TICKS(2000));
             continue;
         }
@@ -1416,33 +1752,50 @@ static float read_temperature_c(void)
     return current_temp_c;
 }
 
+/* Small smoothing filter to reduce temperature jitter */
+static float smooth_temp(float new_temp)
+{
+    static float avg = -10000.0f;
+    if (avg < -9000.0f) avg = new_temp;
+    avg = (avg * 0.8f) + (new_temp * 0.2f);
+    return avg;
+}
+
+
 /* Thermal watchdog — auto-throttle radios and stop audio if needed */
 static void thermal_watchdog_task(void *arg)
 {
     while (1) {
         float t = read_temperature_c();
+        t = smooth_temp(t);
         if (t > -100.0f) { // valid reading
             ESP_LOGI("THERMAL", "Internal temp: %.2f °C", t);
 
+            if (!wifi_stack_started) {
+                ESP_LOGD("THERMAL", "Wi-Fi stack not started yet; skipping TX power adjust");
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                continue;
+            }
+
+            esp_err_t rc = ESP_OK;
+
             if (t >= THERMAL_CRIT_C) {
-                ESP_LOGE("THERMAL", "CRITICAL TEMP %.2f °C — stopping mic and throttling radios", t);
+                ESP_LOGE("THERMAL", "CRITICAL TEMP %.2f °C — stopping mic & throttling radios", t);
                 stop_mic_streaming();
-                // Further reduce WiFi TX to minimum (quarter-dBm units): 8 -> ~2 dBm
-                esp_err_t rc = esp_wifi_set_max_tx_power(8);
-                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+                rc = esp_wifi_set_max_tx_power(8);   // ~2 dBm
             } else if (t >= THERMAL_WARN_C) {
                 ESP_LOGW("THERMAL", "High temp %.2f °C — throttling radios", t);
-                // Lower WiFi TX power moderately (e.g. 32 -> ~8 dBm)
-                esp_err_t rc = esp_wifi_set_max_tx_power(32);
-                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+                rc = esp_wifi_set_max_tx_power(32);  // ~8 dBm
             } else {
-                // Normal operation: allow configured TX power (~40 -> ~10 dBm)
-                esp_err_t rc = esp_wifi_set_max_tx_power(40);
-                if (rc != ESP_OK) ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
+                rc = esp_wifi_set_max_tx_power(40);  // ~10 dBm (nominal)
             }
+
+            if (rc != ESP_OK)
+                ESP_LOGW("THERMAL", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
         } else {
             ESP_LOGD("THERMAL", "Temp read invalid, skipping thermal actions");
         }
+
         vTaskDelay(pdMS_TO_TICKS(5000)); // check every 5 s
     }
 }
@@ -1479,7 +1832,7 @@ static void die_temperature_task(void *arg)
                     ble_send_json_response(die_msg);
 
                     // 4️⃣ Then Wi-Fi to backend for logging
-                    if (wifi_connected) {
+                    if (atomic_load(&wifi_connected)) {
                         esp_http_client_config_t cfg = {
                             .url = TELEMETRY_URL[0] ? TELEMETRY_URL : "http://0.0.0.0:0/esp/telemetry",
                             .method = HTTP_METHOD_POST,
@@ -1493,8 +1846,16 @@ static void die_temperature_task(void *arg)
                     }
 
                     // 5️⃣ Disable everything except radios
-                    esp_wifi_stop();     // optionally stop Wi-Fi
+
+                    if (wifi_stack_started) {
+                        esp_err_t rc = esp_wifi_stop();
+                        ESP_LOGI("DIE_TEMP", "esp_wifi_stop rc=%s", esp_err_to_name(rc));
+                        wifi_stack_started = false;
+                    } else {
+                        ESP_LOGW("DIE_TEMP", "Wi-Fi already stopped, skipping");
+                    }
                     esp_bt_controller_disable(); // optional, leave if BLE alert confirmed
+
 
                     // 6️⃣ Log and sleep forever
                     ESP_LOGE("DIE_TEMP", "System entering deep shutdown to prevent damage.");
@@ -1570,113 +1931,131 @@ static void print_b1_banner() {
     printf("\033[?25h");
 }
 
+static void ws_manager_task(void *arg)
+{
+    ws_action_t act;
+    while (1) {
+        if (xQueueReceive(ws_mgr_q, &act, portMAX_DELAY) == pdTRUE) {
+            switch (act) {
+                case WS_ACTION_STOP_CTRL:
+                    if (ws_client_ctrl) {
+                        esp_websocket_client_stop(ws_client_ctrl);
+                    }
+                    break;
+                case WS_ACTION_DESTROY_CTRL:
+                    if (ws_client_ctrl) {
+                        // must stop then destroy
+                        esp_websocket_client_stop(ws_client_ctrl);
+                        vTaskDelay(pdMS_TO_TICKS(20)); // tiny breathing room
+                        esp_websocket_client_destroy(ws_client_ctrl);
+                        ws_client_ctrl = NULL;
+                        atomic_store(&ws_ctrl_connected, false);
+                    }
+                    break;
+                case WS_ACTION_STOP_AUDIO:
+                    if (ws_client_audio) {
+                        esp_websocket_client_stop(ws_client_audio);
+                    }
+                    break;
+                case WS_ACTION_DESTROY_AUDIO:
+                    if (ws_client_audio) {
+                        esp_websocket_client_stop(ws_client_audio);
+                        vTaskDelay(pdMS_TO_TICKS(20));
+                        esp_websocket_client_destroy(ws_client_audio);
+                        ws_client_audio = NULL;
+                        atomic_store(&ws_audio_connected, false);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+
 /* ---------- app_main ---------- */
 void app_main(void) {
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
-    //esp_log_level_set("*", ESP_LOG_NONE);
+    esp_log_level_set("wifi", ESP_LOG_DEBUG);
+    esp_log_level_set("wifi_init", ESP_LOG_DEBUG);
+
     ESP_LOGI(TAG, "Speechster B1 Starting Up");
 
+    // Mutexes and basic prealloc
     state_lock = xSemaphoreCreateMutex();
-
     ringbuf_mutex = xSemaphoreCreateMutex();
-    if (!ringbuf_mutex) {
-        ESP_LOGE(TAG, "Failed to create ringbuf_mutex");
+    if (!state_lock || !ringbuf_mutex) {
+        ESP_LOGE(TAG, "Failed to create mutexes");
         return;
     }
 
-    // I2S Init & Config
+    // --- I2S Init ---
     i2s_init_inmp441();
 
-    const uint32_t prealloc_frame_ms = 10;
-    const size_t prealloc_frame_samples = (AUDIO_SAMPLE_RATE / 1000) * prealloc_frame_ms;
-    const size_t prealloc_bytes_per_read = prealloc_frame_samples * sizeof(int32_t);
-    const size_t prealloc_pcm_bytes = prealloc_frame_samples * sizeof(int16_t);
-
-    i2s_dma_buf = heap_caps_malloc(prealloc_bytes_per_read, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-    pcm_dma_buf = heap_caps_malloc(prealloc_pcm_bytes, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    // --- Preallocate DMA Buffers ---
+    const size_t frame_bytes = ((AUDIO_SAMPLE_RATE / 1000) * 10) * sizeof(int32_t);
+    i2s_dma_buf = heap_caps_malloc(frame_bytes, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    pcm_dma_buf = heap_caps_malloc(frame_bytes / 2, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     if (!i2s_dma_buf || !pcm_dma_buf) {
-        ESP_LOGE(TAG, "Failed to alloc I2S DMA buffers (size %u / %u)", (unsigned)prealloc_bytes_per_read, (unsigned)prealloc_pcm_bytes);
-        // handle failure: either abort startup or fall back to non-DMA (not recommended)
-        // For now, abort.
+        ESP_LOGE(TAG, "Failed to alloc I2S DMA buffers");
         return;
     }
-    memset(i2s_dma_buf, 0, prealloc_bytes_per_read);
-    memset(pcm_dma_buf, 0, prealloc_pcm_bytes);
 
-    // Start ctrl_queue early
     ctrl_queue = xQueueCreate(CTRL_QUEUE_LEN, sizeof(control_msg_t));
+    wifi_send_q = xQueueCreate(WIFI_SEND_QUEUE_LEN, sizeof(wifi_frame_t));
 
-    if (!ctrl_queue) {
-        ESP_LOGE(TAG, "Failed to create ctrl_queue");
+    if (!ctrl_queue || !wifi_send_q) {
+        ESP_LOGE(TAG, "Queue alloc failed");
         return;
     }
 
+    // --- Init NVS early for Wi-Fi / BLE ---
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ESP_ERROR_CHECK(nvs_flash_init());
     }
 
-    #ifdef CONFIG_PM_ENABLE
-    esp_pm_config_t pm_config = {
-        .max_freq_mhz = 160,
-        .min_freq_mhz = 80,
-        .light_sleep_enable = false
-    };
-    esp_pm_configure(&pm_config);
-    #endif
+    // --- Bring up BLE first ---
+    init_nimble();
 
+    // Create WS manager queue early so event callbacks can enqueue safely
+    ws_mgr_q = xQueueCreate(8, sizeof(ws_action_t));
+    if (!ws_mgr_q) {
+        ESP_LOGE(TAG, "ws_mgr_q create failed");
+    } else {
+        xTaskCreate(ws_manager_task, "ws_mgr", 4096, NULL, 5, NULL);
+    }
+
+
+    // --- Now Wi-Fi (loads from NVS or BLE JSON later) ---
+    loadNVSData();
+
+    // --- Enable PM *after* radios are initialized ---
     setup_power_management();
+    xTaskCreatePinnedToCore(dynamic_pm_task, "pm_adapt", 4096, NULL, 2, NULL, 1);
+
+    // --- Temperature sensor last ---
     init_temp_sensor();
 
-    // Start Thermal Watchdog Task before anything else
+    // --- Start tasks only after dependencies exist ---
+    xTaskCreatePinnedToCore(control_task, "ctrl_task", 6144, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(wifi_send_task, "wifi_send", 8192, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL, 0);
+    xTaskCreatePinnedToCore(pSensor_task, "pSensor", 4096, NULL, 3, NULL, 0);
+
+    // Thermal tasks after Wi-Fi init so esp_wifi_set_max_tx_power() is valid
+    vTaskDelay(pdMS_TO_TICKS(3000));  // Let Wi-Fi init
     xTaskCreatePinnedToCore(thermal_watchdog_task, "thermal_wd", 4096, NULL, 3, NULL, 1);
     xTaskCreatePinnedToCore(die_temperature_task, "die_temp", 4096, NULL, 5, NULL, 1);
 
-    // Start ctrl_task Early
-    xTaskCreatePinnedToCore(control_task, "ctrl_task", 6144, NULL, 5, NULL, 1);
-    xTaskCreate(wifi_watchdog_task, "wifi_wdt_task", 2048, NULL, 2, NULL);
-
-    // Init NimBLE
-    init_nimble();
-    
-    // Load NVS Data
-    loadNVSData();
-
-    static uint8_t agg_buf_static[8 + AGGREGATE_BYTES + 4];
-    agg_buf = agg_buf_static;
-    memset(agg_buf, 0, sizeof(agg_buf_static));
-
-    vTaskDelay(pdMS_TO_TICKS(200));  // let system timers, NimBLE, heap settle
-
-    ESP_LOGI(TAG, "rx_chan ptr=%p", rx_chan);
-    if (rx_chan == NULL) {
-        ESP_LOGE(TAG, "I2S channel invalid!");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-
-    // Start Tasks
-
-    // ─────────────────────────────────────────────
-    // Start Wi-Fi send queue and task
-    // ─────────────────────────────────────────────
-    wifi_send_q = xQueueCreate(WIFI_SEND_QUEUE_LEN, sizeof(wifi_frame_t));
-    if (!wifi_send_q) {
-        ESP_LOGE("WiFiSendTask", "Failed to create Wi-Fi send queue");
-    } else {
-        xTaskCreatePinnedToCore(wifi_send_task, "wifi_send", 8192, NULL, 4, NULL, 1);
-    }
-
-    xTaskCreatePinnedToCore(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL, 0);
-    xTaskCreatePinnedToCore(pSensor_task, "pSensor", 4*1024, NULL, 3, NULL, 0);
-    // xTaskCreatePinnedToCore(telemetry_task, "telemetry", 4*1024, NULL, 3, NULL, 1);
+    // Optional: telemetry push task
     xTaskCreatePinnedToCore(telemetry_push_task, "telemetry_push", 4096, NULL, 3, NULL, 1);
 
     vTaskDelay(pdMS_TO_TICKS(300));
-    printf("\033[2J\033[H");  // clear screen
+    printf("\033[2J\033[H");  // Clear screen
     print_b1_banner();
 
     ESP_LOGI(TAG, "Build %s (%s) — IDF %s", __DATE__, __TIME__, esp_get_idf_version());
-
-    vTaskDelay(pdMS_TO_TICKS(100));  // let tasks start
 }
