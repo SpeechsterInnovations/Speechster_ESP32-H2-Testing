@@ -1,11 +1,9 @@
 // ─────────────────────────────────────────────
-// Speechster-B1 BLE Audio Streamer — v1.2 STABLE --- Improved Systems and Optimized WiFi
-// Nov-2025 build (ESP-IDF v6.1.0)
+// Speechster-B1 v1.6 RELEASE CANDIDATE
+// Nov 2025 — "The one that might actually work"
 // Safe aggregation, adaptive BLE pacing, heap-based buffers
 // Built for ESP32-S3-DevKitC-1-N8R2 ESP32-S3 WiFi Bluetooth-Compatible BLE 5.0 Mesh Development Board
 // ─────────────────────────────────────────────
-
-//#pragma GCC diagnostic ignored "-Wcpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -26,6 +24,7 @@
 #include "esp_timer.h"
 #include "freertos/portable.h"
 #include "esp_system.h"
+#include "esp_rom_sys.h"
 #include "nvs_flash.h"
 #include <stdatomic.h>
 #include "esp_task_wdt.h"
@@ -38,6 +37,7 @@
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 #include "hal/adc_types.h" 
+#include "driver/gpio.h"
 
 /* NimBLE / BLE includes */
 #include "nimble/nimble_port.h"
@@ -72,6 +72,10 @@
 #include "esp_pm.h"
 #endif
 
+/* Brownout Protection (To prevent huge WiFi/BLE bursts) */
+#include "soc/soc_caps.h"
+#include "esp_err.h"
+
 static const char *TAG = "speechster_b1";
 
 /* ---------- Defaults & config ---------- */
@@ -83,31 +87,30 @@ static const char *TAG = "speechster_b1";
 #define AUDIO_READ_BYTES     (AUDIO_FRAME_SAMPLES * AUDIO_BYTES_PER_SAMPLE)
 #define AUDIO_RINGBUF_SIZE   (48 * 1024)
 #define STREAM_SLICE_MAX   (8 * 1024) // Smaller slice size reduces total number of chunks per logical frame
-#define I2S_BUF_SIZE 1024
+#define I2S_BUF_SIZE 2048
 #define AGGREGATE_BYTES  (15 * 320)
 #define LOG_CTRL(fmt, ...) ESP_LOGI(TAG, "[CTRL_IN] " fmt, ##__VA_ARGS__)
 #define LOG_JSON_PARSE(fmt, ...) ESP_LOGI(TAG, "[JSON_PARSE] " fmt, ##__VA_ARGS__)
-// #define LOG_STREAM(fmt, ...) ESP_LOGI(TAG, "[STREAM_OUT] " fmt, ##__VA_ARGS__)
 #define HEAP_TRACE_RECORDS 256
 
 /* ---------- Heap-safe pre-allocated buffers ---------- */
-#define MAX_FRAME_SIZE   (8 + AUDIO_READ_BYTES)  // 8-byte header + PCM
-static uint8_t audio_frame_buf[MAX_FRAME_SIZE]; // pre-allocated buffer for PCM frames
+#define FRAMES_PER_BATCH     10  // 10 × 10 ms = 100 ms audio batch
+#define MAX_BATCH_PCM_BYTES  ( ((AUDIO_SAMPLE_RATE/1000) * AUDIO_FRAME_MS) * sizeof(int16_t) * FRAMES_PER_BATCH )
+#define MAX_FRAME_SIZE       (8 + MAX_BATCH_PCM_BYTES)
+static uint8_t audio_frame_buf[MAX_FRAME_SIZE];
 
 static i2s_chan_handle_t rx_chan = NULL; 
 static uint32_t rb_overflow_count = 0;
 static uint32_t ble_delay_ms = 10;
 
 #define I2S_PORT_NUM         I2S_NUM_0
-#define I2S_BCK_IO           14
-#define I2S_WS_IO            15
-#define I2S_DATA_IN_IO       16
-#define I2S_NUM         I2S_NUM_0
-#define SAMPLE_BUF_LEN  320  // Number of samples per read
+#define I2S_BCK_IO           19   // SCK
+#define I2S_WS_IO            20   // WS / LRCLK
+#define I2S_DATA_IN_IO       21   // SD (data from mic)
+#define SAMPLE_BUF_LEN       320  // Number of samples per read
 
 // Top-level globals
 static int32_t *i2s_dma_buf = NULL;
-static int16_t *pcm_dma_buf = NULL;
 static adc_continuous_handle_t adc_handle = NULL;
 static QueueHandle_t adc_evt_queue = NULL;
 static bool adc_running = false;
@@ -115,7 +118,6 @@ static bool adc_running = false;
 static temperature_sensor_handle_t temp_sensor_handle = NULL;
 static float current_temp_c = 0.0f;
 
-// Put near other globals
 typedef enum {
     WS_ACTION_NONE = 0,
     WS_ACTION_STOP_CTRL,
@@ -136,8 +138,8 @@ static QueueHandle_t ws_mgr_q = NULL;
 #endif
 
 /* Thermal thresholds (adjust to your enclosure / testing) */
-#define THERMAL_WARN_C   65.0f   // throttling threshold
-#define THERMAL_CRIT_C   75.0f   // emergency stop threshold
+#define THERMAL_WARN_C   70.0f   // throttling threshold
+#define THERMAL_CRIT_C   80.0f   // emergency stop threshold
 
 // FSR Stuff
 #define ADC_UNIT            ADC_UNIT_1
@@ -195,11 +197,34 @@ static SemaphoreHandle_t ringbuf_mutex = NULL; // Protects ringbuffer access wit
 static atomic_bool wifi_connected = ATOMIC_VAR_INIT(false);
 static atomic_bool ws_ctrl_connected = ATOMIC_VAR_INIT(false);
 static atomic_bool ws_audio_connected = ATOMIC_VAR_INIT(false);
+static atomic_bool wifi_wdt_active = ATOMIC_VAR_INIT(false);
+static uint32_t frames_dropped = 0;
+
+// new: request that capture task deinit i2s channel
+static atomic_bool i2s_deinit_requested = ATOMIC_VAR_INIT(false);
+// and small helper to test if rx_chan exists atomically
+static inline bool rx_chan_ready(void) {
+    return rx_chan != NULL;
+}
+
 
 /* Set true once esp_wifi_start() returned ESP_OK (soft indicator) */
 static volatile bool wifi_stack_started = false;
 static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 
+// Forward declarations
+static int send_chunked_notify(uint16_t conn_handle,
+                               uint16_t attr_handle,
+                               const uint8_t *frame,
+                               size_t frame_len);
+
+static bool start_mic_streaming(void);
+static void stop_mic_streaming(void);
+void perform_ota_update(void *pvParameters);
+static void ble_send_json_response(const char *json_str);
+static float read_temperature_c(void);
+void ble_on_wifi_creds_received(const char *json_str);
+static esp_netif_t* ensure_sta_netif(void);
 
 /* ------------------- WiFi Config ------------------- */
 static const char *WIFI_TAG = "WiFiSend";
@@ -220,13 +245,33 @@ static esp_http_client_handle_t wifi_http_client = NULL;
 // ─────────────────────────────────────────────
 // Wi-Fi frame send queue (decoupled from I2S task)
 // ─────────────────────────────────────────────
-#define WIFI_SEND_QUEUE_LEN 8
+#define WIFI_SEND_QUEUE_LEN 64
+
 typedef struct {
     size_t len;
-    uint8_t data[MAX_FRAME_SIZE];
+    uint8_t *data;  // dynamically allocated buffer
 } wifi_frame_t;
 
 static QueueHandle_t wifi_send_q = NULL;
+
+// Allocate safe frame object
+static wifi_frame_t *alloc_wifi_frame(size_t len) {
+    wifi_frame_t *f = heap_caps_malloc(sizeof(wifi_frame_t), MALLOC_CAP_INTERNAL);
+    if (!f) return NULL;
+    f->data = heap_caps_malloc(len, MALLOC_CAP_INTERNAL);
+    if (!f->data) {
+        free(f);
+        return NULL;
+    }
+    f->len = len;
+    return f;
+}
+
+static void free_wifi_frame(wifi_frame_t *f) {
+    if (!f) return;
+    if (f->data) free(f->data);
+    free(f);
+}
 
 static void wifi_init_task(void *pv) {
 
@@ -257,9 +302,9 @@ static void wifi_init_task(void *pv) {
         goto done;
     }
 
-    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
+    esp_netif_t *sta_netif = ensure_sta_netif();
     if (!sta_netif) {
-        ESP_LOGE("WiFiTask", "esp_netif_create_default_wifi_sta returned NULL");
+        ESP_LOGE("WiFiTask", "ensure_sta_netif returned NULL");
         goto done;
     }
 
@@ -302,19 +347,15 @@ static void wifi_init_task(void *pv) {
         goto done;
     }
     wifi_stack_started = true;
-    ESP_LOGI("WiFiTask", "esp_wifi_start OK; calling esp_wifi_connect()");
-
-    err = esp_wifi_connect();
-    if (err != ESP_OK) {
-        ESP_LOGE("WiFiTask", "esp_wifi_connect failed: %s", esp_err_to_name(err));
-        // continue — event handler will handle disconnects/retries
-    }
+    ESP_LOGI("WiFiTask", "esp_wifi_start OK");
 
 done:
     // free the heap credentials passed in by caller (if any)
     if (pv) {
         free(pv);
     }
+
+    esp_wifi_set_max_tx_power(40);  // 40 * 0.25dBm = 10 dBm (~10mW)
 
     // one-shot task; exit
     vTaskDelete(NULL);
@@ -343,19 +384,6 @@ typedef struct {
     char *json;
 } control_msg_t;
 static QueueHandle_t ctrl_queue = NULL;
-
-// Forward declarations
-static int send_chunked_notify(uint16_t conn_handle,
-                               uint16_t attr_handle,
-                               const uint8_t *frame,
-                               size_t frame_len);
-
-static bool start_mic_streaming(void);
-static void stop_mic_streaming(void);
-void perform_ota_update(void *pvParameters);
-static void ble_send_json_response(const char *json_str);
-static float read_temperature_c(void);
-void ble_on_wifi_creds_received(const char *json_str);
 
 // ======== Concurrency Flags ========
 static atomic_bool mic_active = ATOMIC_VAR_INIT(false);
@@ -400,6 +428,101 @@ static bool adc_conv_done_cb(adc_continuous_handle_t handle,
 
     /* Return true if a context switch is required */
     return mustYield;
+}
+
+
+/* ---------- Helper: ensure default STA netif (avoid double create) ---------- */
+static esp_netif_t* ensure_sta_netif(void)
+{
+    // The default ifkey name used by esp-netif for STA is "WIFI_STA_DEF"
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    if (netif) {
+        ESP_LOGI("WiFi", "Default STA netif already exists -> reusing");
+        return netif;
+    }
+
+    netif = esp_netif_create_default_wifi_sta();
+    if (!netif) {
+        ESP_LOGE("WiFi", "esp_netif_create_default_wifi_sta returned NULL");
+    } else {
+        ESP_LOGI("WiFi", "Created default STA netif");
+    }
+    return netif;
+}
+
+/* Small task to reconfigure Wi-Fi when stack is already started.
+ * Argument: pointer to heap-allocated wifi_creds_t (freed here)
+ */
+static void wifi_reconfigure_task(void *pv)
+{
+    wifi_creds_t *creds = (wifi_creds_t *)pv;
+    if (!creds) vTaskDelete(NULL);
+
+    wifi_mode_t mode;
+    wifi_config_t current_conf;
+    esp_wifi_get_mode(&mode);
+    esp_wifi_get_config(WIFI_IF_STA, &current_conf);
+
+    // Compare new creds against currently configured SSID
+    if (strcmp((char *)current_conf.sta.ssid, creds->ssid) == 0) {
+        ESP_LOGW("WiFiCFG", "Already connected to the same network — skipping reconfig");
+        free(creds);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI("WiFi", "Reconfiguring Wi-Fi with new creds (safe path)");
+
+    // If driver not initialized, bail (caller should create wifi_init_task instead)
+    if (esp_wifi_get_mode(&mode) == ESP_ERR_WIFI_NOT_INIT) {
+        ESP_LOGW("WiFi", "esp_wifi not initialized; cannot reconfigure");
+        free(creds);
+        vTaskDelete(NULL);
+        return;
+    }
+
+
+    ESP_LOGI("WiFi", "Reconfiguring Wi-Fi with new creds (safe path)");
+    // If driver not initialized, bail (caller should create wifi_init_task instead)
+    if (esp_wifi_get_mode(&mode) == ESP_ERR_WIFI_NOT_INIT) {
+        ESP_LOGW("WiFi", "esp_wifi not initialized; cannot reconfigure");
+        free(creds);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    wifi_config_t wifi_config = {0};
+    strncpy((char *)wifi_config.sta.ssid, creds->ssid, sizeof(wifi_config.sta.ssid)-1);
+    strncpy((char *)wifi_config.sta.password, creds->pass, sizeof(wifi_config.sta.password)-1);
+
+    ESP_LOGI("WiFi", "Reconfiguring Wi-Fi — restarting driver to ensure clean state");
+
+    // Force stop/start (safe even if already running)
+    esp_wifi_disconnect();
+    vTaskDelay(pdMS_TO_TICKS(200));
+    esp_wifi_stop();
+
+    while (esp_wifi_stop() == ESP_ERR_WIFI_NOT_INIT) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+
+
+    vTaskDelay(pdMS_TO_TICKS(300));
+
+    esp_err_t rc = esp_wifi_start();
+    if (rc == ESP_OK) {
+        ESP_LOGI("WiFi", "esp_wifi_start after reconfig OK");
+        vTaskDelay(pdMS_TO_TICKS(200));
+        esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+        esp_wifi_connect();
+    } else {
+        ESP_LOGE("WiFi", "esp_wifi_start failed after reconfig: %s", esp_err_to_name(rc));
+    }
+
+
+    free(creds);
+    vTaskDelete(NULL);
 }
 
 
@@ -455,6 +578,19 @@ static void adc_stop(void)
     ESP_LOGI("ADC_CONT", "ADC stopped");
 }
 
+static TaskHandle_t i2s_task_handle = NULL;
+
+// Notify wrappers (safe from any context)
+static inline void notify_i2s_start(void) {
+    if (i2s_task_handle) xTaskNotifyGive(i2s_task_handle);
+}
+
+static inline void notify_i2s_stop(void) {
+    if (i2s_task_handle) {
+        xTaskNotify(i2s_task_handle, 1, eSetBits);  // optional flag
+    }
+}
+
 static void dynamic_pm_task(void *arg)
 {
 #ifdef CONFIG_PM_ENABLE
@@ -491,34 +627,84 @@ static void dynamic_pm_task(void *arg)
 
 
 /* ---------- I2S (INMP441) ---------- */
-static void i2s_init_inmp441(void) {
-    i2s_chan_config_t chan_cfg = {
-        .id = I2S_PORT_NUM,
-        .role = I2S_ROLE_MASTER,
-        .dma_desc_num = 4,
-        .dma_frame_num = 128,
-        .auto_clear = true,
-    };
+static void i2s_init_inmp441(void)
+{
+    esp_err_t rc;
 
-    ESP_ERROR_CHECK(i2s_new_channel(&chan_cfg, NULL, &rx_chan));
+    /* If a channel exists, leave it to caller to destroy — here we try to be idempotent */
+    if (rx_chan) {
+        ESP_LOGI("I2S", "rx_chan already present — skipping new_channel");
+        return;
+    }
 
+    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT_NUM, I2S_ROLE_MASTER);
+    chan_cfg.auto_clear = true;
+    chan_cfg.id = I2S_PORT_NUM;
+
+    rc = i2s_new_channel(&chan_cfg, NULL, &rx_chan);
+    if (rc != ESP_OK) {
+        ESP_LOGE("I2S", "i2s_new_channel failed: %s", esp_err_to_name(rc));
+        rx_chan = NULL;
+        return;
+    }
+
+    /* Standard (PDM/PCM-style) std config tuned for INMP441:
+     * - 16 kHz sample_rate (AUDIO_SAMPLE_RATE)
+     * - 32-bit slots (INMP441 gives 24 useful bits in a 32-bit slot)
+     * - mono left (L/R tied to GND => left)
+     */
     i2s_std_config_t std_cfg = {
-        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(16000),
-        .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO),
+        .clk_cfg = {
+            .sample_rate_hz = AUDIO_SAMPLE_RATE,
+            .clk_src = I2S_CLK_SRC_DEFAULT,
+            .mclk_multiple = I2S_MCLK_MULTIPLE_256,
+        },
+        .slot_cfg = {
+            .data_bit_width = I2S_DATA_BIT_WIDTH_32BIT,
+            .slot_bit_width = I2S_SLOT_BIT_WIDTH_32BIT,
+            .slot_mode = I2S_SLOT_MODE_MONO,
+            .slot_mask = I2S_STD_SLOT_LEFT,      // left channel (LR tied low)
+            .ws_width = I2S_DATA_BIT_WIDTH_32BIT,
+            .ws_pol = false,
+            .bit_shift = true,
+        },
         .gpio_cfg = {
             .mclk = I2S_GPIO_UNUSED,
             .bclk = I2S_BCK_IO,
             .ws   = I2S_WS_IO,
             .dout = I2S_GPIO_UNUSED,
             .din  = I2S_DATA_IN_IO,
-        }
+        },
     };
-    std_cfg.slot_cfg.slot_mask = I2S_STD_SLOT_LEFT;
 
-    ESP_ERROR_CHECK(i2s_channel_init_std_mode(rx_chan, &std_cfg));
-    ESP_ERROR_CHECK(i2s_channel_enable(rx_chan));
+    rc = i2s_channel_init_std_mode(rx_chan, &std_cfg);
+    if (rc != ESP_OK) {
+        ESP_LOGE("I2S", "i2s_channel_init_std_mode failed: %s", esp_err_to_name(rc));
+        if (rx_chan) {
+            i2s_del_channel(rx_chan);
+            rx_chan = NULL;
+        }
+        return;
+    }
 
-    ESP_LOGI(TAG, "I2S initialized: BCLK=%d WS=%d DIN=%d", I2S_BCK_IO, I2S_WS_IO, I2S_DATA_IN_IO);
+    /* small settle time for WS/BCLK lines */
+    vTaskDelay(pdMS_TO_TICKS(30));
+
+    rc = i2s_channel_enable(rx_chan);
+    if (rc != ESP_OK) {
+        ESP_LOGE("I2S", "i2s_channel_enable failed: %s", esp_err_to_name(rc));
+        i2s_del_channel(rx_chan);
+        rx_chan = NULL;
+        return;
+    }
+
+    ESP_LOGI("I2S_DBG", "Pin levels: BCK=%d WS=%d DIN=%d",
+    gpio_get_level(I2S_BCK_IO),
+    gpio_get_level(I2S_WS_IO),
+    gpio_get_level(I2S_DATA_IN_IO));
+
+
+    ESP_LOGI("I2S", "INMP441 initialized and enabled (%u Hz, 32-bit mono left)", AUDIO_SAMPLE_RATE);
 }
 
 // ─────────────────────────────────────────────
@@ -616,7 +802,23 @@ void mic_test_task_debug(void *param) {
     size_t bytes_read = 0;
     ESP_LOGI(TAG, "Starting mic test task...");
 
+    esp_err_t e = i2s_channel_enable(rx_chan);
+    if (e != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to enable I2S RX channel: %s", esp_err_to_name(e));
+    } else {
+        ESP_LOGI(TAG, "RX channel enabled for mic test");
+    }
+
+
     while (1) {
+
+    if (!rx_chan) {
+        ESP_LOGW("DBG", "rx_chan not ready yet, waiting...");
+        vTaskDelay(pdMS_TO_TICKS(500));
+        continue;
+    }
+
+
         esp_err_t ret = i2s_channel_read(rx_chan, buf, sizeof(buf), &bytes_read, portMAX_DELAY);
         if (ret == ESP_OK && bytes_read > 0) {
             size_t samples = bytes_read / sizeof(int32_t);
@@ -632,129 +834,431 @@ void mic_test_task_debug(void *param) {
     }
 }
 
+// NOTE: call this ONLY from i2s_capture_task context.
+static void i2s_del_channel_from_capture(void)
+{
+    if (rx_chan) {
+        ESP_LOGI("I2S", "Capture task performing i2s del channel");
+        // try to disable the channel first (safe if already disabled)
+        esp_err_t rc = i2s_channel_disable(rx_chan);
+        if (rc != ESP_OK && rc != ESP_ERR_INVALID_STATE) {
+            ESP_LOGW("I2S", "i2s_channel_disable rc=%s", esp_err_to_name(rc));
+        }
+        i2s_del_channel(rx_chan);
+        rx_chan = NULL;
+    }
+}
+
+
 static bool start_mic_streaming(void) {
     bool expected = false;
     if (!atomic_compare_exchange_strong(&mic_active, &expected, true)) {
         ESP_LOGW(TAG, "Mic already active");
         return false;
     }
+
+    ESP_LOGI(TAG, "Starting mic streaming...");
     atomic_store(&streaming, true);
+    atomic_store(&i2s_deinit_requested, false);
+
+    // Always recreate RX channel fresh
+    if (rx_chan) {
+        ESP_LOGW(TAG, "Destroying stale I2S channel before reinit");
+        i2s_channel_disable(rx_chan);
+        i2s_del_channel(rx_chan);
+        rx_chan = NULL;
+    }
+
+    if (rx_chan && !atomic_load(&i2s_deinit_requested)) {
+        ESP_LOGI(TAG, "Reusing existing I2S channel");
+    } else {
+        i2s_init_inmp441();
+    }
+
+    if (!rx_chan) {
+        ESP_LOGE(TAG, "I2S init failed; aborting mic start");
+        atomic_store(&mic_active, false);
+        return false;
+    }
+
+    // Channel is ready to go
+    notify_i2s_start();
     return true;
 }
 
 static void stop_mic_streaming(void) {
+    ESP_LOGI(TAG, "Stopping mic streaming...");
     atomic_store(&streaming, false);
     atomic_store(&mic_active, false);
+
+    // Request capture task to stop cleanly and deinit the I2S channel when safe.
+    atomic_store(&i2s_deinit_requested, true);
+    notify_i2s_stop();
+
+    // Optional: wait briefly for i2s_capture_task to complete its shutdown.
+    // Do not block too long in case this is called from BLE context; use short timeout.
+    for (int i = 0; i < 50; ++i) { // ~50 * 10 ms = 500 ms max
+        if (!rx_chan) break; // capture task finished and cleared rx_chan
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    if (rx_chan) {
+        ESP_LOGW("I2S", "stop_mic_streaming timeout waiting for capture task to deinit; leaving rx_chan (it will be cleaned later)");
+    } else {
+        ESP_LOGI("I2S", "I2S channel deinitialized cleanly");
+    }
 }
 
-// ─────────────────────────────────────────────
-// Dedicated Wi-Fi sender task — async HTTP/WS sends
-// ─────────────────────────────────────────────
+
+/* Recommended replacement wifi_send_task with safer sends and better logging */
 static void wifi_send_task(void *arg)
 {
-    wifi_frame_t frame;
+    wifi_frame_t *frame = NULL;
 
-    ESP_LOGI("WiFiSendTask", "Wi-Fi sender task started");
+    ESP_LOGI("WiFiSendTask", "Wi-Fi sender task started (improved)");
 
-    while (1) {
-        if (xQueueReceive(wifi_send_q, &frame, portMAX_DELAY) == pdTRUE) {
-            if (ws_client_audio && esp_websocket_client_is_connected(ws_client_audio)) {
-                esp_websocket_client_send_bin(ws_client_audio, (const char *)frame.data, frame.len, portMAX_DELAY);
+    const size_t WS_SEND_CHUNK = 1024;      // send in 1 KiB chunks (tune as needed)
+    const int MAX_SEND_RETRIES = 5;
+    const int BASE_TIMEOUT_MS = 3000;       // per-attempt timeout (increase from 1s)
+    const int RESTART_AFTER_FAIL = 3;       // restart ws_client_audio after these many failures
+
+    for (;;) {
+        /* Wait for a frame to appear in the outgoing queue */
+        if (xQueueReceive(wifi_send_q, &frame, portMAX_DELAY) != pdTRUE) {
+            continue;
+        }
+        if (!frame || !frame->data || frame->len == 0) {
+            free_wifi_frame(frame);
+            frame = NULL;
+            continue;
+        }
+
+        /* If audio WS isn't connected, try a few requeues; else drop */
+        if (!ws_client_audio || !esp_websocket_client_is_connected(ws_client_audio)) {
+            ESP_LOGW("WiFiSendTask", "Audio WS not ready, attempting requeue");
+            if (xQueueSend(wifi_send_q, &frame, pdMS_TO_TICKS(200)) != pdTRUE) {
+                ESP_LOGW("WiFiSendTask", "Requeue failed — dropping frame");
+                free_wifi_frame(frame);
             } else {
-                ESP_LOGW("WiFiSendTask", "Audio WS not ready, dropping frame");
+                ESP_LOGI("WiFiSendTask", "Frame requeued");
+            }
+            frame = NULL;
+            vTaskDelay(pdMS_TO_TICKS(10));
+            continue;
+        }
+
+        /* We'll attempt to send the frame in smaller websocket sends */
+        size_t total = frame->len;
+        size_t offset = 0;
+        int consecutive_failures = 0;
+        int send_attempts = 0;
+
+        while (offset < total) {
+            size_t remaining = total - offset;
+            size_t take = MIN(WS_SEND_CHUNK, remaining);
+            esp_err_t rc = ESP_FAIL;
+            int attempt = 0;
+            int per_attempt_timeout = BASE_TIMEOUT_MS;
+
+            for (attempt = 0; attempt < MAX_SEND_RETRIES; ++attempt) {
+                rc = esp_websocket_client_send_bin(ws_client_audio,
+                                                  (const char *)(frame->data + offset),
+                                                  take,
+                                                  per_attempt_timeout);
+                if (rc == ESP_OK) break;
+
+                ESP_LOGW("WiFiSendTask", "ws send failed attempt %d rc=%d (%s) offset=%u/%u",
+                         attempt + 1, rc, esp_err_to_name(rc), (unsigned)offset, (unsigned)total);
+
+                /* If not connected according to client, break early */
+                if (!esp_websocket_client_is_connected(ws_client_audio)) {
+                    ESP_LOGW("WiFiSendTask", "ws_client_audio reports disconnected after send failure");
+                    break;
+                }
+
+                /* Exponential backoff between retries */
+                vTaskDelay(pdMS_TO_TICKS(100 * (attempt + 1)));
+                per_attempt_timeout = MIN(per_attempt_timeout * 2, 10000); // cap
+            }
+
+            if (rc != ESP_OK) {
+                consecutive_failures++;
+                frames_dropped++;
+
+                ESP_LOGW("WiFiSendTask", "Send permanently failed for chunk at offset %u (consec fails=%d). rc=%d (%s)",
+                         (unsigned)offset, consecutive_failures, rc, esp_err_to_name(rc));
+
+                /* If the WS client appears connected but send keeps failing, try restart */
+                if (consecutive_failures >= RESTART_AFTER_FAIL) {
+                    ESP_LOGW("WiFiSendTask", "Too many consecutive send failures — restarting audio WS client");
+                    if (ws_client_audio) {
+                        esp_websocket_client_stop(ws_client_audio);
+                        esp_websocket_client_destroy(ws_client_audio);
+                        ws_client_audio = NULL;
+                        atomic_store(&ws_audio_connected, false);
+                    }
+                    /* give reconnect a chance: requeue the frame once more and break */
+                    if (xQueueSend(wifi_send_q, &frame, pdMS_TO_TICKS(200)) != pdTRUE) {
+                        ESP_LOGW("WiFiSendTask", "Requeue after restart failed — dropping frame");
+                        free_wifi_frame(frame);
+                    } else {
+                        ESP_LOGI("WiFiSendTask", "Frame requeued after ws restart");
+                    }
+                    frame = NULL;
+                    vTaskDelay(pdMS_TO_TICKS(200)); // breathing room
+                    break;
+                } else {
+                    /* drop this chunk and continue to next chunk (best-effort) */
+                    offset += take;
+                    /* minor delay to avoid tight loop */
+                    vTaskDelay(pdMS_TO_TICKS(5));
+                    continue;
+                }
+            } else {
+                /* success: advance */
+                offset += take;
+                consecutive_failures = 0;
+                send_attempts++;
+                vTaskDelay(pdMS_TO_TICKS(1)); // yield to Wi-Fi stack
+            }
+        } /* end per-frame send loop */
+
+        /* if frame still valid and not recycled by requeue logic, free it */
+        if (frame) {
+            free_wifi_frame(frame);
+            frame = NULL;
+        }
+    } /* outer for */
+}
+
+/* ---------- I2S capture task (BLOCKING) ---------- */
+void i2s_capture_task(void *pvParameters)
+{
+    ESP_LOGI("I2S_CAP", "i2s_capture_task start (blocking-read)");
+    esp_task_wdt_add(NULL);
+
+    /* use a moderate blocking read size; must be <= the DMA buffer you allocated */
+    const size_t bytes_per_read = I2S_BUF_SIZE;
+    const size_t target_us = 120000;  // 120 ms cadence target in microseconds
+
+    static uint8_t batch_buf[MAX_BATCH_PCM_BYTES];
+    size_t batch_offset = 0;
+    size_t batch_frames = 0;
+    uint64_t last_ts = esp_timer_get_time();
+
+    frames_dropped = 0;
+
+    for (;;) {
+        /* Wait until mic_active (notify-based) */
+        while (!atomic_load(&mic_active)) {
+            /* block with timeout so WDT can be serviced */
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
+            if (!atomic_load(&mic_active)) {
+                esp_task_wdt_reset();
+                continue;
+            }
+            break;
+        }
+
+        /* Ensure rx_chan exists; try to init once if missing */
+        if (!rx_chan && atomic_load(&mic_active)) {
+            ESP_LOGI("I2S_CAP", "rx_chan NULL — initializing");
+            i2s_init_inmp441();
+            if (!rx_chan) {
+                ESP_LOGE("I2S_CAP", "i2s init failed; retrying in 200 ms");
+                vTaskDelay(pdMS_TO_TICKS(200));
+                continue;
             }
         }
-    }
+
+        batch_offset = 0;
+        batch_frames = 0;
+        last_ts = esp_timer_get_time();
+
+        /* Main capture loop — blocking read until mic deactivated */
+        while (atomic_load(&mic_active)) {
+            esp_task_wdt_reset();
+
+            size_t bytes_read = 0;
+
+            if (!rx_chan) {
+                ESP_LOGE("I2S_CAP", "rx_chan unexpectedly NULL inside capture");
+                break;
+            }
+
+            /* BLOCKING read: wait until DMA provides data */
+            esp_err_t ret = i2s_channel_read(rx_chan,
+                                            (void *)i2s_dma_buf,
+                                            bytes_per_read,
+                                            &bytes_read,
+                                            portMAX_DELAY);  // block indefinitely (until data)
+            if (ret == ESP_OK && bytes_read == 0) {
+                /* weird but harmless — small yield */
+                vTaskDelay(pdMS_TO_TICKS(2));
+                continue;
+            }
+
+            if (ret != ESP_OK) {
+                ESP_LOGW("I2S_CAP", "i2s_channel_read returned %s — attempting graceful recovery", esp_err_to_name(ret));
+                /* try one quick cycle to reset DMA state, then break to outer loop for reinit */
+                if (rx_chan) {
+                    i2s_channel_disable(rx_chan);
+                    i2s_del_channel(rx_chan);
+                    rx_chan = NULL;
+                }
+                break;
+            }
+
+            /* Convert 32-bit samples -> 16-bit and append to batch buffer */
+            int32_t *src = (int32_t *)i2s_dma_buf;
+            size_t samples = bytes_read / sizeof(int32_t);
+            size_t max_samples = (MAX_BATCH_PCM_BYTES - batch_offset) / sizeof(int16_t);
+            if (samples > max_samples) samples = max_samples;
+
+            int16_t *dst = (int16_t *)(batch_buf + batch_offset);
+            for (size_t i = 0; i < samples; ++i) {
+                /* shift down from 32-bit slot; >>8 preserves top 24 bits */
+                dst[i] = (int16_t)(src[i] >> 8);
+            }
+
+            batch_offset += samples * sizeof(int16_t);
+            batch_frames++;
+
+            /* When enough frames collected, package and enqueue */
+            if (batch_frames >= FRAMES_PER_BATCH) {
+                uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
+                uint16_t seq = (uint16_t)__atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
+                size_t frame_len = 8 + batch_offset;
+
+                pack_header(audio_frame_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
+                memcpy(audio_frame_buf + 8, batch_buf, batch_offset);
+
+                wifi_frame_t *wframe = alloc_wifi_frame(frame_len);
+                if (wframe) {
+                    memcpy(wframe->data, audio_frame_buf, frame_len);
+                    wframe->len = frame_len;
+                    if (xQueueSend(wifi_send_q, &wframe, pdMS_TO_TICKS(50)) != pdTRUE) {
+                        free_wifi_frame(wframe);
+                        frames_dropped++;
+                    } else {
+                        frames_sent++;
+                    }
+                } else {
+                    ESP_LOGE("WiFiQueue", "alloc_wifi_frame failed — dropping batch");
+                    frames_dropped++;
+                }
+
+                batch_offset = 0;
+                batch_frames = 0;
+
+                /* keep rough cadence but let blocking reads determine pacing */
+                uint64_t now_ts = esp_timer_get_time();
+                int64_t remain_us = (int64_t)target_us - (int64_t)(now_ts - last_ts);
+                if (remain_us > 0) {
+                    vTaskDelay(pdMS_TO_TICKS((remain_us + 999) / 1000));
+                }
+                last_ts = esp_timer_get_time();
+            }
+        } /* inner while (mic_active) */
+
+        /* Graceful disable on mic stop */
+        ESP_LOGI("I2S_CAP", "Mic deactivated — disabling RX channel (if present)");
+        if (rx_chan) {
+            esp_err_t dis = i2s_channel_disable(rx_chan);
+            if (dis != ESP_OK && dis != ESP_ERR_INVALID_STATE) {
+                ESP_LOGW("I2S_CAP", "i2s_channel_disable rc=%s", esp_err_to_name(dis));
+            }
+        }
+
+        if (atomic_load(&i2s_deinit_requested)) {
+            atomic_store(&i2s_deinit_requested, false);
+            i2s_del_channel_from_capture();
+        }
+
+        esp_task_wdt_reset();
+    } /* outer for */
 }
 
-/* ---------- I2S capture task (DMA-safe, cache-coherent) ---------- */
-static void i2s_capture_task(void *arg)
+static TaskHandle_t wifi_watchdog_handle = NULL;
+
+void wifi_watchdog_task(void *arg)
 {
-    esp_task_wdt_add(NULL);
-    ESP_LOGI(TAG, "i2s_capture_task start (Wi-Fi-only streaming mode)");
+    ESP_LOGI("WiFiWDT", "wifi_watchdog_task started");
+    atomic_store(&wifi_wdt_active, true);
 
-    const uint32_t frame_ms = 10; // 10 ms per read
-    const size_t frame_samples = (AUDIO_SAMPLE_RATE / 1000) * frame_ms; // 160 samples @16kHz
-    const size_t bytes_per_read = frame_samples * sizeof(int32_t);       // bytes read from i2s
-    const size_t pcm_bytes = frame_samples * sizeof(int16_t);           // downmixed bytes
-    const TickType_t i2s_read_timeout = pdMS_TO_TICKS(8);
+    const uint32_t reconnect_interval_ms = 10000;
+    // how long we require stable connection before auto-stopping the watchdog (optional)
+    const uint32_t stable_ms_required = 10000;
+    uint64_t stable_since = 0;
 
-    // Sanity: ensure global DMA buffers are allocated and big enough
-    if (!i2s_dma_buf || !pcm_dma_buf) {
-        ESP_LOGE(TAG, "i2s_capture_task: DMA buffers not allocated");
-        vTaskDelete(NULL);
-        return;
-    }
-
-    // If you allocated larger buffers earlier (e.g. 2048), it's safe to use bytes_per_read here
-    // Zero the regions we'll use (optional)
-    memset(i2s_dma_buf, 0, bytes_per_read);
-    memset(pcm_dma_buf, 0, pcm_bytes);
-
-    while (1) {
-        esp_task_wdt_reset();
-        vTaskDelay(0);
-
-        if (!atomic_load(&mic_active) || !atomic_load(&ws_audio_connected)) {
-            vTaskDelay(pdMS_TO_TICKS(20));
+    while (atomic_load(&wifi_wdt_active)) {
+        // If the wifi stack isn't up yet, wait a bit and keep looping
+        if (!wifi_stack_started) {
+            vTaskDelay(pdMS_TO_TICKS(2000));
             continue;
         }
 
-        size_t bytes_read = 0;
-        esp_err_t ret = i2s_channel_read(rx_chan, (void *)i2s_dma_buf, bytes_per_read, &bytes_read, i2s_read_timeout);
+        bool is_connected = atomic_load(&wifi_connected);
 
-        // Ensure CPU cache coherency before reading DMA-filled buffer.
-        // Use the direction flag that corresponds to peripheral -> memory (M2C).
-        // If your IDF variant doesn't expose ESP_CACHE_MSYNC_FLAG_DIR_M2C, check your headers (some versions use C2M).
-        #ifdef ESP_CACHE_MSYNC_FLAG_DIR_M2C
-                esp_cache_msync(i2s_dma_buf, bytes_read, ESP_CACHE_MSYNC_FLAG_DIR_M2C);
-        #elif defined(ESP_CACHE_MSYNC_FLAG_DIR_C2M)
-                // If only C2M is present in your IDF, use it (observed on some IDF releases).
-                esp_cache_msync(i2s_dma_buf, bytes_read, ESP_CACHE_MSYNC_FLAG_DIR_C2M);
-        #else
-                // Fallback: no-op - but prefer to update IDF or call the correct cache API on your platform.
-        #endif
-
-        esp_task_wdt_reset();
-
-        if (ret != ESP_OK || bytes_read == 0) {
-            vTaskDelay(pdMS_TO_TICKS(2));
-            continue;
+        if (!is_connected) {
+            ESP_LOGW("WiFiWDT", "Not connected — requesting esp_wifi_connect()");
+            esp_err_t rc = esp_wifi_connect();
+            if (rc != ESP_OK) {
+                ESP_LOGW("WiFiWDT", "esp_wifi_connect returned %s", esp_err_to_name(rc));
+            }
+            stable_since = 0; // reset stable timer
+        } else {
+            // connection present: start/continue stable timer
+            if (stable_since == 0) stable_since = esp_timer_get_time() / 1000ULL;
+            else {
+                uint64_t now = esp_timer_get_time() / 1000ULL;
+                if (now - stable_since >= stable_ms_required) {
+                    ESP_LOGI("WiFiWDT", "Wi-Fi stable for %u ms — stopping watchdog", stable_ms_required);
+                    atomic_store(&wifi_wdt_active, false);
+                    break;
+                }
+            }
         }
 
-        size_t samples = bytes_read / sizeof(int32_t);
-        if (samples > frame_samples) samples = frame_samples;
-
-        // Downsample (24bit >> 16bit)
-
-        int32_t *src = i2s_dma_buf;
-        int16_t *dst = pcm_dma_buf;
-        for (size_t i = 0; i < samples; i++) {
-            *dst++ = (int16_t)(*src++ >> 8);
-        }
-
-        size_t frame_len = 8 + (samples * sizeof(int16_t));
-        if (frame_len > MAX_FRAME_SIZE) frame_len = MAX_FRAME_SIZE;
-
-        uint32_t ts = (uint32_t)(esp_timer_get_time() / 1000ULL);
-        uint16_t seq = (uint16_t)__atomic_fetch_add(&seq_counter, 1, __ATOMIC_SEQ_CST);
-        pack_header(audio_frame_buf, 0x01, AUDIO_FLAG_PCM, seq, ts);
-        memcpy(audio_frame_buf + 8, (uint8_t *)pcm_dma_buf, frame_len - 8);
-
-        wifi_frame_t frame;
-        frame.len = frame_len;
-        memcpy(frame.data, audio_frame_buf, frame_len);
-        if (xQueueSend(wifi_send_q, &frame, 0) != pdTRUE) {
-            ESP_LOGW("WiFiQueue", "Wi-Fi send queue full, dropping frame");
-        }
-
-        esp_task_wdt_reset();
-        taskYIELD(); // micro breathing delay
+        vTaskDelay(pdMS_TO_TICKS(reconnect_interval_ms));
     }
 
-    // Do NOT free global buffers here (they are owned by whole-app lifecycle)
+    ESP_LOGI("WiFiWDT", "wifi_watchdog_task exiting");
+    wifi_watchdog_handle = NULL;
     vTaskDelete(NULL);
 }
+
+static void start_wifi_watchdog_if_needed(void)
+{
+    if (wifi_watchdog_handle != NULL) return; // already running
+    if (xTaskCreate(wifi_watchdog_task, "wifi_watchdog", 4096, NULL, 5, &wifi_watchdog_handle) != pdPASS) {
+        ESP_LOGE("WiFiWDT", "Failed to start wifi_watchdog_task");
+        wifi_watchdog_handle = NULL;
+    } else {
+        ESP_LOGI("WiFiWDT", "Watchdog started");
+    }
+}
+
+static void stop_wifi_watchdog(void)
+{
+    // polite stop: set flag and wait for task to exit
+    atomic_store(&wifi_wdt_active, false);
+    if (wifi_watchdog_handle != NULL) {
+        // don't call vTaskDelete() blindly from arbitrary context; the task will exit itself.
+        // Optionally, wait a short time for it to exit:
+        for (int i = 0; i < 10 && wifi_watchdog_handle != NULL; i++) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+        if (wifi_watchdog_handle != NULL) {
+            // as last resort, delete (only if you truly need immediate stop)
+            vTaskDelete(wifi_watchdog_handle);
+            wifi_watchdog_handle = NULL;
+            ESP_LOGW("WiFiWDT", "Watchdog force-deleted");
+        } else {
+            ESP_LOGI("WiFiWDT", "Watchdog stopped cleanly");
+        }
+    }
+}
+
 
 /* ---------- FSR ADC (BLE Notify) ---------- */
 static void pSensor_task(void *arg)
@@ -820,8 +1324,10 @@ static void control_task(void *arg)
     while (1) {
         if (xQueueReceive(ctrl_queue, &msg, portMAX_DELAY) == pdTRUE) {
             LOG_CTRL("rx JSON: %s", msg.json);
-            char ack_buf[64];
-            snprintf(ack_buf, sizeof(ack_buf), "{\"status\":\"RCVD\",\"msg\":\"%.32s\"}", msg.json);
+            char ack_buf[160];
+            snprintf(ack_buf, sizeof(ack_buf),
+                     "{\"status\":\"RCVD\",\"msg\":\"%s\"}", msg.json ? msg.json : "");
+
             ble_send_json_response(ack_buf);
 
 
@@ -896,12 +1402,20 @@ static int send_chunked_notify(uint16_t conn_handle,
         size_t remaining = frame_len - offset;
         size_t take = MIN(chunk_size, remaining);
 
-        // Reuse pre-allocated static notify_buf instead of stack buffer
-        if (offset == 0)
+                // Reuse pre-allocated static notify_buf instead of stack buffer
+        // Always copy the 8-byte header into the start of notify_buf on first chunk,
+        // then copy payload chunks from frame+8+offset (skip the 8-byte header).
+        if (offset == 0) {
             memcpy(notify_buf, frame, 8);
-        memcpy(notify_buf + 8, frame + offset, take);
+        }
 
-        struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + take);
+        size_t safe_take = MIN(take, (size_t)(MAX_NOTIFY_BUF - 8));
+        /* Source must skip the 8-byte header: payload starts at frame + 8.
+           For chunk N we copy from frame + 8 + offset. */
+        memcpy(notify_buf + 8, frame + 8 + offset, safe_take);
+
+        // create mbuf only for the amount actually copied (8 + safe_take)
+        struct os_mbuf *om = ble_hs_mbuf_from_flat(notify_buf, 8 + safe_take);
 
         if (!om) {
             vTaskDelay(pdMS_TO_TICKS(3)); // back off slightly
@@ -919,7 +1433,8 @@ static int send_chunked_notify(uint16_t conn_handle,
             continue;
         }
 
-        offset += take;
+        /* advance by the number of bytes actually copied */
+        offset += safe_take;
         consecutive_failures = 0;
 
         if (rc == 0) {
@@ -928,6 +1443,7 @@ static int send_chunked_notify(uint16_t conn_handle,
             ble_backoff_ms = MIN(50, ble_backoff_ms + 5); // slow down
         }
         vTaskDelay(pdMS_TO_TICKS(ble_backoff_ms));
+
     }
 
     return 0;
@@ -1027,6 +1543,13 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg) {
 
             case BLE_GAP_EVENT_DISCONNECT:
                 ESP_LOGW(TAG, "Client disconnected (reason=%d)", event->disconnect.reason);
+
+                ESP_LOGI("BLE", "Client disconnected, stopping Wi-Fi watchdog...");
+                if (wifi_watchdog_handle != NULL) {
+                    stop_wifi_watchdog();
+                    wifi_watchdog_handle = NULL;
+                }
+
 
                 // Atomic BLE state reset
                 atomic_store(&mic_active, false);
@@ -1144,7 +1667,6 @@ static void nimble_host_task(void *param) {
 
 /* Initialize NimBLE */
 static void init_nimble(void) {
-    esp_err_t rc;
 
     // Initialize nimble host stack
     nimble_port_init();
@@ -1203,7 +1725,7 @@ static void save_wifi_creds(const char *ssid, const char *pass, const char *ip, 
         nvs_set_str(nvs, "port", port);
         nvs_commit(nvs);
         nvs_close(nvs);
-        ESP_LOGI("WiFiNVS", "Saved Wi-Fi creds: SSID=%s IP=%s PORT=%s", ssid, ip, port);
+        ESP_LOGI("WiFiNVS", "Saved Wi-Fi creds: SSID=%s SERVER=%s:%s", ssid, ip, port);
     } else {
         ESP_LOGE("WiFiNVS", "Failed to open NVS for Wi-Fi save");
     }
@@ -1249,6 +1771,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         case WEBSOCKET_EVENT_DISCONNECTED:
             if (client == ws_client_ctrl) {
                 atomic_store(&wifi_connected, false);
+                atomic_store(&ws_ctrl_connected, false);
                 ESP_LOGW("WS", "Control WS disconnected");
                 ws_action_t a = WS_ACTION_DESTROY_CTRL;
                 xQueueSend(ws_mgr_q, &a, 0);
@@ -1273,37 +1796,56 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
             break;
 
         case WEBSOCKET_EVENT_DATA:
-            // Only parse JSON on control socket. Audio socket will deliver binary frames we ignore here.
             if (client == ws_client_ctrl) {
-                // data->data_ptr is not null-terminated — use ParseWithLength as you did.
-                cJSON *root = cJSON_ParseWithLength(data->data_ptr, data->data_len);
-                if (root) {
+                const char *buf = data->data_ptr;
+                size_t len = data->data_len;
+
+                // Sanity: ignore empty or non-printable frames
+                if (!buf || len < 2) break;
+                bool printable = true;
+                for (size_t i = 0; i < len; i++) {
+                    if (buf[i] < 0x09 || buf[i] > 0x7E) { // outside normal text range
+                        printable = false;
+                        break;
+                    }
+                }
+                if (!printable) {
+                    ESP_LOGD("WS", "[CTRL] Ignored non-text frame (len=%d)", (int)len);
+                    break;
+                }
+
+                // Skip whitespace
+                while (len && isspace((unsigned char)*buf)) {
+                    buf++; len--;
+                }
+
+                // Must start and end like JSON
+                if (len < 2 || !((*buf == '{' && buf[len - 1] == '}') ||
+                    (*buf == '[' && buf[len - 1] == ']'))) {
+                    ESP_LOGD("WS", "[CTRL] Ignored frame (no JSON delimiters, len=%d)", (int)data->data_len);
+                    break;
+                    }
+
+                    // Parse safely
+                    cJSON *root = cJSON_ParseWithLength(buf, len);
+                    if (!root) {
+                        ESP_LOGD("WS", "[CTRL] Invalid JSON ignored (len=%d)", (int)len);
+                        break;
+                    }
+
                     cJSON *cmd = cJSON_GetObjectItem(root, "command");
                     if (cmd && cJSON_IsObject(cmd)) {
-                        // Serialize the object to a string (bounded), then send to ctrl_queue
                         char *json_str = cJSON_PrintUnformatted(cmd);
                         if (json_str) {
                             control_msg_t msg = { .len = strlen(json_str), .json = json_str };
-                            if (ctrl_queue && xQueueSend(ctrl_queue, &msg, pdMS_TO_TICKS(10)) == pdTRUE) {
-                                ESP_LOGI("WS", "Enqueued WS control JSON for processing");
-                            } else {
-                                ESP_LOGW("WS", "Control queue full or missing; dropping WS JSON");
+                            if (!ctrl_queue || xQueueSend(ctrl_queue, &msg, pdMS_TO_TICKS(10)) != pdTRUE)
                                 free(json_str);
-                            }
-                        } else {
-                            ESP_LOGW("WS", "Failed to stringify WS JSON command");
                         }
                     }
-
                     cJSON_Delete(root);
-                } else {
-                    ESP_LOGW("WS", "Control WS: invalid JSON received");
-                }
-            } else if (client == ws_client_audio) {
-                // Audio frames are arriving here as binary — server writes them to disk. No-op on device.
-                // Optionally you can monitor incoming server messages on this socket if your server sends acks.
             }
             break;
+
 
         default:
             break;
@@ -1371,21 +1913,45 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
         // Let the watchdog manage backoff/reconnect attempts; still call connect once
         esp_wifi_connect();
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-        atomic_store(&wifi_connected, true);
+
+        ESP_LOGI(WIFI_TAG, "Flushing stale WS handles before reconnect...");
+        if (ws_client_ctrl) {
+            esp_websocket_client_stop(ws_client_ctrl);
+            esp_websocket_client_destroy(ws_client_ctrl);
+            ws_client_ctrl = NULL;
+        }
+        if (ws_client_audio) {
+            esp_websocket_client_stop(ws_client_audio);
+            esp_websocket_client_destroy(ws_client_audio);
+            ws_client_audio = NULL;
+        }
+
         ESP_LOGI(WIFI_TAG, "Connected to Wi-Fi");
+
+        // Do NOT use SSL transport here unless URI starts with wss://
+        // The esp-tls layer will hang like a drunken cat on a ceiling fan.
 
         // Create / start control WS client
         esp_websocket_client_config_t ctrl_cfg = {
-            .uri = WS_CTRL_URI[0] ? WS_CTRL_URI : "ws://0.0.0.0:0/ws",
+            .uri = WS_CTRL_URI,
+            .transport = WEBSOCKET_TRANSPORT_OVER_TCP,
             .reconnect_timeout_ms = 3000,
             .keep_alive_idle = 10,
             .keep_alive_interval = 10,
             .keep_alive_count = 3,
             .network_timeout_ms = 10000
         };
+
+        if (ws_client_ctrl) {
+            esp_websocket_client_stop(ws_client_ctrl);
+            esp_websocket_client_destroy(ws_client_ctrl);
+            ws_client_ctrl = NULL;
+        }
+
         ws_client_ctrl = esp_websocket_client_init(&ctrl_cfg);
         if (ws_client_ctrl) {
-            esp_websocket_register_events(ws_client_ctrl, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)ws_client_ctrl);
+            esp_websocket_register_events(ws_client_ctrl, WEBSOCKET_EVENT_ANY,
+                                          websocket_event_handler, (void *)ws_client_ctrl);
             esp_websocket_client_start(ws_client_ctrl);
             ESP_LOGI(WIFI_TAG, "Control WS client started (%s)", WS_CTRL_URI);
             atomic_store(&ws_ctrl_connected, true);
@@ -1396,16 +1962,25 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
         // Create / start audio WS client
         esp_websocket_client_config_t audio_cfg = {
-            .uri = WS_AUDIO_URI[0] ? WS_AUDIO_URI : "ws://0.0.0.0:0/data/audio",
+            .uri = WS_AUDIO_URI,
+            .transport = WEBSOCKET_TRANSPORT_OVER_TCP,
+            .network_timeout_ms = 10000,
             .reconnect_timeout_ms = 3000,
             .keep_alive_idle = 10,
             .keep_alive_interval = 10,
             .keep_alive_count = 3
-            
         };
+
+        if (ws_client_audio) {
+            esp_websocket_client_stop(ws_client_audio);
+            esp_websocket_client_destroy(ws_client_audio);
+            ws_client_audio = NULL;
+        }
+
         ws_client_audio = esp_websocket_client_init(&audio_cfg);
         if (ws_client_audio) {
-            esp_websocket_register_events(ws_client_audio, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)ws_client_audio);
+            esp_websocket_register_events(ws_client_audio, WEBSOCKET_EVENT_ANY,
+                                          websocket_event_handler, (void *)ws_client_audio);
             esp_websocket_client_start(ws_client_audio);
             ESP_LOGI(WIFI_TAG, "Audio WS client started (%s)", WS_AUDIO_URI);
             atomic_store(&ws_audio_connected, true);
@@ -1421,118 +1996,6 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-static void wifi_watchdog_task(void *arg) {
-    const int SOFT_RESET_AFTER = 10;
-    const int HARD_REBOOT_AFTER  = 60;
-    int wifi_retry = 0;
-    int backoff_ms = 1000;
-    const int BACKOFF_CAP_MS = 15000;
-
-    ESP_LOGI("WiFiWD", "Wi-Fi watchdog started");
-
-    // Runtime stack usage snapshot (words remain)
-    UBaseType_t high_water = uxTaskGetStackHighWaterMark(NULL);
-    ESP_LOGI("WiFiWD", "wifi_wdt_task stack high-water (words): %u", (unsigned)high_water);
-
-    static uint64_t last_connect_attempt_ms = 0;
-
-    while (1) {
-
-        if (!wifi_stack_started) {
-            vTaskDelay(pdMS_TO_TICKS(2000));
-            continue;
-        }
-
-        bool is_connected = atomic_load(&wifi_connected);
-        if (is_connected) {
-            if (wifi_retry != 0) {
-                ESP_LOGI("WiFiWD", "Wi-Fi recovered after %d retries", wifi_retry);
-            }
-            wifi_retry = 0;
-            backoff_ms = 1000;
-            vTaskDelay(pdMS_TO_TICKS(5000));
-            continue;
-        }
-
-        // Not connected — try to reconnect with backoff
-        wifi_retry++;
-        ESP_LOGW("WiFiWD", "Wi-Fi disconnected (retry %d). backoff=%dms", wifi_retry, backoff_ms);
-
-        // Throttle connect attempts so we don't spam the driver (and avoid deep stack churn)
-        uint64_t now_ms = esp_timer_get_time() / 1000ULL;
-        if (now_ms - last_connect_attempt_ms > 10000) { // at least 10s between attempts
-
-            wifi_mode_t mode;
-            esp_err_t st = esp_wifi_get_mode(&mode);
-            if (st == ESP_ERR_WIFI_NOT_INIT) {
-                ESP_LOGW("WiFiWD", "Wi-Fi driver not initialized yet; delaying watchdog");
-                vTaskDelay(pdMS_TO_TICKS(5000));
-                continue;
-            }
-            esp_err_t rc = esp_wifi_connect();
-            if (rc != ESP_OK) {
-                ESP_LOGW("WiFiWD", "esp_wifi_connect rc=%s", esp_err_to_name(rc));
-            }
-            last_connect_attempt_ms = now_ms;
-        } else {
-            ESP_LOGD("WiFiWD", "Skipping connect attempt (debounced)");
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(backoff_ms));
-
-        backoff_ms = MIN(backoff_ms * 2, BACKOFF_CAP_MS);
-
-        if (wifi_retry == SOFT_RESET_AFTER) {
-            ESP_LOGE("WiFiWD", "Soft-resetting WS clients after %d retries", wifi_retry);
-            // stop/destroy clients without deep-stack locals
-            if (ws_client_audio) {
-                esp_websocket_client_stop(ws_client_audio);
-                esp_websocket_client_destroy(ws_client_audio);
-                ws_client_audio = NULL;
-                atomic_store(&ws_audio_connected, false);
-            }
-            if (ws_client_ctrl) {
-                esp_websocket_client_stop(ws_client_ctrl);
-                esp_websocket_client_destroy(ws_client_ctrl);
-                ws_client_ctrl = NULL;
-                atomic_store(&ws_ctrl_connected, false);
-            }
-            if (stream_server) {
-                httpd_stop(stream_server);
-                stream_server = NULL;
-            }
-
-            esp_err_t stop_rc = esp_wifi_stop();
-            ESP_LOGI("WiFiWD", "esp_wifi_stop rc=%s", esp_err_to_name(stop_rc));
-            vTaskDelay(pdMS_TO_TICKS(200));
-            esp_err_t start_rc = esp_wifi_start();
-            if (start_rc == ESP_OK) {
-                wifi_stack_started = true;
-                ESP_LOGI("WiFiWD", "esp_wifi_start after soft reset OK");
-            } else {
-                ESP_LOGW("WiFiWD", "esp_wifi_start after soft reset rc=%s", esp_err_to_name(start_rc));
-            }
-            backoff_ms = 2000;
-        }
-
-        if (wifi_retry >= HARD_REBOOT_AFTER) {
-            ESP_LOGE("WiFiWD", "Too many Wi-Fi failures (%d). Rebooting as last resort.", wifi_retry);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            esp_wifi_stop();
-            esp_bt_controller_disable();
-            vTaskDelay(pdMS_TO_TICKS(200));
-            esp_restart();
-        }
-
-        // Periodically print stack high-water to tune the size (every N loops)
-        static int loop_cnt = 0;
-        if ((loop_cnt++ & 0x3) == 0) { // every 4 iterations
-            UBaseType_t hw = uxTaskGetStackHighWaterMark(NULL);
-            ESP_LOGD("WiFiWD", "wifi_wdt_task high-water left (words): %u", (unsigned)hw);
-        }
-    }
-}
-
 static void wifi_init_sta(const char *ssid, const char *pass) {
     ESP_LOGI("WiFi", "Initializing Wi-Fi stack...");
 
@@ -1540,8 +2003,16 @@ static void wifi_init_sta(const char *ssid, const char *pass) {
 
     // Always init core subsystems — these are idempotent
     ESP_ERROR_CHECK(esp_netif_init());
-    esp_event_loop_create_default();  // safe even if already exists
-    esp_netif_create_default_wifi_sta();  // always ensure STA interface exists
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE("WiFi", "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
+    }
+
+    // ensure STA netif exists but do not assert if already present
+    esp_netif_t *sta_netif = ensure_sta_netif();
+    if (!sta_netif) {
+        ESP_LOGW("WiFi", "Failed to ensure STA netif; continuing but esp_wifi may fail");
+    }
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -1575,7 +2046,7 @@ static void wifi_init_sta(const char *ssid, const char *pass) {
         ESP_LOGW("WiFi", "esp_wifi_set_max_tx_power rc=%s", esp_err_to_name(rc));
 
     // Spawn watchdog after Wi-Fi confirmed up
-    xTaskCreate(wifi_watchdog_task, "wifi_wdt_task", 8192, NULL, 2, NULL);
+    //xTaskCreate(wifi_watchdog_task, "wifi_wdt_task", 8192, NULL, 2, NULL);
 }
 
 // ─────────────────────────────────────────────
@@ -1611,16 +2082,60 @@ void ble_on_wifi_creds_received(const char *json_str) {
     save_wifi_creds(creds.ssid, creds.pass, creds.ip, creds.port);
 
     ESP_LOGI("BLE_CFG", "Parsed Wi-Fi creds: ssid=%s pass=%s", creds.ssid, creds.pass);
+    nvs_handle_t nvs;
+    if (nvs_open("wifi", NVS_READWRITE, &nvs) == ESP_OK) {
+        nvs_erase_all(nvs);
+        nvs_close(nvs);
+    }
 
+    // 🔧 Immediately update runtime URIs
+    snprintf(WS_CTRL_URI, sizeof(WS_CTRL_URI), "ws://%s:%s/ws", creds.ip, creds.port);
+    snprintf(WS_AUDIO_URI, sizeof(WS_AUDIO_URI), "ws://%s:%s/data/audio", creds.ip, creds.port);
+    snprintf(OTA_URL, sizeof(OTA_URL), "http://%s:%s/ota/latest.bin", creds.ip, creds.port);
+    snprintf(TELEMETRY_URL, sizeof(TELEMETRY_URL), "http://%s:%s/esp/telemetry", creds.ip, creds.port);
+
+    ESP_LOGI("BLE_CFG", "Updated runtime URIs:");
+    ESP_LOGI("BLE_CFG", "  CTRL=%s", WS_CTRL_URI);
+    ESP_LOGI("BLE_CFG", "  AUDIO=%s", WS_AUDIO_URI);
 
     // ACK right away
     ble_send_json_response("{\"status\":\"OK\",\"msg\":\"WiFi credentials saved\"}");
 
-    // Spawn wifi_init_task (safe; does heavy work off the BLE host)
-    // Use heap copy or queue; we do a heap allocated copy then create the task.
+
+    // If Wi-Fi stack already started, update config in short task to avoid double-init.
     wifi_creds_t *heap_creds = malloc(sizeof(wifi_creds_t));
-    if (heap_creds) {
-        memcpy(heap_creds, &creds, sizeof(wifi_creds_t));
+    if (!heap_creds) {
+        ESP_LOGE("BLE_CFG", "malloc failed for wifi creds");
+        cJSON_Delete(root);
+        return;
+    }
+    memcpy(heap_creds, &creds, sizeof(wifi_creds_t));
+
+    if (wifi_stack_started) {
+
+        if (ws_client_ctrl) {
+            esp_websocket_client_stop(ws_client_ctrl);
+            esp_websocket_client_destroy(ws_client_ctrl);
+            ws_client_ctrl = NULL;
+        }
+        if (ws_client_audio) {
+            esp_websocket_client_stop(ws_client_audio);
+            esp_websocket_client_destroy(ws_client_audio);
+            ws_client_audio = NULL;
+        }
+
+        start_wifi_watchdog_if_needed();
+
+        // Wi-Fi driver already initialized — reconfigure instead of reinitializing
+        BaseType_t rc = xTaskCreate(wifi_reconfigure_task, "wifi_recfg", 4096, heap_creds, 5, NULL);
+        if (rc != pdPASS) {
+            ESP_LOGE("BLE_CFG", "Failed to create wifi_reconfigure_task");
+            free(heap_creds);
+        } else {
+            ESP_LOGI("BLE_CFG", "wifi_reconfigure_task created (reconfigure path)");
+        }
+    } else {
+        // Wi-Fi stack not started — do full init in wifi_init_task
         BaseType_t rc = xTaskCreate(wifi_init_task, "wifi_init_task", 12288, heap_creds, 3, NULL);
         ESP_LOGI("BLE_CFG", "wifi_init_task create result: %d", rc);
         if (rc != pdPASS) {
@@ -1629,9 +2144,8 @@ void ble_on_wifi_creds_received(const char *json_str) {
         } else {
             ESP_LOGI("BLE_CFG", "wifi_init_task created successfully");
         }
-    } else {
-        ESP_LOGE("BLE_CFG", "malloc failed for wifi creds");
     }
+
 
     cJSON_Delete(root);
 }
@@ -1700,7 +2214,7 @@ static void telemetry_push_task(void *arg) {
 
         char json[256];
         snprintf(json, sizeof(json),
-                "{\"device_id\":\"Speechster_B1\",\"heap\":%u,\"frames_sent\":%" PRIu32 ",\"temp\":%.2f}",
+                "{\"device_id\":\"speechster_b1_s3\",\"heap\":%u,\"frames_sent\":%" PRIu32 ",\"temp\":%.2f}",
                 (unsigned)esp_get_free_heap_size(), frames_sent, temp);
 
         esp_http_client_config_t cfg = {
@@ -1715,7 +2229,7 @@ static void telemetry_push_task(void *arg) {
         esp_http_client_perform(client);
         esp_http_client_cleanup(client);
 
-        vTaskDelay(pdMS_TO_TICKS(10000)); // every 10s
+        vTaskDelay(pdMS_TO_TICKS(30000)); // every 10s
     }
 }
 
@@ -1769,7 +2283,6 @@ static void thermal_watchdog_task(void *arg)
         float t = read_temperature_c();
         t = smooth_temp(t);
         if (t > -100.0f) { // valid reading
-            ESP_LOGI("THERMAL", "Internal temp: %.2f °C", t);
 
             if (!wifi_stack_started) {
                 ESP_LOGD("THERMAL", "Wi-Fi stack not started yet; skipping TX power adjust");
@@ -1976,9 +2489,15 @@ static void ws_manager_task(void *arg)
 
 /* ---------- app_main ---------- */
 void app_main(void) {
+    esp_log_set_vprintf(vprintf);
+    esp_log_level_set("*", ESP_LOG_INFO);
+
     esp_log_level_set("NimBLE", ESP_LOG_ERROR);
-    esp_log_level_set("wifi", ESP_LOG_DEBUG);
-    esp_log_level_set("wifi_init", ESP_LOG_DEBUG);
+    esp_log_level_set("I2S_CAP", ESP_LOG_DEBUG);
+
+    esp_err_t esp_brownout_disable(void);
+    esp_brownout_disable();
+
 
     ESP_LOGI(TAG, "Speechster B1 Starting Up");
 
@@ -1990,20 +2509,20 @@ void app_main(void) {
         return;
     }
 
-    // --- I2S Init ---
-    i2s_init_inmp441();
-
     // --- Preallocate DMA Buffers ---
-    const size_t frame_bytes = ((AUDIO_SAMPLE_RATE / 1000) * 10) * sizeof(int32_t);
-    i2s_dma_buf = heap_caps_malloc(frame_bytes, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    pcm_dma_buf = heap_caps_malloc(frame_bytes / 2, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    if (!i2s_dma_buf || !pcm_dma_buf) {
-        ESP_LOGE(TAG, "Failed to alloc I2S DMA buffers");
+    // Ensure DMA buffer is at least the I2S read size (I2S_BUF_SIZE)
+    const size_t frame_sample_bytes = ((AUDIO_SAMPLE_RATE / 1000) * AUDIO_FRAME_MS) * sizeof(int32_t);
+    const size_t required_bytes = MAX(frame_sample_bytes, (size_t)I2S_BUF_SIZE);
+
+    i2s_dma_buf = heap_caps_malloc(required_bytes, MALLOC_CAP_DMA);
+    if (!i2s_dma_buf) {
+        ESP_LOGE(TAG, "Failed to alloc I2S DMA buffers (need %u bytes)", (unsigned)required_bytes);
         return;
     }
 
     ctrl_queue = xQueueCreate(CTRL_QUEUE_LEN, sizeof(control_msg_t));
-    wifi_send_q = xQueueCreate(WIFI_SEND_QUEUE_LEN, sizeof(wifi_frame_t));
+    // pointer-based queue now (each item = pointer to wifi_frame_t)
+    wifi_send_q = xQueueCreate(WIFI_SEND_QUEUE_LEN, sizeof(wifi_frame_t *));
 
     if (!ctrl_queue || !wifi_send_q) {
         ESP_LOGE(TAG, "Queue alloc failed");
@@ -2032,30 +2551,43 @@ void app_main(void) {
     // --- Now Wi-Fi (loads from NVS or BLE JSON later) ---
     loadNVSData();
 
-    // --- Enable PM *after* radios are initialized ---
+    // ─── Power / PM setup ──────────────────────────────────────
     setup_power_management();
     xTaskCreatePinnedToCore(dynamic_pm_task, "pm_adapt", 4096, NULL, 2, NULL, 1);
 
-    // --- Temperature sensor last ---
+    // ─── Temperature sensor init ───────────────────────────────
     init_temp_sensor();
 
-    // --- Start tasks only after dependencies exist ---
-    xTaskCreatePinnedToCore(control_task, "ctrl_task", 6144, NULL, 5, NULL, 1);
-    xTaskCreatePinnedToCore(wifi_send_task, "wifi_send", 8192, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(i2s_capture_task, "i2s_cap", 16*1024, NULL, 4, NULL, 0);
+    // ─── Core assignments ──────────────────────────────────────
+
+    // Core 0 → network / control / light sensors
+    xTaskCreatePinnedToCore(control_task, "ctrl_task", 6144, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(wifi_send_task, "wifi_send", 8192, NULL, 4, NULL, 0);
     xTaskCreatePinnedToCore(pSensor_task, "pSensor", 4096, NULL, 3, NULL, 0);
 
-    // Thermal tasks after Wi-Fi init so esp_wifi_set_max_tx_power() is valid
-    vTaskDelay(pdMS_TO_TICKS(3000));  // Let Wi-Fi init
+    // Core 1 → audio / power / thermal / telemetry
+    
+    // Capture and store the task handle so notify_i2s_start/stop work
+    if (xTaskCreatePinnedToCore(i2s_capture_task, "i2s_cap", 20*1024, NULL, 5, &i2s_task_handle, 1) != pdPASS) {
+        ESP_LOGE(TAG, "Failed to create i2s_capture_task");
+        i2s_task_handle = NULL;
+    }
     xTaskCreatePinnedToCore(thermal_watchdog_task, "thermal_wd", 4096, NULL, 3, NULL, 1);
     xTaskCreatePinnedToCore(die_temperature_task, "die_temp", 4096, NULL, 5, NULL, 1);
-
-    // Optional: telemetry push task
     xTaskCreatePinnedToCore(telemetry_push_task, "telemetry_push", 4096, NULL, 3, NULL, 1);
+
+/*    // --- Spawn mic test only after I²S fully ready ---
+    vTaskDelay(pdMS_TO_TICKS(500));  // give time for I²S and DMA init
+    if (rx_chan) {
+        ESP_LOGI("DBG", "Spawning mic_test_task_debug (I²S ready)");
+        xTaskCreate(mic_test_task_debug, "mic_debug", 4096, NULL, 5, NULL);
+    } else {
+        ESP_LOGE("DBG", "Skipping mic debug — rx_chan not initialized");
+    } */
 
     vTaskDelay(pdMS_TO_TICKS(300));
     printf("\033[2J\033[H");  // Clear screen
     print_b1_banner();
-
+    
     ESP_LOGI(TAG, "Build %s (%s) — IDF %s", __DATE__, __TIME__, esp_get_idf_version());
 }
